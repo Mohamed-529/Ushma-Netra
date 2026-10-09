@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { ActiveTab, BuildingAudit, VendorTelemetry, IncidentLog } from './types';
+import React, { useState, useEffect } from 'react';
+import { BuildingAudit, VendorTelemetry, IncidentLog } from './types';
 import { INITIAL_BUILDINGS, INITIAL_VENDORS, INITIAL_LOGS } from './data/mockData';
-import { Navigation } from './components/Navigation';
-import { Thermal3DTwin } from './components/Thermal3DTwin';
-import { FacadeComputerVisionScanner } from './components/FacadeComputerVisionScanner';
-import { ThermalDebtLedger } from './components/ThermalDebtLedger';
-import { VendorIoTBeacon } from './components/VendorIoTBeacon';
-import { AWSArchitectureExplorer } from './components/AWSArchitectureExplorer';
-import { Flame, ShieldAlert, AlertTriangle, CheckCircle2, ArrowRight, Zap, Info, X } from 'lucide-react';
+import { HeroAct } from './components/narrative/HeroAct';
+import { TensionAct } from './components/narrative/TensionAct';
+import { HumanCrisisAct } from './components/narrative/HumanCrisisAct';
+import { InsightAct } from './components/narrative/InsightAct';
+import { LiveCenterpieceAct } from './components/narrative/LiveCenterpieceAct';
+import { ArchitectureAct } from './components/narrative/ArchitectureAct';
+import { ProofAct } from './components/narrative/ProofAct';
+import { ClosingAct } from './components/narrative/ClosingAct';
+import { FloatingChapterNav } from './components/narrative/FloatingChapterNav';
+import { AlertTriangle, X, Flame } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('3d_twin');
   const [buildings, setBuildings] = useState<BuildingAudit[]>(INITIAL_BUILDINGS);
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingAudit>(INITIAL_BUILDINGS[0]);
   const [vendors, setVendors] = useState<VendorTelemetry[]>(INITIAL_VENDORS);
@@ -18,8 +20,35 @@ export default function App() {
   const [isMitigated, setIsMitigated] = useState<boolean>(false);
   const [logs, setLogs] = useState<IncidentLog[]>(INITIAL_LOGS);
   const [surgeAlertOpen, setSurgeAlertOpen] = useState<boolean>(false);
+  const [currentAct, setCurrentAct] = useState<string>('act-hero');
 
-  // Trigger peak crisis simulation
+  // Track active section for floating navigator
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['act-hero', 'act-tension', 'act-human', 'act-insight', 'live-system', 'architecture', 'proof'];
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= window.innerHeight * 0.4 && rect.bottom >= window.innerHeight * 0.1) {
+            setCurrentAct(id);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Trigger peak crisis surge simulation
   const handleSimulateSurge = () => {
     setIsMitigated(false);
     setSurgeAlertOpen(true);
@@ -62,208 +91,97 @@ export default function App() {
       detail: `${selectedBuilding.name} deployed verified thermal diversion. Street heat delta reduced by 4.2°C; surcharge discounted.`,
     };
     setLogs((prev) => [newLog, ...prev]);
-    setActiveTab('3d_twin');
+    scrollToSection('live-system');
   };
 
   return (
-    <div className="min-h-screen bg-[#090D16] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
-      {/* Top Bar Navigation */}
-      <Navigation
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
+      {/* Act I: Cinematic Hero Opening */}
+      <div id="act-hero">
+        <HeroAct onExploreClick={() => scrollToSection('act-tension')} />
+      </div>
+
+      {/* Act II: The Thermodynamic Injustice */}
+      <div id="act-tension">
+        <TensionAct />
+      </div>
+
+      {/* Act III: The Human Crisis (Why This Matters Moment) */}
+      <div id="act-human">
+        <HumanCrisisAct />
+      </div>
+
+      {/* Act IV: The Regulatory & Technological Breakthrough */}
+      <div id="act-insight">
+        <InsightAct onScrollToLive={() => scrollToSection('live-system')} />
+      </div>
+
+      {/* Act V: The Live Working System (Centerpiece) */}
+      <LiveCenterpieceAct
+        building={selectedBuilding}
+        allBuildings={buildings}
+        onSelectBuilding={setSelectedBuilding}
+        vendor={selectedVendor}
+        allVendors={vendors}
+        onSelectVendor={setSelectedVendor}
+        isMitigated={isMitigated}
+        onMitigationToggle={(m) => setIsMitigated(m)}
+        onApplyMitigation={handleApplyMitigation}
         onSimulateSurge={handleSimulateSurge}
       />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Editorial Context Kicker */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-amber-400 mb-1">
-              <span>TRACK 02: HEAT & WATER</span>
-              <span>·</span>
-              <span>THE AC EXHAUST "DEATH LOOP"</span>
-              <span>·</span>
-              <span className="text-emerald-400">AWS ENVIRONMENTAL HACKATHON</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Ushma-Netra: Autonomous Thermal Equity & AC Exhaust Debt Grid
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-4xl leading-relaxed">
-              Air conditioners don't destroy heat—they transfer indoor cooling and dump 50°C+ exhaust into narrow alleys, artificially baking street vendors and informal settlements. Ushma-Netra is the world's first AI platform to map, quantify, and penalize micro-thermal exhaust dumping on AWS.
-            </p>
-          </div>
+      {/* Act VI: AWS Cloud Infrastructure Architecture */}
+      <ArchitectureAct />
 
-          {/* Quick Stats Pill Replacement */}
-          <div className="flex items-center gap-4 text-xs font-mono shrink-0">
-            <div className="bg-slate-900/90 px-3.5 py-2 rounded-lg border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">MONITORED REJECTION</span>
-              <span className="font-bold text-red-400 text-sm">638.4 kW Waste Heat</span>
-            </div>
-            <div className="bg-slate-900/90 px-3.5 py-2 rounded-lg border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">CURRENT STREET DELTA</span>
-              <span className={`font-bold text-sm ${isMitigated ? 'text-emerald-400' : 'text-amber-400'}`}>
-                {isMitigated ? '+1.2°C (Mitigated)' : '+6.6°C (Unmitigated)'}
-              </span>
-            </div>
-          </div>
-        </div>
+      {/* Act VII: Proof, Field Validation & Measured Metrics */}
+      <ProofAct />
 
-        {/* Tab View Switching */}
-        {activeTab === '3d_twin' && (
-          <div className="space-y-6">
-            <Thermal3DTwin
-              building={selectedBuilding}
-              vendor={selectedVendor}
-              onMitigationToggle={(mitigated) => setIsMitigated(mitigated)}
-            />
+      {/* Act VIII: The Finale */}
+      <ClosingAct
+        onBackToTop={() => scrollToSection('act-hero')}
+        onExploreSystem={() => scrollToSection('live-system')}
+      />
 
-            {/* Quick Context Strip */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-red-950/60 border border-red-800 flex items-center justify-center shrink-0">
-                  <Flame className="w-4 h-4 text-red-400" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-white">The Thermodynamic Injustice</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                    64 AC outdoor units eject 53.6°C exhaust horizontally into the 7.2m alley. Indoor occupants enjoy 22°C while street workers endure 48°C.
-                  </div>
-                </div>
-              </div>
+      {/* Floating Chapter Progress Navigation */}
+      <FloatingChapterNav
+        currentAct={currentAct}
+        onNavigateAct={scrollToSection}
+        onSimulateSurge={handleSimulateSurge}
+      />
 
-              <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-950/60 border border-amber-800 flex items-center justify-center shrink-0">
-                  <AlertTriangle className="w-4 h-4 text-amber-400" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-white">Human Collateral Damage</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                    Vendor Rameshwar Pal is positioned 2.8m from the exhaust jet. Wet Bulb Globe Temperature reaches 36.8°C—crossing the physiological survivability threshold.
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-950/60 border border-emerald-800 flex items-center justify-center shrink-0">
-                  <ShieldAlert className="w-4 h-4 text-emerald-400" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-white">The Ushma-Netra Fix</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                    Mandatory 45° upward aerodynamic deflector cowls redirect exhaust towards the roofline, cooling the street by 3.8°C.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'cv_scanner' && (
-          <FacadeComputerVisionScanner
-            building={selectedBuilding}
-            onSelectBuilding={setSelectedBuilding}
-            allBuildings={buildings}
-            onOpenLedger={() => setActiveTab('thermal_debt')}
-          />
-        )}
-
-        {activeTab === 'thermal_debt' && (
-          <ThermalDebtLedger
-            buildings={buildings}
-            selectedBuilding={selectedBuilding}
-            onSelectBuilding={setSelectedBuilding}
-            vendor={selectedVendor}
-            onApplyMitigation={handleApplyMitigation}
-          />
-        )}
-
-        {activeTab === 'vendor_iot' && (
-          <VendorIoTBeacon
-            vendor={selectedVendor}
-            allVendors={vendors}
-            onSelectVendor={setSelectedVendor}
-            isMitigated={isMitigated}
-          />
-        )}
-
-        {activeTab === 'aws_architecture' && (
-          <AWSArchitectureExplorer />
-        )}
-
-        {/* Real-Time Live Activity & Incident Stream */}
-        <div className="bg-slate-900/80 rounded-xl border border-slate-800 p-5 space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-mono text-slate-300 font-semibold uppercase tracking-wider">
-                Live Incident & Agentic Escalation Audit Feed
-              </span>
-            </div>
-            <span className="text-[11px] font-mono text-slate-500">
-              AWS EventBridge Event Bus · Real-Time Dispatch
-            </span>
-          </div>
-
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {logs.map((log) => (
-              <div
-                key={log.id}
-                className="p-3 bg-slate-950/80 rounded-lg border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="font-mono text-slate-500 text-[11px] shrink-0">
-                    {log.timestamp}
-                  </span>
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ${
-                    log.tier === 1 ? 'bg-amber-950 text-amber-300 border border-amber-800' :
-                    log.tier === 2 ? 'bg-red-950 text-red-300 border border-red-800' :
-                    'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                  }`}>
-                    Tier {log.tier}
-                  </span>
-                  <span className="font-semibold text-slate-200">{log.title}:</span>
-                  <span className="text-slate-400">{log.detail}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-
-      {/* Surge Disaster Modal */}
+      {/* Emergency Surge Modal */}
       {surgeAlertOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-red-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative space-y-4">
             <button
               onClick={() => setSurgeAlertOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white cursor-pointer"
+              className="absolute top-5 right-5 text-slate-400 hover:text-white cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-3 text-red-400 border-b border-slate-800 pb-3">
-              <div className="w-10 h-10 rounded-xl bg-red-950/80 border border-red-800 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-400" />
+            <div className="flex items-center gap-3 text-red-400 border-b border-slate-800 pb-4">
+              <div className="w-11 h-11 rounded-2xl bg-red-950/80 border border-red-800 flex items-center justify-center">
+                <Flame className="w-6 h-6 text-red-500 fill-current" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Peak AC Heat Exhaust Surge</h3>
-                <span className="text-xs font-mono text-red-400">Micro-Thermal Hazard Alert #UN-709</span>
+                <h3 className="text-lg font-bold text-white">Peak AC Heat Exhaust Surge</h3>
+                <span className="text-xs font-mono text-red-400">Hazard Code: #UN-DELHI-01-CRITICAL</span>
               </div>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-300 leading-relaxed">
+            <div className="space-y-3 text-xs text-slate-300 leading-relaxed font-sans">
               <p>
-                All 70 split and VRF AC outdoor units at <strong>{selectedBuilding.name}</strong> have surged to 100% capacity due to 41.2°C ambient city temperatures.
+                All 70 split and VRF AC outdoor units at <strong>{selectedBuilding.name}</strong> surged to 100% capacity due to 41.2°C ambient city temperatures.
               </p>
-              <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 font-mono text-xs space-y-1">
+              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Exhaust Heat Rejection:</span>
+                  <span className="text-slate-400">Continuous Waste Heat Rejection:</span>
                   <span className="text-red-400 font-bold">638.4 kW continuous</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Alleyway Temperature:</span>
-                  <span className="text-amber-400 font-bold">47.8°C (+6.6°C artificial delta)</span>
+                  <span className="text-slate-400">Street Alleyway Air Temp:</span>
+                  <span className="text-amber-400 font-bold">47.8°C (+6.6°C delta)</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Vendor Rameshwar Pal WBGT:</span>
@@ -275,45 +193,20 @@ export default function App() {
               </p>
             </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            <div className="pt-2 flex justify-end gap-3">
               <button
                 onClick={() => {
                   setSurgeAlertOpen(false);
-                  setActiveTab('vendor_iot');
+                  scrollToSection('live-system');
                 }}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium cursor-pointer"
+                className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition-colors cursor-pointer"
               >
-                Inspect Vendor Beacon
-              </button>
-              <button
-                onClick={() => {
-                  setSurgeAlertOpen(false);
-                  setActiveTab('thermal_debt');
-                }}
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-bold cursor-pointer"
-              >
-                Review Legal Notice
+                Inspect Live 3D Canyon Reaction
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Clean Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-950/60 py-6 mt-12 text-xs text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-300">Ushma-Netra</span>
-            <span>·</span>
-            <span>AI Thermal Equity & AC Exhaust Debt Grid</span>
-            <span>·</span>
-            <span>Track 02 (Heat & Water)</span>
-          </div>
-          <div className="text-slate-400 font-mono text-[11px]">
-            Engineered on AWS Serverless (Bedrock, SageMaker, IoT Core, Step Functions)
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
