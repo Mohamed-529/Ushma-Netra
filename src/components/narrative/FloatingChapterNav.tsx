@@ -33,6 +33,7 @@ export const FloatingChapterNav: React.FC<Props> = ({
     { id: 'live-system', label: 'V. Live 3D' },
     { id: 'architecture', label: 'VI. Cloud' },
     { id: 'proof', label: 'VII. Proof' },
+    { id: 'interactive-readme', label: 'VIII. 3D Readme' },
   ];
 
   return (

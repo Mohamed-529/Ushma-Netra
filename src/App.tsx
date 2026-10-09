@@ -8,6 +8,7 @@ import { InsightAct } from './components/narrative/InsightAct';
 import { LiveCenterpieceAct } from './components/narrative/LiveCenterpieceAct';
 import { ArchitectureAct } from './components/narrative/ArchitectureAct';
 import { ProofAct } from './components/narrative/ProofAct';
+import { Interactive3DReadme } from './components/Interactive3DReadme';
 import { ClosingAct } from './components/narrative/ClosingAct';
 import { FloatingChapterNav } from './components/narrative/FloatingChapterNav';
 import { AlertTriangle, X, Flame } from 'lucide-react';
@@ -25,7 +26,7 @@ export default function App() {
   // Track active section for floating navigator
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['act-hero', 'act-tension', 'act-human', 'act-insight', 'live-system', 'architecture', 'proof'];
+      const sections = ['act-hero', 'act-tension', 'act-human', 'act-insight', 'live-system', 'architecture', 'proof', 'interactive-readme'];
       for (const id of sections) {
         const el = document.getElementById(id);
         if (el) {
@@ -136,7 +137,12 @@ export default function App() {
       {/* Act VII: Proof, Field Validation & Measured Metrics */}
       <ProofAct />
 
-      {/* Act VIII: The Finale */}
+      {/* Act VIII: Interactive 3D Documentation Tome (Readme Spec) */}
+      <div id="interactive-readme">
+        <Interactive3DReadme />
+      </div>
+
+      {/* Act IX: The Finale */}
       <ClosingAct
         onBackToTop={() => scrollToSection('act-hero')}
         onExploreSystem={() => scrollToSection('live-system')}
