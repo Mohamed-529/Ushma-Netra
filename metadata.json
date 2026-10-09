@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Ushma-Netra | AI Thermal Equity & AC Exhaust Debt Grid",
+  "description": "The world's first AI-powered micro-thermal exhaust mapping and thermal debt grid, tracking AC waste heat dumping, street canyon collateral damage, and autonomous municipal mitigation on AWS.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
