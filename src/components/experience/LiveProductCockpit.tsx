@@ -272,6 +272,7 @@ export const LiveProductCockpit: React.FC<Props> = ({
             <Thermal3DTwin
               building={building}
               vendor={vendor}
+              isMitigated={isMitigated}
               onMitigationToggle={onMitigationToggle}
             />
           )}

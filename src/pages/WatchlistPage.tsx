@@ -135,7 +135,7 @@ export const WatchlistPage: React.FC<Props> = ({
                 navigate('/');
               }
             }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 border border-zinc-750 text-xs font-mono font-medium transition-all cursor-pointer shadow-sm group"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-bold transition-all cursor-pointer shadow-sm group"
             title="Return to previous screen"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
@@ -144,7 +144,7 @@ export const WatchlistPage: React.FC<Props> = ({
 
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 text-xs font-mono transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-medium transition-colors"
             title="Return to Home Overview"
           >
             <Home className="w-3.5 h-3.5" />
@@ -152,30 +152,30 @@ export const WatchlistPage: React.FC<Props> = ({
           </Link>
         </div>
 
-        <nav className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-          <Link to="/" className="hover:text-amber-400 transition-colors">
+        <nav className="flex items-center gap-2 text-xs font-mono text-[#0b1b2d]/70">
+          <Link to="/" className="hover:text-[#a8321a] transition-colors">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
-          <span className="text-amber-400 font-semibold">Heat Surge Watchlist & Alert Center</span>
+          <ChevronRight className="w-3.5 h-3.5 text-[#0b1b2d]/40" />
+          <span className="text-[#a8321a] font-bold">Heat Surge Watchlist &amp; Alert Center</span>
         </nav>
       </div>
 
       {/* Hero Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-zinc-800/80">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#d6cebe]">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+            <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-100 text-rose-900 border border-rose-300 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
               <span>Real-Time Alert Feed</span>
             </span>
-            <span className="text-zinc-500 text-xs font-mono">·</span>
-            <span className="text-zinc-400 text-xs font-mono">Early Warning System</span>
+            <span className="text-[#0b1b2d]/40 text-xs font-mono">·</span>
+            <span className="text-[#0b1b2d]/80 text-xs font-mono font-semibold">Early Warning System</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            Heat Surge Watchlist & Alert Center
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0b1b2d]">
+            Heat Surge Watchlist &amp; Alert Center
           </h1>
-          <p className="text-sm text-zinc-400 max-w-2xl leading-relaxed">
+          <p className="text-sm text-[#1f3044] max-w-2xl leading-relaxed">
             Monitor flagged high-vulnerability urban micro-canyons, simulate multi-lingual WhatsApp/SMS emergency dispatches to street vendors, and inspect autonomous SCADA mitigation logs.
           </p>
         </div>
@@ -183,9 +183,9 @@ export const WatchlistPage: React.FC<Props> = ({
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={onSimulateSurge}
-            className="px-4 py-2 rounded-xl bg-red-950/80 hover:bg-red-900 border border-red-800 text-red-200 text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-red-950/40"
+            className="px-4 py-2.5 rounded-xl bg-red-100 hover:bg-red-200 border border-red-300 text-red-900 text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer shadow-xs"
           >
-            <Flame className="w-4 h-4 text-red-400 animate-pulse" />
+            <Flame className="w-4 h-4 text-red-700 animate-pulse" />
             <span>Simulate City-Wide Surge</span>
           </button>
         </div>
@@ -195,11 +195,11 @@ export const WatchlistPage: React.FC<Props> = ({
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-400" />
+            <h2 className="text-xl font-bold text-[#0b1b2d] flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#a8321a]" />
               <span>My Monitored Hotspot Watchlist ({watchlistedBuildings.length})</span>
             </h2>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-[#1f3044]">
               Zones currently pinned for sub-second lethal temperature threshold alerts.
             </p>
           </div>
@@ -207,13 +207,13 @@ export const WatchlistPage: React.FC<Props> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={addAllCritical}
-              className="text-xs font-mono text-amber-400 hover:text-amber-300 underline cursor-pointer"
+              className="text-xs font-mono text-[#a8321a] hover:underline font-bold cursor-pointer"
             >
               + Add All Critical Hotspots
             </button>
             <Link
               to="/grid"
-              className="text-xs font-mono text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 transition-colors"
+              className="text-xs font-mono text-[#0b1b2d] hover:text-[#a8321a] px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] border border-[#d6cebe] transition-colors font-bold"
             >
               Browse Registry
             </Link>
@@ -221,13 +221,13 @@ export const WatchlistPage: React.FC<Props> = ({
         </div>
 
         {watchlistedBuildings.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-zinc-900/30 border border-dashed border-zinc-800 text-center space-y-3">
-            <p className="text-sm text-zinc-400">Your watchlist is currently empty.</p>
+          <div className="p-8 rounded-2xl bg-[#efe8dc] border border-dashed border-[#d6cebe] text-center space-y-3">
+            <p className="text-sm text-[#1f3044]">Your watchlist is currently empty.</p>
             <button
               onClick={addAllCritical}
-              className="px-4 py-2 rounded-xl bg-amber-500 text-zinc-950 font-mono font-bold text-xs"
+              className="px-4 py-2 rounded-xl bg-[#0b1b2d] text-white font-mono font-bold text-xs cursor-pointer"
             >
-              Add Critical Delhi & Mumbai Nodes
+              Add Critical Delhi &amp; Mumbai Nodes
             </button>
           </div>
         ) : (
@@ -235,52 +235,52 @@ export const WatchlistPage: React.FC<Props> = ({
             {watchlistedBuildings.map((b) => (
               <div
                 key={b.id}
-                className="bg-[#0e0e14] rounded-xl border border-zinc-800 hover:border-amber-500/50 p-4 transition-all flex flex-col justify-between"
+                className="bg-[#efe8dc] rounded-2xl border border-[#d6cebe] hover:border-[#b8ad9d] p-5 transition-all flex flex-col justify-between shadow-sm"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div>
-                      <span className="text-[10px] font-mono uppercase text-zinc-500">
+                      <span className="text-[10px] font-mono uppercase text-[#526071] font-bold">
                         {b.city} ({b.district})
                       </span>
-                      <h4 className="text-sm font-bold text-white">{b.name}</h4>
+                      <h4 className="text-sm font-bold text-[#0b1b2d]">{b.name}</h4>
                     </div>
                     <button
                       onClick={() => removeFromWatchlist(b.id)}
-                      className="text-zinc-600 hover:text-red-400 transition-colors p-1"
+                      className="text-[#526071] hover:text-red-700 transition-colors p-1 cursor-pointer"
                       title="Remove from Watchlist"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-zinc-950 border border-zinc-850 flex items-center justify-between my-2">
+                  <div className="p-3.5 rounded-xl bg-[#f5efe6] border border-[#d6cebe] flex items-center justify-between my-2 shadow-xs">
                     <div>
-                      <span className="text-[10px] font-mono text-zinc-500 block">Plume Temp</span>
-                      <span className="text-lg font-black font-mono text-amber-400">
+                      <span className="text-[10px] font-mono text-[#526071] font-bold block uppercase">Plume Temp</span>
+                      <span className="text-lg font-black font-mono text-[#a8321a]">
                         {b.streetPlumeTempCelsius}°C
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] font-mono text-zinc-500 block">Exposed</span>
-                      <span className="text-lg font-black font-mono text-rose-400">
+                      <span className="text-[10px] font-mono text-[#526071] font-bold block uppercase">Exposed</span>
+                      <span className="text-lg font-black font-mono text-rose-800">
                         {b.adjacentVulnerablePopulation.vendorsCount} vendors
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-zinc-850 flex items-center justify-between text-xs font-mono">
+                <div className="pt-3 border-t border-[#d6cebe] flex items-center justify-between text-xs font-mono">
                   <span
-                    className={`text-[10px] uppercase font-bold ${
-                      b.thermalDebtScore >= 85 ? 'text-red-400' : 'text-amber-400'
+                    className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-md ${
+                      b.thermalDebtScore >= 85 ? 'bg-red-100 text-red-900 border border-red-300' : 'bg-amber-100 text-amber-900 border border-amber-300'
                     }`}
                   >
                     Debt: {b.thermalDebtScore}/100
                   </span>
                   <Link
                     to={`/grid/${b.id}`}
-                    className="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold"
+                    className="text-[#a8321a] hover:text-[#8c2210] flex items-center gap-1 font-bold"
                   >
                     <span>Inspect</span>
                     <ArrowRight className="w-3 h-3" />
@@ -293,16 +293,16 @@ export const WatchlistPage: React.FC<Props> = ({
       </div>
 
       {/* Section 2: Interactive SMS & WhatsApp Early Warning Dispatch Simulator */}
-      <div className="bg-[#0c0c14] rounded-2xl border border-zinc-800 p-6 sm:p-8 space-y-6 shadow-xl">
-        <div className="space-y-1 pb-4 border-b border-zinc-800">
-          <div className="flex items-center gap-2 text-xs font-mono text-amber-400">
+      <div className="bg-[#efe8dc] rounded-2xl border border-[#d6cebe] p-6 sm:p-8 space-y-6 shadow-sm">
+        <div className="space-y-1 pb-4 border-b border-[#d6cebe]">
+          <div className="flex items-center gap-2 text-xs font-mono text-[#a8321a] font-bold">
             <Smartphone className="w-4 h-4" />
             <span>Community Early Warning System</span>
           </div>
-          <h2 className="text-2xl font-bold text-white">
-            SMS & WhatsApp Emergency Dispatch Simulator
+          <h2 className="text-2xl font-bold text-[#0b1b2d]">
+            SMS &amp; WhatsApp Emergency Dispatch Simulator
           </h2>
-          <p className="text-xs text-zinc-400 max-w-2xl">
+          <p className="text-xs text-[#1f3044] max-w-2xl leading-relaxed">
             Simulate automated micro-targeted alerts sent via AWS SNS / WhatsApp Business API to street vendors and local health responders when exhaust temperatures breach survivability thresholds.
           </p>
         </div>
@@ -312,19 +312,19 @@ export const WatchlistPage: React.FC<Props> = ({
           <div className="lg:col-span-6 space-y-4">
             {/* Phone Number Input */}
             <div className="space-y-1.5">
-              <label className="text-xs font-mono text-zinc-400">Recipient Phone Number</label>
+              <label className="text-xs font-mono text-[#526071] font-bold">Recipient Phone Number</label>
               <input
                 type="text"
                 value={recipientNumber}
                 onChange={(e) => setRecipientNumber(e.target.value)}
                 placeholder="+91 XXXXX XXXXX"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#fbf9f5] border border-[#d6cebe] rounded-xl px-4 py-2.5 text-xs text-[#0b1b2d] font-mono focus:outline-none focus:border-[#0b1b2d] shadow-2xs font-semibold"
               />
             </div>
 
             {/* Persona Target */}
             <div className="space-y-1.5">
-              <label className="text-xs font-mono text-zinc-400">Recipient Persona</label>
+              <label className="text-xs font-mono text-[#526071] font-bold">Recipient Persona</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { id: 'vendor', label: 'Street Vendor' },
@@ -334,10 +334,10 @@ export const WatchlistPage: React.FC<Props> = ({
                   <button
                     key={p.id}
                     onClick={() => setRecipientPersona(p.id as any)}
-                    className={`py-2 px-3 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
+                    className={`py-2 px-3 rounded-xl text-xs font-mono transition-colors cursor-pointer ${
                       recipientPersona === p.id
-                        ? 'bg-zinc-800 text-white font-bold border border-zinc-700'
-                        : 'bg-zinc-950 border border-zinc-850 text-zinc-400 hover:text-zinc-200'
+                        ? 'bg-[#0b1b2d] text-white font-bold shadow-xs'
+                        : 'bg-[#f5efe6] border border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
                     }`}
                   >
                     {p.label}
@@ -348,7 +348,7 @@ export const WatchlistPage: React.FC<Props> = ({
 
             {/* Language Selector */}
             <div className="space-y-1.5">
-              <label className="text-xs font-mono text-zinc-400">Broadcast Language</label>
+              <label className="text-xs font-mono text-[#526071] font-bold">Broadcast Language</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { id: 'en', label: 'English' },
@@ -358,10 +358,10 @@ export const WatchlistPage: React.FC<Props> = ({
                   <button
                     key={lang.id}
                     onClick={() => setSelectedLanguage(lang.id as any)}
-                    className={`py-2 px-3 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
+                    className={`py-2 px-3 rounded-xl text-xs font-mono transition-colors cursor-pointer ${
                       selectedLanguage === lang.id
-                        ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40'
-                        : 'bg-zinc-950 border border-zinc-850 text-zinc-400 hover:text-zinc-200'
+                        ? 'bg-amber-100 text-amber-950 font-bold border border-amber-300 shadow-xs'
+                        : 'bg-[#f5efe6] border border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
                     }`}
                   >
                     {lang.label}
@@ -372,24 +372,24 @@ export const WatchlistPage: React.FC<Props> = ({
 
             {/* Alert Severity Tier */}
             <div className="space-y-1.5">
-              <label className="text-xs font-mono text-zinc-400">Hazard Tier</label>
+              <label className="text-xs font-mono text-[#526071] font-bold">Hazard Tier</label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => setSelectedAlertTier('tier1')}
-                  className={`py-2 px-3 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
+                  className={`py-2 px-3 rounded-xl text-xs font-mono transition-colors cursor-pointer ${
                     selectedAlertTier === 'tier1'
-                      ? 'bg-red-950/60 text-red-300 font-bold border border-red-800'
-                      : 'bg-zinc-950 border border-zinc-850 text-zinc-400'
+                      ? 'bg-red-100 text-red-900 font-bold border border-red-300 shadow-xs'
+                      : 'bg-[#f5efe6] border border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
                   }`}
                 >
-                  Tier 1: Lethal Spike (WBGT &gt;36.5°C)
+                  Tier 1: Lethal Spike (&gt;36.5°C)
                 </button>
                 <button
                   onClick={() => setSelectedAlertTier('tier2')}
-                  className={`py-2 px-3 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
+                  className={`py-2 px-3 rounded-xl text-xs font-mono transition-colors cursor-pointer ${
                     selectedAlertTier === 'tier2'
-                      ? 'bg-amber-950/60 text-amber-300 font-bold border border-amber-800'
-                      : 'bg-zinc-950 border border-zinc-850 text-zinc-400'
+                      ? 'bg-amber-100 text-amber-900 font-bold border border-amber-300 shadow-xs'
+                      : 'bg-[#f5efe6] border border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
                   }`}
                 >
                   Tier 2: High Risk Warning
@@ -401,11 +401,11 @@ export const WatchlistPage: React.FC<Props> = ({
             <button
               onClick={handleDispatchNotification}
               disabled={isSending}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-amber-500/20"
+              className="w-full py-3 rounded-xl bg-[#0b1b2d] hover:bg-[#1a2d42] text-amber-300 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-50"
             >
               {isSending ? (
                 <>
-                  <span className="w-3.5 h-3.5 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
+                  <span className="w-3.5 h-3.5 border-2 border-amber-300 border-t-transparent rounded-full animate-spin" />
                   <span>Dispatching Gateway Messages...</span>
                 </>
               ) : (
@@ -418,40 +418,40 @@ export const WatchlistPage: React.FC<Props> = ({
           </div>
 
           {/* Smartphone Preview (6 cols) */}
-          <div className="lg:col-span-6 bg-zinc-950 rounded-2xl border border-zinc-800 p-5 flex flex-col justify-between">
+          <div className="lg:col-span-6 bg-[#f5efe6] rounded-2xl border border-[#d6cebe] p-5 flex flex-col justify-between shadow-xs">
             <div className="space-y-3">
-              <div className="flex items-center justify-between pb-3 border-b border-zinc-900 text-xs font-mono text-zinc-400">
-                <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
+              <div className="flex items-center justify-between pb-3 border-b border-[#d6cebe] text-xs font-mono text-[#0b1b2d]">
+                <span className="flex items-center gap-1.5 text-emerald-800 font-bold">
                   <MessageSquare className="w-3.5 h-3.5" />
                   <span>WhatsApp Business Gateway Preview</span>
                 </span>
-                <span className="text-zinc-600">Encrypted AES-256</span>
+                <span className="text-[#526071] text-[11px]">Encrypted AES-256</span>
               </div>
 
               {/* Message Feed inside phone */}
               <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
                 {dispatchedMessages.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-850 text-xs font-mono text-zinc-500 italic text-center py-10">
+                  <div className="p-4 rounded-xl bg-[#efe8dc] border border-dashed border-[#d6cebe] text-xs font-mono text-[#526071] italic text-center py-10">
                     No active dispatches sent in this session. Configure alert parameters and click &quot;Dispatch Warning Alert&quot;.
                   </div>
                 ) : (
                   dispatchedMessages.map((msg) => (
                     <div
                       key={msg.id}
-                      className="p-3.5 rounded-xl bg-[#12221b] border border-emerald-900/60 space-y-1.5 animate-in fade-in"
+                      className="p-3.5 rounded-xl bg-[#fbf9f5] border border-emerald-300 space-y-1.5 shadow-2xs"
                     >
-                      <div className="flex items-center justify-between text-[10px] font-mono text-emerald-400">
+                      <div className="flex items-center justify-between text-[10px] font-mono text-emerald-800">
                         <span className="font-bold">TO: {msg.to}</span>
                         <span>{msg.time} · Delivered ✓✓</span>
                       </div>
-                      <p className="text-xs text-zinc-100 leading-relaxed font-sans">{msg.text}</p>
+                      <p className="text-xs text-[#0b1b2d] leading-relaxed font-sans">{msg.text}</p>
                     </div>
                   ))
                 )}
               </div>
             </div>
 
-            <div className="text-[10px] font-mono text-zinc-600 pt-3 border-t border-zinc-900 flex justify-between">
+            <div className="text-[10px] font-mono text-[#526071] pt-3 border-t border-[#d6cebe] flex justify-between font-medium">
               <span>Channel: AWS SNS SMS &amp; Meta Cloud API</span>
               <span>Latency: 420ms</span>
             </div>
@@ -460,19 +460,20 @@ export const WatchlistPage: React.FC<Props> = ({
       </div>
 
       {/* Section 3: Live Incident Log Stream */}
-      <div className="bg-[#0c0c12] rounded-2xl border border-zinc-800 p-6 space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="bg-[#efe8dc] rounded-2xl border border-[#d6cebe] p-6 space-y-4 shadow-sm">
+        <div className="flex items-center justify-between border-b border-[#d6cebe] pb-3">
           <div>
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-400" />
-              <span>Real-Time Incident Stream & SCADA Actuation Queue</span>
+            <h3 className="text-base font-bold text-[#0b1b2d] flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#a8321a]" />
+              <span>Real-Time Incident Stream &amp; SCADA Actuation Queue</span>
             </h3>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-[#1f3044]">
               Live audit logs of thermal surges, vendor alerts, Section 133 notices, and mist cannon engagements.
             </p>
           </div>
-          <span className="text-xs font-mono text-emerald-400 font-bold animate-pulse">
-            ● STREAM ACTIVE
+          <span className="text-xs font-mono text-emerald-800 font-bold flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+            STREAM ACTIVE
           </span>
         </div>
 
@@ -480,36 +481,36 @@ export const WatchlistPage: React.FC<Props> = ({
           {logs.map((log) => (
             <div
               key={log.id}
-              className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex items-start justify-between gap-4 font-mono text-xs"
+              className="p-3.5 rounded-xl bg-[#f5efe6] border border-[#d6cebe] flex items-start justify-between gap-4 font-mono text-xs shadow-2xs"
             >
               <div className="space-y-1 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-zinc-500 font-bold">{log.timestamp}</span>
-                  <span className="text-zinc-700">·</span>
+                  <span className="text-[10px] text-[#526071] font-bold">{log.timestamp}</span>
+                  <span className="text-[#0b1b2d]/30">·</span>
                   <span
                     className={`text-[10px] font-bold uppercase ${
                       log.type === 'exhaust_spike'
-                        ? 'text-red-400'
+                        ? 'text-red-700'
                         : log.type === 'vendor_alert'
-                        ? 'text-rose-400'
+                        ? 'text-rose-700'
                         : log.type === 'tax_issued'
-                        ? 'text-amber-400'
-                        : 'text-emerald-400'
+                        ? 'text-[#a8321a]'
+                        : 'text-emerald-800'
                     }`}
                   >
                     {log.type.replace('_', ' ')}
                   </span>
                 </div>
-                <div className="text-zinc-200 font-bold font-sans">{log.title}</div>
-                <div className="text-zinc-400 text-[11px] leading-relaxed">{log.detail}</div>
+                <div className="text-[#0b1b2d] font-bold font-sans">{log.title}</div>
+                <div className="text-[#1f3044] text-[11px] leading-relaxed font-sans">{log.detail}</div>
               </div>
 
               <div className="shrink-0 text-right">
                 <span
-                  className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
+                  className={`inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-bold ${
                     log.tier === 1
-                      ? 'bg-red-500/10 text-red-400 border border-red-500/30'
-                      : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                      ? 'bg-red-100 text-red-900 border border-red-300'
+                      : 'bg-amber-100 text-amber-900 border border-amber-300'
                   }`}
                 >
                   TIER {log.tier}

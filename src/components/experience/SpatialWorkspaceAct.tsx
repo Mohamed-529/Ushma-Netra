@@ -25,10 +25,10 @@ export const SpatialWorkspaceAct: React.FC<Props> = ({ onScrollToProblem }) => {
               <span className="text-zinc-600">·</span>
               <span className="text-zinc-400 uppercase">Interactive Spatial Telemetry Grid</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-light text-zinc-100 tracking-tight font-sans">
+            <h2 className="text-3xl sm:text-5xl font-normal text-[#0b1b2d] tracking-tight font-sans">
               Tactile 3D Infrastructure Console & Multi-Spectral Bench
             </h2>
-            <p className="text-sm sm:text-base text-zinc-400 max-w-3xl font-light leading-relaxed">
+            <p className="text-sm sm:text-base text-[#1f3044] max-w-3xl font-normal leading-relaxed">
               Before dissecting the street-level anthropogenic heat physics, explore the physical test-bench docking all 7 multi-spectral data tokens—from Landsat-9 infrared satellite scans and IoT LoRaWAN sensors to DynamoDB audit ledgers and autonomous Section 133 municipal decrees.
             </p>
           </div>

@@ -16,10 +16,13 @@ import {
   Satellite,
   BookOpen,
   Bell,
-  Scale,
   Box,
-  Scan
+  Scan,
+  Scale,
+  Compass,
+  Sparkles
 } from 'lucide-react';
+import { NetraGuide } from './experience/NetraGuide';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -46,6 +49,7 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
   const [audioActive, setAudioActive] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const [guideOpen, setGuideOpen] = useState<boolean>(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -94,7 +98,8 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
   ];
 
   const isHomePage = location.pathname === '/';
-  const showTicker = isScrolled || !isHomePage;
+  // Telemetry ticker consistently visible across hero and all subpages
+  const showTicker = true;
 
   const handleReturn = () => {
     if (window.history.length > 1) {
@@ -252,14 +257,26 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
             </nav>
 
             {/* Action Controls & Mobile Menu Toggle */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              {/* Interactive Netra Guide 10-Step Tour Button */}
+              <button
+                onClick={() => setGuideOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-mono font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                title="Launch 10-step audio & scroll interactive walkthrough tour"
+              >
+                <Compass className="w-3.5 h-3.5 text-slate-950 animate-spin-slow" />
+                <span className="hidden sm:inline">Netra Guide</span>
+                <span className="sm:hidden">Guide</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-black/15 text-[10px]">10</span>
+              </button>
+
               {/* Direct 3D Simulation Twin Launcher */}
               <Link
                 to="/twin"
-                className="px-4 py-2 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md hover:shadow-lg bg-[#0b1b2d] hover:bg-[#1a2d42] text-white"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:shadow-md bg-[#0b1b2d] hover:bg-[#1a2d42] text-white"
               >
-                <span>Launch Live Twin</span>
-                <span className="text-[12px] leading-none">➔</span>
+                <span>Live Twin</span>
+                <span className="text-[11px] leading-none text-amber-400">➔</span>
               </Link>
 
               {onSimulateSurge && (
@@ -375,6 +392,9 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
       <main className="relative z-10 w-full text-[#0b1b2d]">
         {children}
       </main>
+
+      {/* Floating 10-Step Interactive Netra Guide */}
+      <NetraGuide isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   );
 };

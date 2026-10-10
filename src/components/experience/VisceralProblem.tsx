@@ -24,12 +24,12 @@ export const VisceralProblem: React.FC = () => {
             <span className="text-slate-400">THERMODYNAMIC CAUSATION</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extralight text-zinc-100 tracking-tight leading-[1.08] font-sans">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-normal text-[#0b1b2d] tracking-tight leading-[1.08] font-sans">
             Air conditioners don't destroy heat. <br />
-            <span className="text-red-400 font-normal">They dump it onto the people outside.</span>
+            <span className="text-red-700 font-bold">They dump it onto the people outside.</span>
           </h2>
 
-          <p className="text-sm sm:text-base text-zinc-400 max-w-2xl font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-[#1f3044] max-w-2xl font-normal leading-relaxed">
             Every 1 TR of indoor cooling rejects 1.35 kW of superheated sensible exhaust. In dense Indian street canyons, commercial buildings mount banks of 60+ split AC units directly at head height, creating an unventilated furnace.
           </p>
         </div>

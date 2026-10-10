@@ -6,13 +6,27 @@ import { Wind, Flame, ShieldCheck, Eye, RotateCcw, AlertTriangle, Info, ArrowUpR
 interface Props {
   building: BuildingAudit;
   vendor: VendorTelemetry;
+  isMitigated?: boolean;
   onMitigationToggle?: (mitigated: boolean) => void;
 }
 
-export const Thermal3DTwin: React.FC<Props> = ({ building, vendor, onMitigationToggle }) => {
+export const Thermal3DTwin: React.FC<Props> = ({
+  building,
+  vendor,
+  isMitigated: externalIsMitigated,
+  onMitigationToggle,
+}) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const [acLoadPct, setAcLoadPct] = useState<number>(95);
-  const [isMitigated, setIsMitigated] = useState<boolean>(false);
+  // Default to externalIsMitigated or building's compliance status
+  const effectiveMitigatedInitial = externalIsMitigated ?? (building.isMitigated || building.complianceStatus === 'Compliant');
+  const [isMitigated, setIsMitigated] = useState<boolean>(effectiveMitigatedInitial);
+
+  // Keep state synced when external prop or building changes
+  useEffect(() => {
+    const target = externalIsMitigated ?? (building.isMitigated || building.complianceStatus === 'Compliant');
+    setIsMitigated(Boolean(target));
+  }, [externalIsMitigated, building.id, building.isMitigated, building.complianceStatus]);
   const [flirMode, setFlirMode] = useState<boolean>(true);
   const [activeProbe, setActiveProbe] = useState<'grill' | 'breathing_zone' | 'cart' | 'roof'>('breathing_zone');
   const [windSpeedKmh, setWindSpeedKmh] = useState<number>(3);

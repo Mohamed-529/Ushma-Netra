@@ -43,7 +43,7 @@ export const ScannerPage: React.FC<Props> = ({
                 navigate('/');
               }
             }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 border border-zinc-750 text-xs font-mono font-medium transition-all cursor-pointer shadow-sm group"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-bold transition-all cursor-pointer shadow-sm group"
             title="Return to previous screen"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
@@ -52,7 +52,7 @@ export const ScannerPage: React.FC<Props> = ({
 
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 text-xs font-mono transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-medium transition-colors"
             title="Return to Home Overview"
           >
             <Home className="w-3.5 h-3.5" />
@@ -60,31 +60,31 @@ export const ScannerPage: React.FC<Props> = ({
           </Link>
         </div>
 
-        <nav className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-          <Link to="/" className="hover:text-amber-400 transition-colors">
+        <nav className="flex items-center gap-2 text-xs font-mono text-[#0b1b2d]/70">
+          <Link to="/" className="hover:text-[#a8321a] transition-colors">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
-          <span className="text-amber-400 font-semibold">AI Façade Computer Vision Scanner</span>
+          <ChevronRight className="w-3.5 h-3.5 text-[#0b1b2d]/40" />
+          <span className="text-[#a8321a] font-bold">AI Façade Computer Vision Scanner</span>
         </nav>
       </div>
 
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-[#d6cebe]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-sky-500/10 text-sky-400 border border-sky-500/30">
+            <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-sky-100 text-sky-900 border border-sky-300">
               Edge Computer Vision
             </span>
-            <span className="text-zinc-500 text-xs font-mono">·</span>
-            <span className="text-zinc-400 text-xs font-mono">
+            <span className="text-[#0b1b2d]/40 text-xs font-mono">·</span>
+            <span className="text-[#0b1b2d]/80 text-xs font-mono font-semibold">
               YOLOv8 Outdoor Condenser Unit Extraction
             </span>
           </div>
-          <h1 className="text-3xl font-black text-white">
+          <h1 className="text-3xl font-black text-[#0b1b2d]">
             AI Façade Computer Vision &amp; Thermal Leak Scanner
           </h1>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-[#1f3044]">
             Real-time automated edge camera inference detecting outdoor split condensers, VRF heat exchangers, and unauthorized horizontal exhaust blasts.
           </p>
         </div>
@@ -93,14 +93,14 @@ export const ScannerPage: React.FC<Props> = ({
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => navigate('/twin')}
-            className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-200 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] border border-[#d6cebe] text-[#0b1b2d] text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
           >
             <span>Launch 3D Twin</span>
-            <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+            <ArrowRight className="w-3.5 h-3.5 text-[#a8321a]" />
           </button>
           <button
             onClick={() => navigate('/ledger')}
-            className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-200 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-[#0b1b2d] hover:bg-[#1a2d42] border border-[#0b1b2d] text-white text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
           >
             <span>View Surcharge Ledger</span>
             <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
@@ -117,36 +117,36 @@ export const ScannerPage: React.FC<Props> = ({
       />
 
       {/* Edge Hardware & Architecture Specifications */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-zinc-800">
-        <div className="p-5 rounded-xl bg-zinc-900/40 border border-zinc-800 space-y-2">
-          <div className="text-[10px] font-mono text-zinc-500 uppercase font-bold flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-amber-400" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-[#d6cebe]">
+        <div className="p-5 rounded-2xl bg-[#efe8dc] border border-[#d6cebe] space-y-2 shadow-sm">
+          <div className="text-[10px] font-mono text-[#526071] uppercase font-bold flex items-center gap-1.5">
+            <Cpu className="w-3.5 h-3.5 text-[#a8321a]" />
             <span>Neural Model Specs</span>
           </div>
-          <h4 className="text-sm font-bold text-white">YOLOv8-Thermal Nano</h4>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+          <h4 className="text-sm font-bold text-[#0b1b2d]">YOLOv8-Thermal Nano</h4>
+          <p className="text-xs text-[#1f3044] leading-relaxed">
             Quantized INT8 weights executing on Google Coral Edge TPU and Raspberry Pi 5 with 14ms inference latency per frame.
           </p>
         </div>
 
-        <div className="p-5 rounded-xl bg-zinc-900/40 border border-zinc-800 space-y-2">
-          <div className="text-[10px] font-mono text-zinc-500 uppercase font-bold flex items-center gap-1.5">
-            <Camera className="w-3.5 h-3.5 text-sky-400" />
-            <span>Optics & Sensor Calibration</span>
+        <div className="p-5 rounded-2xl bg-[#efe8dc] border border-[#d6cebe] space-y-2 shadow-sm">
+          <div className="text-[10px] font-mono text-[#526071] uppercase font-bold flex items-center gap-1.5">
+            <Camera className="w-3.5 h-3.5 text-sky-700" />
+            <span>Optics &amp; Sensor Calibration</span>
           </div>
-          <h4 className="text-sm font-bold text-white">Dual Optical / LWIR Sensor</h4>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+          <h4 className="text-sm font-bold text-[#0b1b2d]">Dual Optical / LWIR Sensor</h4>
+          <p className="text-xs text-[#1f3044] leading-relaxed">
             Co-aligned 4K optical sensor + 8-14μm long-wave infrared thermal sensor registering pixel-level surface temperature false colors.
           </p>
         </div>
 
-        <div className="p-5 rounded-xl bg-zinc-900/40 border border-zinc-800 space-y-2">
-          <div className="text-[10px] font-mono text-zinc-500 uppercase font-bold flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="p-5 rounded-2xl bg-[#efe8dc] border border-[#d6cebe] space-y-2 shadow-sm">
+          <div className="text-[10px] font-mono text-[#526071] uppercase font-bold flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
             <span>Evidence Immutability</span>
           </div>
-          <h4 className="text-sm font-bold text-white">Cryptographic Timestamping</h4>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+          <h4 className="text-sm font-bold text-[#0b1b2d]">Cryptographic Timestamping</h4>
+          <p className="text-xs text-[#1f3044] leading-relaxed">
             Façade audit bounding boxes cryptographically hashed and anchored on AWS Timestream for legal admissibility under Section 133 CrPC.
           </p>
         </div>

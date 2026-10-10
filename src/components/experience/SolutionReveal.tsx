@@ -87,10 +87,10 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-20px' }}
             transition={{ duration: 0.35, delay: 0.05 }}
-            className="text-3xl sm:text-5xl lg:text-6xl font-light text-zinc-100 tracking-tight leading-tight font-sans"
+            className="text-3xl sm:text-5xl lg:text-6xl font-normal text-[#0b1b2d] tracking-tight leading-tight font-sans"
           >
             "Why is dumping sewage in a public street a crime, but dumping{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-red-400 bg-clip-text text-transparent font-normal">
+            <span className="text-[#a8321a] font-bold">
               600 kW of blistering thermal waste
             </span>{' '}
             onto public sidewalks completely legal?"
@@ -101,7 +101,7 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-20px' }}
             transition={{ duration: 0.35, delay: 0.1 }}
-            className="text-sm sm:text-base text-zinc-400 font-light max-w-2xl mx-auto"
+            className="text-sm sm:text-base text-[#1f3044] font-normal max-w-2xl mx-auto leading-relaxed"
           >
             Because until now, municipal bodies lacked the computer vision, edge IoT telemetry, and legal mathematical framework to prove thermal causation and enforce civic accountability.
           </motion.p>

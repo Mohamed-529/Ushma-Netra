@@ -40,7 +40,7 @@ export const HowItWorksPage: React.FC = () => {
       resolution: '30m Thermal Spatial Grid, 100m Radiometric',
       summary:
         'Continuous orbital ingestion of thermal infrared radiance layers maps baseline metro surface temperatures across Indian urban centers, identifying regional micro-heat island hotspots before street-level inspection.',
-      equation: 'LST = \\frac{\\gamma}{\\epsilon} \\left( \\psi_1 L_{sen} + \\psi_2 \\right) + \\psi_3 + \\delta',
+      equation: 'LST = (γ / ε) · (ψ₁ · L_sen + ψ₂) + ψ₃ + δ',
       cloudService: 'AWS Lambda + Amazon S3 Planetary Data Ingestion',
       inputData: 'Radiance values: 10.89 W/(m²·sr·μm), Ambient baseline: 41.2°C',
       outputData: 'Delhi NCR Heat Anomaly Polygon: +4.8°C above suburban greenery',
@@ -55,7 +55,7 @@ export const HowItWorksPage: React.FC = () => {
       resolution: '4K Optical + Edge Coral TPU Inference at 30 FPS',
       summary:
         'Custom-trained YOLOv8 neural network detects and classifies outdoor condenser banks (Split ACs, VRF Heat Exchangers, Rooftop Chillers) along building façades, extracting orientation, elevation, and direct exhaust blast vectors.',
-      equation: '\\text{IoU} \\ge 0.85, \\quad \\text{Confidence} > 94.2\\%',
+      equation: 'IoU ≥ 0.86 · Confidence > 94.2% (142 audited façades)',
       cloudService: 'AWS SageMaker Edge + AWS IoT Greengrass v2',
       inputData: 'Façade video stream: 1080p, 64 detected split units + 6 VRF stacks',
       outputData: 'Total Rejected Heat: 638.4 kW expelled directly into street canyon',
@@ -70,7 +70,7 @@ export const HowItWorksPage: React.FC = () => {
       resolution: '0.25m Voxel Grid in Narrow Street Canyons (H/W > 2.0)',
       summary:
         'Physics-informed fluid dynamic solvers compute how superheated 53°C+ exhaust air gets trapped in narrow street canyons, calculating temperature decay curves and trapped boundary heat accumulation over time.',
-      equation: '\\frac{\\partial T}{\\partial t} + u \\cdot \\nabla T = \\alpha \\nabla^2 T + \\frac{Q_{exhaust}}{\\rho c_p}',
+      equation: '∂T/∂t + u · ∇T = α ∇²T + Q_exhaust / (ρ · c_p)',
       cloudService: 'AWS High-Performance Computing (HPC) ParallelCluster',
       inputData: 'Canyon Width: 7.2m, Wind Velocity: 1.2 m/s, Ambient: 41.2°C',
       outputData: 'Street Plume Air: 47.8°C (+6.6°C thermal trap at ground level)',
@@ -85,7 +85,7 @@ export const HowItWorksPage: React.FC = () => {
       resolution: '1-Second Real-Time Pings (LoRaWAN & Cellular Gateway)',
       summary:
         'Inexpensive, ruggedized IoT sensors mounted on tea carts and vegetable stalls continuously measure Dry Bulb Temperature, Relative Humidity, and Black Globe irradiance, computing Wet Bulb Globe Temperature (WBGT).',
-      equation: 'WBGT = 0.7 T_{wet} + 0.2 T_{globe} + 0.1 T_{dry}',
+      equation: 'WBGT = 0.7 · T_wet + 0.2 · T_globe + 0.1 · T_dry',
       cloudService: 'AWS IoT Core (MQTT) + Amazon Timestream for Telemetry',
       inputData: 'Dry Bulb: 48.4°C, RH: 44%, Black Globe: 54.0°C',
       outputData: 'WBGT: 36.8°C (Extreme Lethality threshold crossed)',
@@ -100,8 +100,8 @@ export const HowItWorksPage: React.FC = () => {
       resolution: 'Hourly Micro-Surcharge Calculation per Building',
       summary:
         'Translates excess heat dumped onto public pedestrian rights-of-way into an enforceable civic debt under Section 133 CrPC (Public Nuisance & Endangerment), levying monthly restorative tariffs to fund local cooling.',
-      equation: '\\text{Tariff} = Q_{rejected} \\times (T_{plume} - T_{base}) \\times \\text{Vendor Headcount} \\times R_{rate}',
-      cloudService: 'Amazon DynamoDB + AWS Bedrock Legal Agent',
+      equation: 'Tariff = Q_rejected × (T_plume − T_base) × Vendors × R_rate',
+      cloudService: 'Amazon DynamoDB + Amazon Bedrock Legal Agent',
       inputData: 'Excess Delta: +6.6°C, Vulnerable Population: 28 vendors',
       outputData: 'Statutory Monthly Surcharge: ₹1,84,500 assessed against building',
     },
@@ -115,7 +115,7 @@ export const HowItWorksPage: React.FC = () => {
       resolution: 'Automatic Sub-Second Relay Triggering via Cloud SCADA',
       summary:
         'When lethal thresholds are breached, the system autonomously triggers pneumatic louver deflectors to direct exhaust upward above the roof canopy, and activates street-level mist hydration arches to cool vendors.',
-      equation: '\\Delta T_{evap} = \\frac{\\dot{m}_{water} \\cdot h_{fg}}{\\dot{m}_{air} \\cdot c_p}',
+      equation: 'ΔT_evap = (ṁ_water · h_fg) / (ṁ_air · c_p)',
       cloudService: 'AWS IoT Device Management + MQTT Relay Actuation',
       inputData: 'Surge trigger: WBGT > 36.5°C in alleyway for 5+ minutes',
       outputData: 'Actuation verified: 3 Mist Hydration lines ON, Street delta lowered by 5.4°C',

@@ -56,7 +56,7 @@ export const TwinLabPage: React.FC<Props> = ({
                 navigate('/');
               }
             }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 border border-zinc-750 text-xs font-mono font-medium transition-all cursor-pointer shadow-sm group"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-bold transition-all cursor-pointer shadow-sm group"
             title="Return to previous screen"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
@@ -65,7 +65,7 @@ export const TwinLabPage: React.FC<Props> = ({
 
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 text-xs font-mono transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-medium transition-colors"
             title="Return to Home Overview"
           >
             <Home className="w-3.5 h-3.5" />
@@ -73,44 +73,44 @@ export const TwinLabPage: React.FC<Props> = ({
           </Link>
         </div>
 
-        <nav className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-          <Link to="/" className="hover:text-amber-400 transition-colors">
+        <nav className="flex items-center gap-2 text-xs font-mono text-[#0b1b2d]/70">
+          <Link to="/" className="hover:text-[#a8321a] transition-colors">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
-          <span className="text-amber-400 font-semibold">3D CFD Digital Twin & SCADA Lab</span>
+          <ChevronRight className="w-3.5 h-3.5 text-[#0b1b2d]/40" />
+          <span className="text-[#a8321a] font-bold">3D CFD Digital Twin &amp; SCADA Lab</span>
         </nav>
       </div>
 
       {/* Header & Controls Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-[#d6cebe]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/30">
+            <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-purple-100 text-purple-900 border border-purple-300">
               Interactive WebGL Simulation
             </span>
-            <span className="text-zinc-500 text-xs font-mono">·</span>
-            <span className="text-zinc-400 text-xs font-mono">
+            <span className="text-[#0b1b2d]/40 text-xs font-mono">·</span>
+            <span className="text-[#0b1b2d]/80 text-xs font-mono font-semibold">
               60 FPS Physics-Informed Plume Dispersion
             </span>
           </div>
-          <h1 className="text-3xl font-black text-white">
-            3D Thermal Plume & Hardware SCADA Digital Twin
+          <h1 className="text-3xl font-black text-[#0b1b2d]">
+            3D Thermal Plume &amp; Hardware SCADA Digital Twin
           </h1>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-[#1f3044]">
             Real-time simulation of commercial condenser exhaust heat rejection in narrow urban street canyons.
           </p>
         </div>
 
         {/* Mode Switcher & Presets */}
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          <div className="flex items-center p-1 bg-zinc-950 rounded-xl border border-zinc-800 text-xs font-mono">
+          <div className="flex items-center p-1 bg-[#efe8dc] rounded-xl border border-[#d6cebe] text-xs font-mono shadow-xs">
             <button
               onClick={() => setTwinViewMode('facade_twin')}
               className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                 twinViewMode === 'facade_twin'
-                  ? 'bg-zinc-800 text-white font-bold'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-[#0b1b2d] text-white font-bold shadow-2xs'
+                  : 'text-[#0b1b2d]/70 hover:text-[#0b1b2d]'
               }`}
             >
               Building Façade Twin
@@ -119,8 +119,8 @@ export const TwinLabPage: React.FC<Props> = ({
               onClick={() => setTwinViewMode('parametric_canyon')}
               className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                 twinViewMode === 'parametric_canyon'
-                  ? 'bg-zinc-800 text-white font-bold'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-[#0b1b2d] text-white font-bold shadow-2xs'
+                  : 'text-[#0b1b2d]/70 hover:text-[#0b1b2d]'
               }`}
             >
               Parametric Canyon CFD
@@ -129,10 +129,10 @@ export const TwinLabPage: React.FC<Props> = ({
 
           <button
             onClick={() => setShowHardwarePanel(!showHardwarePanel)}
-            className={`px-3 py-2 rounded-xl text-xs font-mono border transition-colors cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-mono border transition-colors cursor-pointer font-bold ${
               showHardwarePanel
-                ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 font-bold'
-                : 'bg-zinc-900 border-zinc-800 text-zinc-400'
+                ? 'bg-amber-100 border-amber-300 text-amber-950 shadow-xs'
+                : 'bg-[#efe8dc] border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
             }`}
           >
             {showHardwarePanel ? 'Hide SCADA Controls' : 'Show SCADA Controls'}
@@ -142,15 +142,15 @@ export const TwinLabPage: React.FC<Props> = ({
 
       {/* Target Building Selector */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 text-xs font-mono">
-        <span className="text-zinc-500 shrink-0">Active Hotspot:</span>
+        <span className="text-[#526071] shrink-0 font-bold uppercase text-[10px]">Active Hotspot:</span>
         {allBuildings.slice(0, 6).map((b) => (
           <button
             key={b.id}
             onClick={() => onSelectBuilding(b)}
-            className={`px-3 py-1.5 rounded-lg border whitespace-nowrap transition-colors cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl border whitespace-nowrap transition-colors cursor-pointer font-semibold ${
               building.id === b.id
-                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 font-bold'
-                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                ? 'bg-[#0b1b2d] border-[#0b1b2d] text-white shadow-2xs font-bold'
+                : 'bg-[#efe8dc] border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
             }`}
           >
             {b.name} ({b.city})
@@ -165,6 +165,7 @@ export const TwinLabPage: React.FC<Props> = ({
             <Thermal3DTwin
               building={building}
               vendor={vendor}
+              isMitigated={isMitigated}
               onMitigationToggle={onMitigationToggle}
             />
           ) : (
@@ -187,33 +188,33 @@ export const TwinLabPage: React.FC<Props> = ({
       </div>
 
       {/* Cross Navigation Footer */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-zinc-800">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-[#d6cebe]">
         <Link
           to="/grid"
-          className="p-4 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 text-left transition-colors group"
+          className="p-5 rounded-2xl bg-[#efe8dc] hover:bg-[#f5efe6] border border-[#d6cebe] text-left transition-colors group shadow-sm"
         >
-          <div className="text-[10px] font-mono text-zinc-500 uppercase">National Data</div>
-          <div className="text-sm font-bold text-white group-hover:text-amber-400 flex items-center justify-between">
+          <div className="text-[10px] font-mono text-[#526071] uppercase font-bold">National Data</div>
+          <div className="text-sm font-bold text-[#0b1b2d] group-hover:text-[#a8321a] flex items-center justify-between mt-1">
             <span>Thermal Grid Registry</span>
             <ArrowRight className="w-4 h-4" />
           </div>
         </Link>
         <Link
           to="/scanner"
-          className="p-4 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 text-left transition-colors group"
+          className="p-5 rounded-2xl bg-[#efe8dc] hover:bg-[#f5efe6] border border-[#d6cebe] text-left transition-colors group shadow-sm"
         >
-          <div className="text-[10px] font-mono text-zinc-500 uppercase">Computer Vision</div>
-          <div className="text-sm font-bold text-white group-hover:text-amber-400 flex items-center justify-between">
+          <div className="text-[10px] font-mono text-[#526071] uppercase font-bold">Computer Vision</div>
+          <div className="text-sm font-bold text-[#0b1b2d] group-hover:text-[#a8321a] flex items-center justify-between mt-1">
             <span>AI Façade Scanner</span>
             <ArrowRight className="w-4 h-4" />
           </div>
         </Link>
         <Link
           to="/ledger"
-          className="p-4 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 text-left transition-colors group"
+          className="p-5 rounded-2xl bg-[#efe8dc] hover:bg-[#f5efe6] border border-[#d6cebe] text-left transition-colors group shadow-sm"
         >
-          <div className="text-[10px] font-mono text-zinc-500 uppercase">Statutory Penalties</div>
-          <div className="text-sm font-bold text-white group-hover:text-amber-400 flex items-center justify-between">
+          <div className="text-[10px] font-mono text-[#526071] uppercase font-bold">Statutory Penalties</div>
+          <div className="text-sm font-bold text-[#0b1b2d] group-hover:text-[#a8321a] flex items-center justify-between mt-1">
             <span>Thermal Debt Ledger</span>
             <ArrowRight className="w-4 h-4" />
           </div>
