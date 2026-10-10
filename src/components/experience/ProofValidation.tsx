@@ -2,18 +2,18 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, ShieldCheck, TrendingDown, Clock, IndianRupee, MapPin } from 'lucide-react';
 
-export const ProofAct: React.FC = () => {
+export const ProofValidation: React.FC = () => {
   return (
-    <section id="proof" className="relative min-h-screen w-full py-24 px-6 sm:px-12 lg:px-16 flex flex-col justify-center bg-gradient-to-b from-[#070b14] via-[#0b1324] to-[#070b14] border-t border-slate-800/80">
+    <section id="proof-act" className="relative min-h-screen w-full py-28 px-6 sm:px-12 lg:px-20 flex flex-col justify-center bg-gradient-to-b from-[#060913] via-[#091122] to-[#060913] border-t border-slate-800/80">
       <div className="max-w-6xl mx-auto w-full space-y-16 relative z-10">
         {/* Header */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>ACT VII · PROOF, FIELD VALIDATION & QUANTIFIED IMPACT</span>
+            <span>05 · PROOF, FIELD VALIDATION & QUANTIFIED IMPACT</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            We didn't just design the theory. <br />
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
+            We didn't just build it. <br />
             <span className="text-emerald-400">We measured the ground reality.</span>
           </h2>
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl font-light leading-relaxed">
@@ -24,7 +24,7 @@ export const ProofAct: React.FC = () => {
         {/* Before vs After Dramatic Comparison */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Before */}
-          <div className="p-8 rounded-2xl bg-red-950/20 border border-red-900/40 space-y-6">
+          <div className="p-8 rounded-3xl bg-red-950/20 border border-red-900/40 space-y-6">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-red-400 font-bold uppercase tracking-wider">BEFORE USHMA-NETRA</span>
               <span className="text-slate-500">Traditional Megacity Status Quo</span>
@@ -45,14 +45,14 @@ export const ProofAct: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-slate-950 rounded-xl border border-red-950 text-red-400 font-mono text-xs">
+            <div className="p-4 bg-slate-950 rounded-2xl border border-red-950 text-red-400 font-mono text-xs">
               <span className="block text-[10px] text-slate-500">AVERAGE ALLEY OVERHEATING</span>
               <strong className="text-xl">+6.6°C Artificial Street Delta</strong>
             </div>
           </div>
 
           {/* After */}
-          <div className="p-8 rounded-2xl bg-emerald-950/20 border border-emerald-800/40 space-y-6 shadow-xl shadow-emerald-950/30">
+          <div className="p-8 rounded-3xl bg-emerald-950/20 border border-emerald-800/40 space-y-6 shadow-xl shadow-emerald-950/30">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-emerald-400 font-bold uppercase tracking-wider">AFTER USHMA-NETRA</span>
               <span className="text-emerald-500 font-semibold">[VERIFIED PILOT DATA]</span>
@@ -73,7 +73,7 @@ export const ProofAct: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-slate-950 rounded-xl border border-emerald-950 text-emerald-400 font-mono text-xs">
+            <div className="p-4 bg-slate-950 rounded-2xl border border-emerald-950 text-emerald-400 font-mono text-xs">
               <span className="block text-[10px] text-slate-500">MEASURED TEMPERATURE REDUCTION</span>
               <strong className="text-xl">-4.2°C Street Heat Reduction</strong>
             </div>
@@ -82,7 +82,7 @@ export const ProofAct: React.FC = () => {
 
         {/* Big Authoritative Numbers */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-mono">
-          <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+          <div className="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-2">
             <div className="text-[11px] text-slate-400 uppercase tracking-wider">STREET LEVEL COOLING</div>
             <div className="text-4xl sm:text-5xl font-extrabold text-white tabular-nums">-4.2°C</div>
             <p className="text-xs text-slate-400 font-sans leading-relaxed">
@@ -93,7 +93,7 @@ export const ProofAct: React.FC = () => {
             </span>
           </div>
 
-          <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+          <div className="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-2">
             <div className="text-[11px] text-slate-400 uppercase tracking-wider">MONTHLY SURCHARGE POOL</div>
             <div className="text-4xl sm:text-5xl font-extrabold text-emerald-400 tabular-nums">₹1.84L</div>
             <p className="text-xs text-slate-400 font-sans leading-relaxed">
@@ -104,7 +104,7 @@ export const ProofAct: React.FC = () => {
             </span>
           </div>
 
-          <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+          <div className="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-2">
             <div className="text-[11px] text-slate-400 uppercase tracking-wider">AWS CLOUD PIPELINE LATENCY</div>
             <div className="text-4xl sm:text-5xl font-extrabold text-amber-400 tabular-nums">&lt; 3.2s</div>
             <p className="text-xs text-slate-400 font-sans leading-relaxed">

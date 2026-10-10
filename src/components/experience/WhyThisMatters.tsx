@@ -1,18 +1,18 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { HeartPulse, AlertTriangle, Eye, ShieldAlert } from 'lucide-react';
+import { HeartPulse, AlertTriangle, ShieldAlert } from 'lucide-react';
 
-export const HumanCrisisAct: React.FC = () => {
+export const WhyThisMatters: React.FC = () => {
   return (
-    <section className="relative min-h-screen w-full py-28 px-6 sm:px-12 lg:px-16 flex flex-col justify-center bg-gradient-to-b from-[#1e0a0a] via-[#120404] to-[#0a0712] overflow-hidden">
-      {/* Background Pulse Glow */}
-      <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(ellipse_at_center,#dc2626_0,transparent_70%)] animate-pulse-glow" />
+    <section className="relative min-h-screen w-full py-28 px-6 sm:px-12 lg:px-20 flex flex-col justify-center bg-gradient-to-b from-[#1f0808] via-[#140404] to-[#090b14] overflow-hidden">
+      {/* Background Pulse Ambient Glow */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_center,#dc2626_0,transparent_70%)] animate-pulse-glow" />
 
       <div className="max-w-5xl mx-auto w-full space-y-16 relative z-10">
-        {/* Header Kicker */}
+        {/* Section Kicker */}
         <div className="flex items-center gap-2 text-xs font-mono text-red-400">
           <HeartPulse className="w-4 h-4 text-red-500 animate-pulse" />
-          <span>ACT III · THE PHYSIOLOGICAL LETHALITY LIMIT</span>
+          <span>02 · THE HUMAN COLLATERAL & PHYSIOLOGICAL LIMIT</span>
         </div>
 
         {/* Sequential Typography Master Statements */}
@@ -24,7 +24,7 @@ export const HumanCrisisAct: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-2xl sm:text-4xl lg:text-5xl font-light text-slate-400"
           >
-            This is not seasonal summer heat.
+            This is not seasonal summer weather.
           </motion.p>
 
           <motion.h2
@@ -32,9 +32,9 @@ export const HumanCrisisAct: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight"
+            className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight font-serif"
           >
-            This is an <span className="text-red-400 underline decoration-red-600/50">artificial micro-thermal trap</span> dumped onto public rights-of-way.
+            This is an <span className="text-red-400 underline decoration-red-600/50">artificial micro-thermal trap</span> dumped onto public sidewalks.
           </motion.h2>
 
           <motion.p
@@ -49,13 +49,13 @@ export const HumanCrisisAct: React.FC = () => {
           </motion.p>
         </div>
 
-        {/* Ground-Truth Profile: Rameshwar Pal (Laxmi Nagar, Delhi) */}
+        {/* Ground-Truth Subject Profile: Rameshwar Pal */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="p-6 sm:p-8 rounded-2xl bg-slate-950/80 border border-slate-800 shadow-2xl space-y-6"
+          className="p-6 sm:p-8 rounded-3xl bg-slate-950/90 border border-slate-800 shadow-2xl space-y-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
             <div>
@@ -70,22 +70,22 @@ export const HumanCrisisAct: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
-            <div className="p-3 bg-slate-900/90 rounded-lg border border-slate-800">
+            <div className="p-4 bg-slate-900/90 rounded-xl border border-slate-800">
               <span className="text-slate-400 block text-[10px]">LOCAL WBGT MEASURED</span>
-              <span className="text-2xl font-bold text-red-500 tabular-nums">36.8°C</span>
-              <span className="text-[10px] text-red-400 block mt-0.5">Exceeds physiological limit</span>
+              <span className="text-3xl font-extrabold text-red-500 tabular-nums">36.8°C</span>
+              <span className="text-[10px] text-red-400 block mt-1">Exceeds physiological limit</span>
             </div>
 
-            <div className="p-3 bg-slate-900/90 rounded-lg border border-slate-800">
+            <div className="p-4 bg-slate-900/90 rounded-xl border border-slate-800">
               <span className="text-slate-400 block text-[10px]">DAILY DURATION OF EXPOSURE</span>
-              <span className="text-2xl font-bold text-amber-400 tabular-nums">11.5 Hours</span>
-              <span className="text-[10px] text-slate-400 block mt-0.5">07:00 to 18:30 daily</span>
+              <span className="text-3xl font-extrabold text-amber-400 tabular-nums">11.5 Hours</span>
+              <span className="text-[10px] text-slate-400 block mt-1">07:00 to 18:30 daily</span>
             </div>
 
-            <div className="p-3 bg-slate-900/90 rounded-lg border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">ESTIMATED HEAT STROKE TIME</span>
-              <span className="text-2xl font-bold text-red-400 tabular-nums">&lt; 40 mins</span>
-              <span className="text-[10px] text-red-400 block mt-0.5">Without active hydration break</span>
+            <div className="p-4 bg-slate-900/90 rounded-xl border border-slate-800">
+              <span className="text-slate-400 block text-[10px]">HEAT STROKE LETHALITY WINDOW</span>
+              <span className="text-3xl font-extrabold text-red-400 tabular-nums">&lt; 40 mins</span>
+              <span className="text-[10px] text-red-400 block mt-1">Without active hydration stand-down</span>
             </div>
           </div>
 

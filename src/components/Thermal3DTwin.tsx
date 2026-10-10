@@ -13,8 +13,9 @@ export const Thermal3DTwin: React.FC<Props> = ({ building, vendor, onMitigationT
   const mountRef = useRef<HTMLDivElement>(null);
   const [acLoadPct, setAcLoadPct] = useState<number>(95);
   const [isMitigated, setIsMitigated] = useState<boolean>(false);
+  const [flirMode, setFlirMode] = useState<boolean>(true);
+  const [activeProbe, setActiveProbe] = useState<'grill' | 'breathing_zone' | 'cart' | 'roof'>('breathing_zone');
   const [windSpeedKmh, setWindSpeedKmh] = useState<number>(3);
-  const [selectedHotspot, setSelectedHotspot] = useState<'ac_exhaust' | 'vendor_cart' | 'street_canyon' | null>('ac_exhaust');
   const [cameraView, setCameraView] = useState<'pedestrian' | 'side' | 'isometric'>('isometric');
 
   // Animation & Three.js refs
@@ -316,11 +317,16 @@ export const Thermal3DTwin: React.FC<Props> = ({ building, vendor, onMitigationT
 
           if (isMitigated) {
             // Cools quickly into green/cyan as it dissipates high above
-            col[i * 3] = Math.max(0.2, 1.0 - distanceTraveled * 0.1);
-            col[i * 3 + 1] = Math.min(0.9, 0.4 + distanceTraveled * 0.08);
-            col[i * 3 + 2] = 0.4;
+            col[i * 3] = Math.max(0.1, 0.4 - distanceTraveled * 0.08);
+            col[i * 3 + 1] = Math.min(0.9, 0.6 + distanceTraveled * 0.06);
+            col[i * 3 + 2] = 0.8;
+          } else if (flirMode) {
+            // Searing FLIR False-Color: White-hot core fading into thermal magenta and deep crimson
+            col[i * 3] = 1.0;
+            col[i * 3 + 1] = Math.max(0.05, 0.8 - distanceTraveled * 0.12); // white-yellow to deep magenta
+            col[i * 3 + 2] = Math.max(0.1, 0.9 - distanceTraveled * 0.1);
           } else {
-            // Stays angrily red-amber hitting street level
+            // Realistic flame/smoke amber
             col[i * 3] = 1.0;
             col[i * 3 + 1] = Math.max(0.15, 0.4 - distanceTraveled * 0.02);
             col[i * 3 + 2] = 0.05;
@@ -459,6 +465,20 @@ export const Thermal3DTwin: React.FC<Props> = ({ building, vendor, onMitigationT
             </button>
           </div>
 
+          {/* View Mode: FLIR False-Color vs Standard 3D */}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setFlirMode(!flirMode)}
+              className={`px-3 py-1 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                flirMode
+                  ? 'bg-rose-950/80 text-rose-300 border-rose-700 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
+                  : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+              }`}
+            >
+              {flirMode ? '🌡️ FLIR Thermal IR Active' : '📷 Standard 3D View'}
+            </button>
+          </div>
+
           {/* AC Capacity Slider */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-xs text-slate-300">
@@ -480,7 +500,7 @@ export const Thermal3DTwin: React.FC<Props> = ({ building, vendor, onMitigationT
           <div className="flex items-center gap-2">
             <button
               onClick={toggleMitigation}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition-all ${
+              className={`px-4 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition-all cursor-pointer ${
                 isMitigated
                   ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/40'
                   : 'bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white'
@@ -501,14 +521,39 @@ export const Thermal3DTwin: React.FC<Props> = ({ building, vendor, onMitigationT
           </div>
         </div>
 
-        {/* Legend Explainer Callout */}
-        <div className="mt-2 text-[11px] text-slate-400 bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800/50 flex items-center justify-between">
-          <span>
-            🔴 <strong className="text-red-400">Red Particle Stream</strong>: 53°C horizontal waste heat jet blasted from 64 AC outdoor units into the 7.2m alleyway.
-          </span>
-          <span>
-            🟢 <strong className="text-emerald-400">Green Upward Louver</strong>: Mandated by Ushma-Netra to redirect exhaust above roofline, saving street workers.
-          </span>
+        {/* Interactive Micro-Thermal Probe Crosshairs Bar */}
+        <div className="mt-2.5 p-2 bg-slate-950/90 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+          <div className="flex items-center gap-2 text-slate-400">
+            <span className="text-[10px] uppercase text-amber-400 font-bold">Targeted Temperature Probes:</span>
+            <button
+              onClick={() => setActiveProbe('grill')}
+              className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${activeProbe === 'grill' ? 'bg-red-900/80 text-red-200 border border-red-700' : 'text-slate-400 hover:text-white'}`}
+            >
+              Exhaust Grill: <strong className="text-red-400">{effectiveExhaustTemp}°C</strong>
+            </button>
+            <button
+              onClick={() => setActiveProbe('breathing_zone')}
+              className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${activeProbe === 'breathing_zone' ? 'bg-amber-900/80 text-amber-200 border border-amber-700' : 'text-slate-400 hover:text-white'}`}
+            >
+              Breathing Height: <strong className="text-amber-300">{isMitigated ? '33.5°C' : `${currentPlumeTemp}°C`}</strong>
+            </button>
+            <button
+              onClick={() => setActiveProbe('cart')}
+              className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${activeProbe === 'cart' ? 'bg-purple-900/80 text-purple-200 border border-purple-700' : 'text-slate-400 hover:text-white'}`}
+            >
+              Vendor Cart: <strong className="text-purple-300">{isMitigated ? '30.2°C' : `${vendor.wetBulbGlobeTempCelsius}°C`}</strong>
+            </button>
+            <button
+              onClick={() => setActiveProbe('roof')}
+              className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${activeProbe === 'roof' ? 'bg-emerald-900/80 text-emerald-200 border border-emerald-700' : 'text-slate-400 hover:text-white'}`}
+            >
+              Roof Discharge: <strong className="text-emerald-300">34.0°C</strong>
+            </button>
+          </div>
+
+          <div className="text-[11px] text-slate-500">
+            {flirMode ? '🔴 FLIR False-Color: White/Red = 54°C · Blue/Indigo = 32°C' : '🟢 Upward Louver vents exhaust to sky'}
+          </div>
         </div>
       </div>
     </div>
