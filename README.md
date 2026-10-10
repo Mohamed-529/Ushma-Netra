@@ -50,15 +50,21 @@ To establish bulletproof institutional credibility and enterprise robustness, Us
 - **Cognito Restitution Portal**: Authenticated RBAC portal with distinct views for **Commercial Building Owners** (Thermal Debt balance, mitigation compliance, payment history) and **Informal Street Vendors** (Direct Benefit Transfer stipend balance for misting kiosk refills, Polly alert preferences).
 - **Immutable DynamoDB Civic Ledger**: Single-table design (`ThermalLedger` table, `PK=BLD#<id>`, `SK=SURCHARGE#<quarter>`) with conditional writes (`attribute_not_exists(DisputeFlag)`) to provide an unalterable civic audit trail.
 
-### 2. Policy-Based Legal Guardrails via AWS Cedar
+### 2. Physical ESP32 Edge Ingestion & Web Serial API (`src/hooks/useHardwareSerial.ts` & `src/components/LiveHardwareControl.tsx`)
+- **Live USB Hardware Stream**: Connects real physical ESP32 microcontrollers at `115200` baud via the browser's native **Web Serial API**, instantly feeding live ambient temperature and WBGT directly into the Three.js Digital Twin.
+- **Zero-Friction Test Bench**: Built-in simulated telemetry packet generator and rogue packet spoof injector (`TEST SPOOF INJECTION`) enabling judges to evaluate token rejection in real time without hardware attached.
+
+### 3. Policy-Based Legal Guardrails via AWS Cedar
 - **Statutory Action Authorization**: Cedar policy engine enforces strict boundaries preventing automated municipal overreach.
 - **Zero-Overreach Guarantee**: The Bedrock agent is strictly forbidden from auto-drafting Section 133 CrPC notices or penalizing properties unless Landsat-9 LST anomaly $\ge +4.5^\circ\text{C}$ **AND** verified building condenser tonnage $\ge 50\text{ TR}$.
 - **Interactive Cedar Policy Evaluator**: Built-in test harness allowing judges to simulate boundary conditions and verify instant authorization or denial with audit log generation.
 
-### 3. Deterministic Multi-Tier Escalation Workflows (AWS Step Functions)
-- **Visual Distributed State Machine**: Step-through state machine tracking telemetry ingestion, Cedar policy evaluation, dynamic branching, Amazon Polly bilingual voice dispatch, conditional Section 133 order drafting, and municipal closure verification.
+### 4. Deterministic Multi-Tier Escalation & Amazon Polly Voice Dispatch (`src/utils/pollyVoiceDispatch.ts`)
+- **Bilingual Acoustic Alerts (Hindi + Indian English)**: Produces full Amazon Polly Neural SSML targeting voice `Kajal` (`hi-IN` / `en-IN`) with `<amazon:auto-breaths>`, pitch/rate prosody, and `<lang xml:lang="en-IN">` phonetic markup.
+- **Offline In-Browser Voice Simulation**: Integrated Web Audio API 880Hz municipal alert chime tone and Web Speech API synthesis allows immediate audible playback during live judging demos.
+- **Multi-Tier Orchestration (AWS Step Functions)**: Automated progression from Tier-1 vendor voice warning to Tier-2 Section 133 legal drafting and Tier-3 municipal grid dispatch.
 
-### 4. Interactive 3D Thermal Plume Digital Twin (Three.js WebGL)
+### 5. Interactive 3D Thermal Plume Digital Twin (Three.js WebGL)
 - **High-Performance WebGL Engine**: Complete street micro-canyon with dual modes:
   - *Micro-Canyon Digital Twin*: Real-time ray-marched thermal particle plume showing horizontal heat trapping vs. 45° upward diversion louver venting.
   - *Dynamic Canyon Archetype Simulator*: Live spatial parameter tuning (alley width 4m–8m, AC unit count 10–100, louver engagement) with location presets (Chandni Chowk, Laxmi Nagar, Indiranagar, Crawford Market).

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { VendorTelemetry } from '../types';
-import { Radio, Volume2, ShieldAlert, Battery, Wifi, Activity, Play, AlertTriangle, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Radio, Volume2, ShieldAlert, Battery, Wifi, Activity, Play, AlertTriangle, RefreshCw, CheckCircle2, Code2, Sparkles } from 'lucide-react';
+import { buildPollySSML, playAudibleBeaconAlert } from '../utils/pollyVoiceDispatch';
 
 interface Props {
   vendor: VendorTelemetry;
@@ -17,6 +18,7 @@ export const VendorIoTBeacon: React.FC<Props> = ({
 }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
   const [selectedScenario, setSelectedScenario] = useState<'normal' | 'surge' | 'mitigated'>('surge');
+  const [showSSMLPayload, setShowSSMLPayload] = useState<boolean>(false);
 
   // Compute dynamic values based on scenario and mitigation
   const currentTemp = isMitigated
@@ -35,24 +37,30 @@ export const VendorIoTBeacon: React.FC<Props> = ({
     ? 'Extreme Lethality (WBGT > 35°C)'
     : 'High Risk';
 
-  // Play voice warning via Web Speech API
-  const handlePlayVoice = (lang: 'en' | 'hi') => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
+  // Amazon Polly bilingual voice dispatch
+  const handlePlayVoice = async (lang: 'hi' | 'en' | 'bilingual') => {
     setIsPlayingAudio(true);
-
-    const text =
-      lang === 'en'
-        ? `Ushma-Netra Emergency Heat Warning for ${vendor.vendorName}. Ambient air conditioner exhaust plume is exceeding forty-eight degrees Celsius. Wet Bulb Globe Temperature is thirty-six point eight. Mandatory hydration stand-down in effect. Please move your cart fifteen meters to the municipal cooling shelter.`
-        : `उष्मा-नेत्रा आपातकालीन हीट चेतावनी। ${vendor.vendorName} जी, एसी एग्जॉस्ट के कारण तापमान अड़तालीस डिग्री से ऊपर चला गया है। तुरंत पानी पिएं और ठेले को पंद्रह मीटर दूर शेड में ले जाएं।`;
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.95;
-    utterance.pitch = 1.0;
-    utterance.onend = () => setIsPlayingAudio(false);
-    utterance.onerror = () => setIsPlayingAudio(false);
-    window.speechSynthesis.speak(utterance);
+    try {
+      await playAudibleBeaconAlert({
+        vendorName: vendor.vendorName,
+        measuredWbgt: currentWbgt,
+        nearestKioskMeters: 45,
+        exhaustTemp: currentTemp,
+        kioskName: 'Chandni Chowk Municipal Mist Station #03',
+        preferredLanguage: lang === 'bilingual' ? 'bilingual' : lang === 'hi' ? 'hi-IN' : 'en-IN',
+      });
+    } finally {
+      setIsPlayingAudio(false);
+    }
   };
+
+  const pollyData = buildPollySSML({
+    vendorName: vendor.vendorName,
+    measuredWbgt: currentWbgt,
+    nearestKioskMeters: 45,
+    exhaustTemp: currentTemp,
+    kioskName: 'Chandni Chowk Municipal Mist Station #03',
+  });
 
   return (
     <div className="w-full space-y-6">
@@ -162,25 +170,49 @@ export const VendorIoTBeacon: React.FC<Props> = ({
 
           {/* Voice Dispatch Triggers */}
           <div className="w-full mt-4 space-y-2">
-            <div className="text-[11px] text-slate-400 font-mono text-center">
-              Autonomous Voice Dispatcher (Polly / WebSpeech Simulation)
+            <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono">
+              <span className="flex items-center gap-1.5 text-amber-400">
+                <Sparkles className="w-3 h-3 text-amber-400" />
+                Amazon Polly Neural Voice Alert
+              </span>
+              <span className="text-[10px] text-slate-400">Voice: Kajal (hi-IN / en-IN)</span>
             </div>
+
+            {/* Primary Bilingual Mixed Trigger */}
+            <button
+              onClick={() => handlePlayVoice('bilingual')}
+              disabled={isPlayingAudio}
+              className="w-full py-2.5 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-bold rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md disabled:opacity-50"
+            >
+              {isPlayingAudio ? (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-slate-950 animate-ping" />
+                  <span>Broadcasting Alarm (Tier-1)...</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-4 h-4 text-slate-950" />
+                  <span>Bilingual Alert (Hindi + Indian English)</span>
+                </>
+              )}
+            </button>
+
             <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => handlePlayVoice('en')}
-                disabled={isPlayingAudio}
-                className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-              >
-                <Volume2 className="w-3.5 h-3.5 text-amber-400" />
-                <span>Play English Alert</span>
-              </button>
               <button
                 onClick={() => handlePlayVoice('hi')}
                 disabled={isPlayingAudio}
-                className="py-2 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
               >
-                <Play className="w-3.5 h-3.5" />
-                <span>Play Hindi Alert (हिंदी)</span>
+                <Play className="w-3.5 h-3.5 text-amber-400" />
+                <span>हिंदी (Hindi Only)</span>
+              </button>
+              <button
+                onClick={() => handlePlayVoice('en')}
+                disabled={isPlayingAudio}
+                className="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <Volume2 className="w-3.5 h-3.5 text-sky-400" />
+                <span>English Audio</span>
               </button>
             </div>
           </div>
@@ -261,13 +293,39 @@ export const VendorIoTBeacon: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Raw Ingestion MQTT Packet Inspector */}
+          {/* Dual Ingestion / Amazon Polly SSML Inspector */}
           <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono">
-            <div className="flex justify-between items-center text-slate-400 pb-2 border-b border-slate-800 mb-2">
-              <span className="text-amber-400">AWS IoT Core Topic: /ushma/telemetry/{vendor.id}</span>
-              <span className="text-emerald-400">QoS 1 · Real-Time Stream</span>
+            <div className="flex flex-wrap justify-between items-center text-slate-400 pb-2 border-b border-slate-800 mb-2 gap-2">
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setShowSSMLPayload(false)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                    !showSSMLPayload
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  AWS IoT Core MQTT
+                </button>
+                <button
+                  onClick={() => setShowSSMLPayload(true)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                    showSSMLPayload
+                      ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Sparkles className="w-3 h-3 text-sky-400" />
+                  Amazon Polly Neural SSML
+                </button>
+              </div>
+              <span className="text-[11px] text-slate-400 font-mono">
+                {!showSSMLPayload ? 'QoS 1 · Real-Time Stream' : `Voice: ${pollyData.voiceId} · Engine: ${pollyData.engine}`}
+              </span>
             </div>
-            <pre className="text-slate-300 text-[11px] leading-relaxed overflow-x-auto">
+
+            {!showSSMLPayload ? (
+              <pre className="text-slate-300 text-[11px] leading-relaxed overflow-x-auto max-h-56">
 {JSON.stringify(
   {
     device_uuid: `esp32-beacon-${vendor.id}`,
@@ -289,7 +347,22 @@ export const VendorIoTBeacon: React.FC<Props> = ({
   null,
   2
 )}
-            </pre>
+              </pre>
+            ) : (
+              <div className="space-y-2">
+                <div className="text-[10px] text-sky-400/90 font-mono flex items-center justify-between border-b border-slate-900 pb-1">
+                  <span>SPEECH SYNTHESIS MARKUP LANGUAGE (SSML)</span>
+                  <span>Est. Duration: {pollyData.audioPromptDurationSec}s · Tier: {pollyData.warningSeverity}</span>
+                </div>
+                <pre className="text-emerald-300 text-[11px] leading-relaxed overflow-x-auto max-h-56 whitespace-pre-wrap font-mono p-2 bg-slate-900/60 rounded-lg border border-slate-800">
+{pollyData.ssml}
+                </pre>
+                <div className="text-[10px] text-slate-400 leading-normal flex items-center gap-1.5 pt-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <span>Includes auto-breaths, emphatic pitch modulations, and dual-script &lt;lang xml:lang="en-IN"&gt; phonetic boundaries for street intelligibility.</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

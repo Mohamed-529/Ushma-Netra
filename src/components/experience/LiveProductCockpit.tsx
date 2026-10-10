@@ -5,7 +5,8 @@ import { ThermalPlumeTwin } from '../ThermalPlumeTwin';
 import { FacadeComputerVisionScanner } from '../FacadeComputerVisionScanner';
 import { ThermalDebtLedger } from '../ThermalDebtLedger';
 import { VendorIoTBeacon } from '../VendorIoTBeacon';
-import { Box, Scan, Scale, Radio, Flame, ShieldCheck, Lock, CheckCircle2, Sliders } from 'lucide-react';
+import { LiveHardwareControl } from '../LiveHardwareControl';
+import { Box, Scan, Scale, Radio, Flame, ShieldCheck, Lock, CheckCircle2, Sliders, Terminal } from 'lucide-react';
 import { verifyDeviceHandshake } from '../../utils/cryptoVerify';
 
 interface Props {
@@ -33,7 +34,7 @@ export const LiveProductCockpit: React.FC<Props> = ({
   onApplyMitigation,
   onSimulateSurge,
 }) => {
-  const [activeTool, setActiveTool] = useState<'3d_twin' | 'cv_scanner' | 'thermal_debt' | 'vendor_iot'>('3d_twin');
+  const [activeTool, setActiveTool] = useState<'3d_twin' | 'cv_scanner' | 'thermal_debt' | 'vendor_iot' | 'hardware_serial'>('3d_twin');
   const [twinMode, setTwinMode] = useState<'facade_twin' | 'parametric_canyon'>('facade_twin');
   const [hwTokenValid, setHwTokenValid] = useState<boolean>(true);
 
@@ -196,6 +197,18 @@ export const LiveProductCockpit: React.FC<Props> = ({
             <Radio className="w-3.5 h-3.5" />
             <span>4. Street Vendor IoT Beacon & Audio</span>
           </button>
+
+          <button
+            onClick={() => setActiveTool('hardware_serial')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+              activeTool === 'hardware_serial'
+                ? 'bg-amber-500 text-slate-950 shadow-md'
+                : 'text-amber-400/80 hover:text-amber-300 bg-amber-500/10 border border-amber-500/20'
+            }`}
+          >
+            <Terminal className="w-3.5 h-3.5 text-amber-400" />
+            <span>5. Physical ESP32 Serial Hook (Live Edge)</span>
+          </button>
         </div>
 
         {/* Viewport Render Canvas */}
@@ -275,6 +288,10 @@ export const LiveProductCockpit: React.FC<Props> = ({
               onSelectVendor={onSelectVendor}
               isMitigated={isMitigated}
             />
+          )}
+
+          {activeTool === 'hardware_serial' && (
+            <LiveHardwareControl />
           )}
         </div>
       </div>
