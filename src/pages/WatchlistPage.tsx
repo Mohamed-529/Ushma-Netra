@@ -19,7 +19,9 @@ import {
   MapPin,
   Trash2,
   Clock,
-  RefreshCw
+  RefreshCw,
+  ArrowLeft,
+  Home
 } from 'lucide-react';
 import { soundEngine } from '../utils/audioSynthesizer';
 
@@ -122,14 +124,42 @@ export const WatchlistPage: React.FC<Props> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-        <Link to="/" className="hover:text-zinc-200 transition-colors">
-          Home
-        </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
-        <span className="text-amber-400 font-semibold">Heat Surge Watchlist & Alert Center</span>
-      </nav>
+      {/* Top Navigation & Breadcrumbs Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate('/');
+              }
+            }}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 border border-zinc-750 text-xs font-mono font-medium transition-all cursor-pointer shadow-sm group"
+            title="Return to previous screen"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+            <span>Return</span>
+          </button>
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 text-xs font-mono transition-colors"
+            title="Return to Home Overview"
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>Home Overview</span>
+          </Link>
+        </div>
+
+        <nav className="flex items-center gap-2 text-xs font-mono text-zinc-400">
+          <Link to="/" className="hover:text-amber-400 transition-colors">
+            Home
+          </Link>
+          <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
+          <span className="text-amber-400 font-semibold">Heat Surge Watchlist & Alert Center</span>
+        </nav>
+      </div>
 
       {/* Hero Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-zinc-800/80">

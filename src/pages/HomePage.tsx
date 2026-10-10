@@ -128,8 +128,8 @@ export const HomePage: React.FC<Props> = ({
       {/* Act 1: Flagship Wow Hero */}
       <div id="wow_hero">
         <WowHero
-          onScrollToProblem={() => onScrollToAct('workspace')}
-          onJumpToLive={() => onScrollToAct('live_cockpit')}
+          onScrollToProblem={() => onScrollToAct('problem')}
+          onJumpToLive={() => navigate('/twin')}
         />
       </div>
 

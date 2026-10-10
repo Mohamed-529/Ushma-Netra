@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { ThermalContrastCards } from './ThermalContrastCards';
+import { ArrowRight, ArrowDown, MapPin, Box, ShieldAlert } from 'lucide-react';
 
 interface Props {
   onScrollToProblem: () => void;
@@ -8,71 +10,43 @@ interface Props {
 }
 
 export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) => {
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <section className="relative min-h-screen w-full flex flex-col justify-between px-6 sm:px-12 lg:px-20 pt-8 pb-12 overflow-hidden bg-[#faf7f2] text-slate-900 selection:bg-amber-500/20 selection:text-amber-900">
-      {/* =============================================================== */}
-      {/* 1. THE ULTRA-CLEAN NAVBAR */}
-      {/* Single, borderless, crystal-clear transparent navbar overlay */}
-      {/* =============================================================== */}
-      <nav className="relative z-30 w-full flex items-center justify-between py-2">
-        {/* Left Side: Clean text logo "Ushma-Netra" with subtitle "Thermal Equity Grid" */}
-        <div className="flex flex-col">
-          <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-950 font-sans">
-            Ushma-Netra
-          </span>
-          <span className="text-[11px] sm:text-xs font-mono font-medium tracking-wider text-slate-500 uppercase">
-            Thermal Equity Grid
-          </span>
+    <section className="relative min-h-[calc(100vh-4rem)] w-full flex flex-col justify-between px-6 sm:px-12 lg:px-20 pt-6 pb-12 overflow-hidden bg-[#faf7f2] text-slate-900 selection:bg-amber-500/20 selection:text-amber-900">
+      {/* Top Ambient Status Strip */}
+      <div className="relative z-20 w-full flex items-center justify-between py-2 text-xs font-mono text-slate-500 border-b border-slate-200/60 pb-3">
+        <div className="flex items-center gap-2">
+          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-semibold text-slate-700">NODE SENSOR TELEMETRY LIVE</span>
+          <span className="text-slate-300 hidden sm:inline">|</span>
+          <span className="text-slate-500 hidden sm:inline">10 MONITORED CITIES</span>
         </div>
 
-        {/* Center: 3 simple text links */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 font-sans">
-          <button
-            onClick={() => scrollToSection('problem')}
-            className="hover:text-slate-950 transition-colors cursor-pointer"
+        <div className="flex items-center gap-4">
+          <Link
+            to="/grid"
+            className="hover:text-slate-900 text-slate-600 transition-colors hidden sm:flex items-center gap-1 font-medium"
           >
-            The Injustice
-          </button>
-          <button
-            onClick={() => scrollToSection('live_cockpit')}
-            className="hover:text-slate-950 transition-colors cursor-pointer"
+            <span>Thermal Grid</span>
+            <ArrowRight className="w-3 h-3 text-amber-700" />
+          </Link>
+          <Link
+            to="/twin"
+            className="hover:text-slate-900 text-slate-600 transition-colors hidden sm:flex items-center gap-1 font-medium"
           >
-            Live Network
-          </button>
-          <button
-            onClick={() => scrollToSection('technology')}
-            className="hover:text-slate-950 transition-colors cursor-pointer"
-          >
-            How It Works
-          </button>
+            <span>3D Twin Lab</span>
+            <ArrowRight className="w-3 h-3 text-amber-700" />
+          </Link>
         </div>
-
-        {/* Right Side: A single, high-contrast, rounded primary button */}
-        <div className="flex items-center">
-          <button
-            onClick={onJumpToLive}
-            className="px-5 py-2.5 rounded-full bg-slate-950 hover:bg-slate-800 text-white font-medium text-sm transition-all shadow-md hover:shadow-lg cursor-pointer"
-          >
-            Launch Live Twin
-          </button>
-        </div>
-      </nav>
+      </div>
 
       {/* =============================================================== */}
       {/* MAIN HERO VIEWPORT: High-Impact Human Story Layout */}
       {/* =============================================================== */}
-      <div className="relative z-20 my-auto w-full py-8 lg:py-12">
+      <div className="relative z-20 my-auto w-full py-8 lg:py-14">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-          {/* 2. MASSIVE TYPOGRAPHY HIERARCHY (Left Side, 7 Cols) */}
+          {/* MASSIVE TYPOGRAPHY HIERARCHY (Left Side, 7 Cols) */}
           <div className="lg:col-span-7 space-y-7">
-            {/* Main Headline (text-5xl or text-6xl, font-bold, tracking-tight) */}
+            {/* Main Headline */}
             <motion.h1
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -95,28 +69,40 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
               Air conditioners don't destroy heat—they dump blistering 54°C exhaust directly onto informal street workers. Ushma-Netra quantifies this hidden thermal dumping to protect vulnerable citizens.
             </motion.p>
 
-            {/* Quick Action Anchor */}
+            {/* Primary Action Anchors */}
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-slate-500"
+              className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono"
             >
               <button
                 onClick={onScrollToProblem}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-300 text-slate-800 font-medium hover:bg-slate-50 hover:border-slate-400 shadow-sm transition-all cursor-pointer font-sans text-sm"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-950 text-white font-medium hover:bg-slate-800 shadow-md transition-all cursor-pointer font-sans text-sm"
               >
                 <span>Read The Field Investigation</span>
-                <span className="text-amber-700">↓</span>
+                <ArrowDown className="w-4 h-4 text-amber-400" />
               </button>
-              <span className="hidden sm:inline text-slate-400">·</span>
-              <span className="hidden sm:inline text-slate-500 font-sans">
-                Monitored across 10 Urban Heat Canyons in India
-              </span>
+
+              <Link
+                to="/grid"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-800 font-medium hover:bg-slate-50 hover:border-slate-400 shadow-sm transition-all cursor-pointer font-sans text-sm"
+              >
+                <MapPin className="w-4 h-4 text-amber-700" />
+                <span>Explore 10 Hotspot Canyons</span>
+              </Link>
+
+              <Link
+                to="/twin"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-100/80 border border-amber-300 text-amber-950 font-medium hover:bg-amber-200/80 shadow-sm transition-all cursor-pointer font-sans text-sm"
+              >
+                <Box className="w-4 h-4 text-amber-800" />
+                <span>Launch 3D Twin</span>
+              </Link>
             </motion.div>
           </div>
 
-          {/* 3. CRISP VISUAL PROOF: Overlapping Thermal Image Cards (Right Side, 5 Cols) */}
+          {/* CRISP VISUAL PROOF: Overlapping Thermal Image Cards (Right Side, 5 Cols) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
