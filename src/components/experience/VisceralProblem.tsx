@@ -10,9 +10,9 @@ export const VisceralProblem: React.FC = () => {
   const totalHeatKw = ((acLoad / 100) * 638.4).toFixed(0);
 
   return (
-    <section id="problem-act" className="relative min-h-screen w-full py-28 px-6 sm:px-12 lg:px-20 flex flex-col justify-center bg-gradient-to-b from-[#050812] via-[#1a0707] to-[#1f0808] transition-colors duration-1000 overflow-hidden">
+    <section id="problem-act" className="relative min-h-screen w-full py-28 px-6 sm:px-12 lg:px-20 flex flex-col justify-center bg-transparent transition-colors duration-1000 overflow-hidden">
       {/* Background Volcanic Heat Glow & Distortion */}
-      <div className="absolute inset-0 opacity-25 pointer-events-none bg-[radial-gradient(circle_at_65%_45%,#ef4444_0,transparent_65%)]" />
+      <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_65%_45%,#ef4444_0,transparent_65%)]" />
 
       <div className="max-w-6xl mx-auto w-full space-y-14 relative z-10">
         {/* Section Kicker */}
@@ -20,6 +20,8 @@ export const VisceralProblem: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-mono text-red-400">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
             <span>01 · THE ANTHROPOGENIC CANYON INJUSTICE</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-slate-400">THERMODYNAMIC CAUSATION</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.08] font-serif">
@@ -32,9 +34,9 @@ export const VisceralProblem: React.FC = () => {
           </p>
         </div>
 
-        {/* Visual Narrative Stage: The 4-Stage Thermodynamic Pipeline */}
+        {/* Visual Narrative Stage: The 4-Stage Thermodynamic Pipeline with Transfer Links */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
-          <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+          <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 relative group hover:border-slate-700 transition-colors">
             <div className="flex items-center justify-between text-slate-500">
               <span>STAGE 01</span>
               <Snowflake className="w-4 h-4 text-sky-400" />
@@ -44,9 +46,13 @@ export const VisceralProblem: React.FC = () => {
             <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
               Extracts 182 TR sensible and latent heat from corporate offices and luxury mall boutiques.
             </p>
+            <div className="pt-2 border-t border-slate-900 text-[10px] text-slate-500 flex items-center justify-between">
+              <span>Heat Extracted</span>
+              <span className="text-sky-400">→ Dispatched</span>
+            </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+          <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 relative group hover:border-slate-700 transition-colors">
             <div className="flex items-center justify-between text-slate-500">
               <span>STAGE 02</span>
               <Zap className="w-4 h-4 text-amber-400" />
@@ -56,9 +62,13 @@ export const VisceralProblem: React.FC = () => {
             <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
               Compressor motor converts electrical energy into raw mechanical heat, inflating the exhaust load by 35%.
             </p>
+            <div className="pt-2 border-t border-slate-900 text-[10px] text-slate-500 flex items-center justify-between">
+              <span>Electrical Added</span>
+              <span className="text-amber-400">→ +35% Load</span>
+            </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-950/80 border border-red-900/60 bg-red-950/20 space-y-3 shadow-lg shadow-red-950/40">
+          <div className="p-5 rounded-2xl bg-slate-950/80 border border-red-900/60 bg-red-950/20 space-y-3 shadow-lg shadow-red-950/40 relative group hover:border-red-700 transition-colors">
             <div className="flex items-center justify-between text-red-400">
               <span>STAGE 03</span>
               <Flame className="w-4 h-4 text-red-500" />
@@ -68,9 +78,13 @@ export const VisceralProblem: React.FC = () => {
             <p className="text-[11px] text-slate-300 font-sans leading-relaxed">
               64 outdoor condenser units vent 53.6°C sensible heat horizontally at 1.5m pedestrian head height.
             </p>
+            <div className="pt-2 border-t border-red-950 text-[10px] text-red-400 flex items-center justify-between">
+              <span>Sensible Discharge</span>
+              <span className="text-red-400">→ Sidewalk Level</span>
+            </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-950/80 border border-red-900/60 bg-red-950/20 space-y-3 shadow-lg shadow-red-950/40">
+          <div className="p-5 rounded-2xl bg-slate-950/80 border border-red-900/60 bg-red-950/20 space-y-3 shadow-lg shadow-red-950/40 relative group hover:border-red-700 transition-colors">
             <div className="flex items-center justify-between text-red-400">
               <span>STAGE 04</span>
               <AlertOctagon className="w-4 h-4 text-red-500" />
@@ -80,6 +94,10 @@ export const VisceralProblem: React.FC = () => {
             <p className="text-[11px] text-slate-300 font-sans leading-relaxed">
               7.2m narrow street canyon traps the thermal plume. Ambient WBGT crosses 36.8°C lethal threshold.
             </p>
+            <div className="pt-2 border-t border-red-950 text-[10px] text-red-400 flex items-center justify-between">
+              <span>Vortex Stagnation</span>
+              <span className="text-red-500 font-bold">Lethal WBGT</span>
+            </div>
           </div>
         </div>
 
@@ -106,6 +124,22 @@ export const VisceralProblem: React.FC = () => {
                 value={acLoad}
                 onChange={(e) => setAcLoad(Number(e.target.value))}
                 className="w-36 accent-red-500 cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* Interactive Heat Plume Expansion Bar */}
+          <div className="space-y-1.5 font-mono text-xs">
+            <div className="flex justify-between text-[11px] text-slate-400">
+              <span>Sidewalk Thermal Plume Spread</span>
+              <span className="text-red-400 font-bold">
+                {acLoad > 80 ? 'CRITICAL PLUME PENETRATION (100% of Alley Width)' : 'Moderate Plume Depth'}
+              </span>
+            </div>
+            <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
+              <div
+                className="h-full rounded-full transition-all duration-200 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600"
+                style={{ width: `${acLoad}%` }}
               />
             </div>
           </div>

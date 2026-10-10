@@ -34,7 +34,7 @@ export const LiveProductCockpit: React.FC<Props> = ({
   const [activeTool, setActiveTool] = useState<'3d_twin' | 'cv_scanner' | 'thermal_debt' | 'vendor_iot'>('3d_twin');
 
   return (
-    <section id="live-cockpit" className="relative min-h-screen w-full py-24 px-4 sm:px-8 lg:px-12 bg-[#060913] border-t border-slate-800/80">
+    <section id="live-cockpit" className="relative min-h-screen w-full py-24 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-slate-800/80">
       {/* Top Ambient Glow */}
       <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-[#0284c7]/10 to-transparent pointer-events-none" />
 
@@ -45,6 +45,8 @@ export const LiveProductCockpit: React.FC<Props> = ({
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>04 · THE LIVE WORKING SYSTEM CENTERPIECE</span>
+              <span className="text-slate-600">·</span>
+              <span className="text-slate-400">4-TOOL TACTICAL SUITE</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
               The Autonomous Resilience Engine in Action
@@ -75,6 +77,32 @@ export const LiveProductCockpit: React.FC<Props> = ({
               <ShieldCheck className="w-4 h-4" />
               <span>{isMitigated ? 'Mitigation Active (Skyward Venting)' : 'Deploy Restorative Louvers'}</span>
             </button>
+          </div>
+        </div>
+
+        {/* Synchronized Cross-Tool Real-Time Status Strip */}
+        <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="space-y-0.5">
+            <span className="text-[10px] text-slate-500 block uppercase">MONITORED TARGET</span>
+            <span className="font-bold text-white truncate block">{building.name}</span>
+          </div>
+          <div className="space-y-0.5">
+            <span className="text-[10px] text-slate-500 block uppercase">OUTDOOR CONDENSERS</span>
+            <span className="font-bold text-amber-400">
+              {building.detectedOutdoorUnits.splitUnits + building.detectedOutdoorUnits.vrfUnits} units (Split & VRF)
+            </span>
+          </div>
+          <div className="space-y-0.5">
+            <span className="text-[10px] text-slate-500 block uppercase">REJECTED SENSIBLE HEAT</span>
+            <span className={`font-bold ${isMitigated ? 'text-emerald-400' : 'text-red-400'}`}>
+              {isMitigated ? '182 kW (Vented Skyward)' : `${building.rejectedHeatKw} kW (Direct Alley Blast)`}
+            </span>
+          </div>
+          <div className="space-y-0.5">
+            <span className="text-[10px] text-slate-500 block uppercase">WORKER EXPOSURE</span>
+            <span className={`font-bold ${isMitigated ? 'text-emerald-400' : 'text-amber-400'}`}>
+              {vendor.vendorName} ({vendor.distanceToExhaustMeters}m away)
+            </span>
           </div>
         </div>
 

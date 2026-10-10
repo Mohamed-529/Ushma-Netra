@@ -90,6 +90,22 @@ Rather than a conventional generic SaaS landing page, the application is structu
 
 ---
 
+## 🔬 Scientific Foundations & Factual Attribution
+
+Every model and calculation in Ushma-Netra is grounded in published physical science rather than speculative claims:
+
+1. **Urban Canyon Aerodynamics (Oke 1988 Model)**:
+   - When street aspect ratio $H/W \ge 0.65$, wind transitions into a *Skimming Flow Vortex*.
+   - Horizontal AC discharge gets trapped in the recirculation cavity. 45° upward diversion louvers break the vortex by ejecting exhaust into the boundary shear layer.
+2. **Sensible Heat Rejection Physics (ASHRAE Fundamentals)**:
+   - $Q_{rejected} = Q_{cooling} + W_{compressor} = 1\text{ TR } (3.517\text{ kW}) + 0.88\text{ kW} = 4.4\text{ kW sensible heat at } 52^\circ\text{C}-55^\circ\text{C}$.
+3. **Human Biometeorology (ISO 7243 / OSHA WBGT)**:
+   - Compares Required Evaporation ($E_{req}$) against Maximum Evaporative Capacity ($E_{max}$). When $E_{req} > E_{max}$, sweat runs off as un-evaporated liquid, leading to net heat storage and hyperthermia.
+4. **Transparent Regulatory Model**:
+   - Proposed administrative enforcement framework under Section 133 CrPC (Public Nuisance and Environmental Hazard). All data points are clearly designated with badges: `[CFD Modeled]`, `[ASHRAE Standard]`, `[ISO 7243]`, or `[Proposed Legal Framework]`.
+
+---
+
 ## 🏃 Local Development & Execution
 
 ```bash

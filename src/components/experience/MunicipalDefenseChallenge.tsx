@@ -200,9 +200,21 @@ export const MunicipalDefenseChallenge: React.FC = () => {
     setTotalHeatDivertedKw((prev) => prev + 180);
   };
 
-  // Command 4: Broadcast Hindi/Kannada Voice Alert
+  // Command 4: Broadcast Hindi/Kannada Voice Alert with real Web Speech synthesis
   const handleBroadcastAudio = (sectorId: string) => {
     soundEngine.playSpikeAlert();
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const text =
+        activeSector.city === 'Bengaluru'
+          ? 'Ushma-Netra Emergency Heat Advisory for Indiranagar vendors. Ambient AC exhaust is at forty-nine degrees. Please move to shaded misting kiosk immediately.'
+          : 'उष्मा-नेत्रा आपातकालीन चेतावनी: एसी एग्जॉस्ट के कारण तापमान अत्यधिक बढ़ गया है। तुरंत पानी पिएं और ठेले को शेड में ले जाएं।';
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;
+      window.speechSynthesis.speak(utterance);
+    }
+
     setSectors((prev) =>
       prev.map((s) => {
         if (s.id === sectorId) {
@@ -238,17 +250,19 @@ export const MunicipalDefenseChallenge: React.FC = () => {
   const protectionScore = Math.round((totalProtectedVendors / totalVendors) * 100);
 
   return (
-    <section id="heat-challenge-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-gradient-to-b from-[#070e22] via-[#090d18] to-[#04060d] border-t border-slate-800/80">
+    <section id="heat-challenge-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-slate-800/80">
       {/* Background Radiance */}
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(circle_at_50%_20%,#ef4444_0,transparent_60%)]" />
 
       <div className="max-w-7xl mx-auto w-full space-y-12 relative z-10">
-        {/* Header Kicker */}
+        {/* Header Kicker with Clean Typography (Anti-Slop No-Pill) */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-800 pb-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs font-mono text-amber-400 px-3.5 py-1.5 rounded-full bg-amber-950/40 border border-amber-800/40">
+            <div className="flex items-center gap-2 text-xs font-mono text-amber-400">
               <Award className="w-3.5 h-3.5 text-amber-400" />
               <span>08 · INTERACTIVE FINALE: THE 48-HOUR HEATWAVE DEFENSE CHALLENGE</span>
+              <span className="text-slate-600">·</span>
+              <span className="text-slate-400">DECISION SIMULATION</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
               Take the Commissioner's Hot Seat

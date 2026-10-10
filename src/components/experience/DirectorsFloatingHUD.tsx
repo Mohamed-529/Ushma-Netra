@@ -58,8 +58,8 @@ export const DirectorsFloatingHUD: React.FC<Props> = ({
           <span className="text-slate-400 text-[10px] hidden sm:inline">THERMAL EQUITY GRID</span>
         </div>
 
-        {/* Center: The 8-Act Story Chapter Timeline */}
-        <div className="pointer-events-auto hidden md:flex items-center gap-1 p-1 rounded-2xl bg-black/80 border border-slate-800/90 shadow-2xl backdrop-blur-xl text-[11px] font-mono">
+        {/* Center: The Story Chapter Timeline (Desktop) */}
+        <div className="pointer-events-auto hidden xl:flex items-center gap-1 p-1 rounded-2xl bg-black/85 border border-slate-800/90 shadow-2xl backdrop-blur-xl text-[11px] font-mono">
           {navItems.map((item) => {
             const isActive = activeAct === item.id;
             return (
@@ -72,11 +72,34 @@ export const DirectorsFloatingHUD: React.FC<Props> = ({
                     : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
                 }`}
               >
-                <span className={`text-[9px] ${isActive ? 'text-slate-900' : 'text-slate-500'}`}>{item.number}</span>
+                <span className={`text-[9px] ${isActive ? 'text-slate-900 font-bold' : 'text-slate-500'}`}>{item.number}</span>
                 <span>{item.label}</span>
               </button>
             );
           })}
+        </div>
+
+        {/* Compact Act Stepper for Medium & Tablet screens */}
+        <div className="pointer-events-auto hidden md:flex xl:hidden items-center gap-1 px-3 py-1.5 rounded-2xl bg-black/85 border border-slate-800/90 shadow-2xl backdrop-blur-xl text-xs font-mono">
+          <span className="text-amber-400 font-bold">
+            {navItems.find((n) => n.id === activeAct)?.number || '01'}
+          </span>
+          <span className="text-slate-600">/</span>
+          <span className="text-white font-semibold tracking-wide">
+            {navItems.find((n) => n.id === activeAct)?.label || 'ACT'}
+          </span>
+          <div className="flex items-center gap-1 ml-2">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => onNavigateTo(item.id)}
+                className={`w-2 h-2 rounded-full transition-all cursor-pointer ${
+                  activeAct === item.id ? 'bg-amber-400 w-4' : 'bg-slate-700 hover:bg-slate-500'
+                }`}
+                title={item.label}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Right: Soundscape, Peak Surge, & Live Twin Shortcuts */}
@@ -101,7 +124,7 @@ export const DirectorsFloatingHUD: React.FC<Props> = ({
             title="Trigger peak cooling surge"
           >
             <Flame className="w-3.5 h-3.5 text-red-400 animate-pulse" />
-            <span className="hidden lg:inline">Peak 54°C Surge</span>
+            <span className="hidden sm:inline">Peak 54°C Surge</span>
           </button>
 
           {/* Jump to Live Tool */}
@@ -113,6 +136,26 @@ export const DirectorsFloatingHUD: React.FC<Props> = ({
             <span>Live Twin</span>
           </button>
         </div>
+      </div>
+
+      {/* Mobile Horizontal Act Scrubber Strip */}
+      <div className="pointer-events-auto md:hidden mt-1.5 flex items-center gap-1.5 overflow-x-auto py-1 px-1 scrollbar-none">
+        {navItems.map((item) => {
+          const isActive = activeAct === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onNavigateTo(item.id)}
+              className={`px-2.5 py-1 rounded-xl text-[10px] font-mono whitespace-nowrap transition-all border shrink-0 ${
+                isActive
+                  ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow-md'
+                  : 'bg-black/80 text-slate-400 border-slate-800 backdrop-blur-md'
+              }`}
+            >
+              {item.number} {item.label}
+            </button>
+          );
+        })}
       </div>
     </nav>
   );

@@ -144,9 +144,27 @@ export default function App() {
           />
         </div>
 
+        {/* Transition Divider 01 -> 02 */}
+        <div className="flex items-center justify-center py-4 pointer-events-none">
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
+            <span>ACT 02 // CANYON THERMODYNAMICS</span>
+            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
+          </div>
+        </div>
+
         {/* Act 2: PROBLEM (Anthropogenic Canyon Thermodynamics) */}
         <div id="problem">
           <VisceralProblem />
+        </div>
+
+        {/* Transition Divider 02 -> 03 */}
+        <div className="flex items-center justify-center py-4 pointer-events-none">
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
+            <span>ACT 03 // PHYSIOLOGICAL LIMIT & HUMAN COLLATERAL</span>
+            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
+          </div>
         </div>
 
         {/* Act 3: TENSION & HUMAN COLLATERAL (Physiological Limit & Rameshwar Pal Story) */}
@@ -154,9 +172,27 @@ export default function App() {
           <WhyThisMatters />
         </div>
 
+        {/* Transition Divider 03 -> 04 */}
+        <div className="flex items-center justify-center py-4 pointer-events-none">
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
+            <span>ACT 04 // THE REGULATORY BREAKTHROUGH</span>
+            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
+          </div>
+        </div>
+
         {/* Act 4: INSIGHT & SOLUTION REVEAL (The Architectural Convergence) */}
         <div id="solution">
           <SolutionReveal onScrollToLive={() => scrollToAct('live_cockpit')} />
+        </div>
+
+        {/* Transition Divider 04 -> 05 */}
+        <div className="flex items-center justify-center py-4 pointer-events-none">
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
+            <span>ACT 05 // LIVE RESILIENCE ENGINE (WORKING TWIN)</span>
+            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
+          </div>
         </div>
 
         {/* Act 5: LIVE WORKING PRODUCT COCKPIT (3D WebGL Twin + CV Scanner + Surcharge Ledger + IoT Beacon) */}
@@ -175,9 +211,27 @@ export default function App() {
           />
         </div>
 
+        {/* Transition Divider 05 -> 06 */}
+        <div className="flex items-center justify-center py-4 pointer-events-none">
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
+            <span>ACT 06 // SCIENTIFIC RIGOR & OKE VORTEX DYNAMICS</span>
+            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
+          </div>
+        </div>
+
         {/* Act 6: PROOF & FIELD VALIDATION (Delhi & Bengaluru Field Trial Data) */}
         <div id="proof">
           <ProofValidation />
+        </div>
+
+        {/* Transition Divider 06 -> 07 */}
+        <div className="flex items-center justify-center py-4 pointer-events-none">
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
+            <span>ACT 07 // AWS PRODUCTION SERVERLESS BLUEPRINT</span>
+            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
+          </div>
         </div>
 
         {/* Act 7: AWS PRODUCTION TECHNOLOGY & SERVERLESS BLUEPRINT */}
@@ -185,9 +239,27 @@ export default function App() {
           <TechnologyBlueprint />
         </div>
 
+        {/* Transition Divider 07 -> 08 */}
+        <div className="flex items-center justify-center py-4 pointer-events-none">
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
+            <span>ACT 08 // STATUTORY SECTION 133 DECREE GENERATOR</span>
+            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
+          </div>
+        </div>
+
         {/* Act 8: MUNICIPAL THERMAL DEBT CALCULATOR, SECTION 133 DECREE & JUDGE EVALUATION */}
         <div id="final_demo">
           <FinalDemoDecree />
+        </div>
+
+        {/* Transition Divider 08 -> 09 */}
+        <div className="flex items-center justify-center py-4 pointer-events-none">
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
+            <span>ACT 09 // 48-HOUR CRISIS DEFENSE CHALLENGE (FINALE)</span>
+            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
+          </div>
         </div>
 
         {/* Act 9: INTERACTIVE FINALE - 48-HOUR HEATWAVE DEFENSE CHALLENGE */}

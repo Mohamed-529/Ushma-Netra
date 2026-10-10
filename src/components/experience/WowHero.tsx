@@ -13,6 +13,7 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
   const [flirMode, setFlirMode] = useState<boolean>(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false);
   const [spotTemp, setSpotTemp] = useState<number>(53.8);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,6 +47,8 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
   return (
     <section
       ref={heroRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`relative min-h-screen w-full flex flex-col justify-between p-6 sm:p-10 lg:p-16 overflow-hidden transition-colors duration-1000 ${
         flirMode ? 'bg-[#06040e]' : 'bg-[#040711]'
       }`}
@@ -53,7 +56,7 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
       {/* Dynamic FLIR Thermal Infrared Heat Matrix Simulation */}
       {flirMode ? (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Street Level 54°C Superheated Thermal Plume Plume Gradient */}
+          {/* Street Level 54°C Superheated Thermal Plume Gradient */}
           <div
             className="absolute bottom-0 inset-x-0 h-[65%] opacity-55 blur-[120px] transition-all duration-700 bg-gradient-to-t from-red-600 via-amber-500 to-transparent"
             style={{
@@ -83,31 +86,33 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
         </div>
       )}
 
-      {/* Interactive Cursor Thermal Spot Meter HUD */}
-      <div
-        className="pointer-events-none fixed z-40 hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/80 border border-slate-700/80 shadow-2xl backdrop-blur-md text-[10px] font-mono transition-transform duration-75"
-        style={{
-          left: `${mousePos.clientX + 16}px`,
-          top: `${mousePos.clientY - 12}px`,
-        }}
-      >
-        <Crosshair className={`w-3 h-3 animate-spin ${spotTemp > 45 ? 'text-red-400' : 'text-sky-400'}`} />
-        <span className="text-slate-400">IR SPOT:</span>
-        <span
-          className={`font-bold ${
-            spotTemp > 45 ? 'text-red-400' : spotTemp > 35 ? 'text-amber-400' : 'text-sky-400'
-          }`}
+      {/* Interactive Cursor Thermal Spot Meter HUD (Only active when inside hero) */}
+      {isHovered && (
+        <div
+          className="pointer-events-none fixed z-40 hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/85 border border-slate-700/80 shadow-2xl backdrop-blur-md text-[10px] font-mono transition-transform duration-75"
+          style={{
+            left: `${mousePos.clientX + 16}px`,
+            top: `${mousePos.clientY - 12}px`,
+          }}
         >
-          {spotTemp}°C
-        </span>
-        <span className="text-slate-500 text-[9px]">
-          {spotTemp > 45 ? '[EXHAUST PLUME]' : spotTemp < 25 ? '[CHILLED INTERIOR]' : '[STREET AMBIENT]'}
-        </span>
-      </div>
+          <Crosshair className={`w-3 h-3 animate-spin ${spotTemp > 45 ? 'text-red-400' : 'text-sky-400'}`} />
+          <span className="text-slate-400">IR SPOT:</span>
+          <span
+            className={`font-bold ${
+              spotTemp > 45 ? 'text-red-400' : spotTemp > 35 ? 'text-amber-400' : 'text-sky-400'
+            }`}
+          >
+            {spotTemp}°C
+          </span>
+          <span className="text-slate-500 text-[9px]">
+            {spotTemp > 45 ? '[EXHAUST PLUME]' : spotTemp < 25 ? '[CHILLED INTERIOR]' : '[STREET AMBIENT]'}
+          </span>
+        </div>
+      )}
 
       {/* Top Floating Telemetry & Sensor Controls */}
       <div className="relative z-20 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
@@ -161,15 +166,17 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
 
       {/* Central Provocative Typographic Architecture */}
       <div className="relative z-10 my-auto max-w-5xl space-y-6 pt-8 pb-4">
-        {/* Provocative Pill Badge */}
+        {/* Provocative Kicker with Clean Typography (Anti-Slop No-Pill) */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-950/80 border border-red-900/50 text-xs font-mono text-red-300 shadow-xl backdrop-blur-md"
+          className="flex items-center gap-2 text-xs font-mono text-red-400"
         >
           <Flame className="w-3.5 h-3.5 text-red-400 animate-pulse" />
-          <span className="font-semibold">The AC Exhaust "Death Loop" in Indian Megacities</span>
+          <span className="font-semibold uppercase tracking-wider">ANTHROPOGENIC CANYON INJUSTICE</span>
+          <span className="text-slate-600">·</span>
+          <span className="text-slate-400">THE AC EXHAUST "DEATH LOOP" IN INDIAN MEGACITIES</span>
         </motion.div>
 
         {/* Master Provocative Contrast Headline */}

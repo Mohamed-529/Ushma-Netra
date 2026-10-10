@@ -43,16 +43,18 @@ AUTHORIZED UNDER MUNICIPAL CLIMATE RESILIENCE COALITION`;
   };
 
   return (
-    <section id="final-demo-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-gradient-to-b from-[#060913] via-[#0b0716] to-[#04060d] border-t border-slate-800/80">
+    <section id="final-demo-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-slate-800/80">
       {/* Background Radiance */}
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(circle_at_50%_40%,#d97706_0,transparent_65%)]" />
 
       <div className="max-w-6xl mx-auto w-full space-y-16 relative z-10">
-        {/* Section Header */}
+        {/* Section Header with Clean Typography (Anti-Slop No-Pill) */}
         <div className="space-y-3 text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 text-xs font-mono text-amber-400 px-3.5 py-1.5 rounded-full bg-amber-950/40 border border-amber-800/40">
+          <div className="flex items-center justify-center gap-2 text-xs font-mono text-amber-400">
             <Scale className="w-3.5 h-3.5 text-amber-400" />
-            <span>07 · MUNICIPAL THERMAL DEBT CALCULATOR & DECREE</span>
+            <span>07 · MUNICIPAL THERMAL DEBT CALCULATOR & STATUTORY DECREE</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-slate-400">SECTION 133 ENFORCEMENT</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
@@ -62,6 +64,50 @@ AUTHORIZED UNDER MUNICIPAL CLIMATE RESILIENCE COALITION`;
           <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed">
             Test any commercial complex profile. See how canyon geometry and condenser count compound into human collateral damage and statutory municipal penalties.
           </p>
+        </div>
+
+        {/* Commercial Complex Quick Presets */}
+        <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono space-y-2">
+          <span className="text-[10px] text-slate-400 uppercase block">Quick Field Audit Presets:</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {[
+              {
+                name: 'Ambience Mall (Delhi)',
+                type: 'mall' as const,
+                units: 72,
+                width: 6.8,
+                temp: 43.5,
+              },
+              {
+                name: 'Manyata Tech Park (Bengaluru)',
+                type: 'it_park' as const,
+                units: 54,
+                width: 8.5,
+                temp: 38.0,
+              },
+              {
+                name: 'BKC One (Mumbai)',
+                type: 'mall' as const,
+                units: 88,
+                width: 6.0,
+                temp: 39.5,
+              },
+            ].map((preset) => (
+              <button
+                key={preset.name}
+                onClick={() => {
+                  setBldgType(preset.type);
+                  setAcUnits(preset.units);
+                  setCanyonWidth(preset.width);
+                  setAmbientTemp(preset.temp);
+                }}
+                className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-left transition-all cursor-pointer flex flex-col gap-0.5"
+              >
+                <span className="font-bold text-white text-xs">{preset.name}</span>
+                <span className="text-[10px] text-slate-400">{preset.units} units · {preset.width}m canyon · {preset.temp}°C</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Interactive Calculator & Live Legal Notice Output */}
@@ -251,6 +297,21 @@ AUTHORIZED UNDER MUNICIPAL CLIMATE RESILIENCE COALITION`;
                 No mock wireframes or static pitch decks: a live 3D thermal plume twin, computer vision facade model, real-time IoT wearable telemetry with synthetic voice alerts, and an autonomous regulatory ledger.
               </p>
             </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs font-mono text-slate-300">
+              <span className="text-amber-400 font-bold block">EXPERIENCE ACT 09 // THE INTERACTIVE FINALE</span>
+              Put your statutory decrees to the test in a live simulated 48-hour urban heatwave emergency.
+            </div>
+
+            <a
+              href="#challenge"
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-slate-950 font-extrabold text-xs flex items-center gap-2 transition-all shadow-xl shadow-amber-500/20 cursor-pointer shrink-0"
+            >
+              <span>Take The Commissioner's Seat (48-Hour Simulator)</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
         </div>
       </div>
