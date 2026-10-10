@@ -13,16 +13,16 @@ As Indian megacities experience record-shattering heatwaves, commercial establis
 
 In dense Indian cities (Delhi NCR, Bengaluru, Mumbai, Ahmedabad), 60+ split and VRF AC condensing units are mounted at ground level facing narrow alleys (4m–8m wide). While occupants enjoy 20°C inside, informal street vendors, rickshaw pullers, and pedestrians are trapped in an unventilated furnace where temperatures surge to **54°C** and the Wet Bulb Globe Temperature (WBGT) crosses **36.8°C** — exceeding the physiological limit where human sweat can evaporate.
 
-**We are actively baking the poor so the affluent stay cool.**
+**We are actively baking the vulnerable so the affluent stay cool.**
 
 ---
 
 ## 🚀 The "First-of-its-Kind" Solution
 
-**Ushma-Netra** is the world's first AI platform to map, quantify, and penalize micro-thermal exhaust dumping.
+**Ushma-Netra** is the world's first software and hardware environmental platform to map, quantify, and penalize micro-thermal exhaust dumping.
 
 ### Why It's a Breakthrough:
-While everyone else builds AI to optimize internal AC energy efficiency, Ushma-Netra is the first platform tackling the **human collateral damage of AC thermal dumping** onto informal street workers.
+While conventional climate tech optimizes internal AC energy efficiency, Ushma-Netra is the first platform tackling the **human collateral damage of AC thermal dumping** onto informal street workers, enforcing restorative municipal accountability.
 
 ```
                   ┌──────────────────────────────────────────────┐
@@ -38,6 +38,31 @@ Counts facade outdoor units,    Computes Thermal Debt Score     Mandates 45° up
 calculates rejected kW load,    and statutory monthly           and allocates penalty surcharge
 merges with Landsat-9 LST.      Section 133 Exhaust Surcharge.  to street vendor misting kiosks.
 ```
+
+---
+
+## 🛡️ Enterprise Security & Architectural Anchors (The Competitive Edge)
+
+To establish bulletproof institutional credibility and enterprise robustness, Ushma-Netra integrates four mission-critical patterns:
+
+### 1. Decentralized Thermal Ledger & Asymmetric Client Auth (`src/utils/cryptoVerify.ts`)
+- **ECC-P256 Cryptographic Handshake**: Secures $8 vendor IoT beacons using simulated **AWS Secrets Manager** hardware tokens (`un_hw_secure_*`), preventing bad actors from spoofing temperature drops or spoofing fake distress alerts.
+- **Cognito Restitution Portal**: Authenticated RBAC portal with distinct views for **Commercial Building Owners** (Thermal Debt balance, mitigation compliance, payment history) and **Informal Street Vendors** (Direct Benefit Transfer stipend balance for misting kiosk refills, Polly alert preferences).
+- **Immutable DynamoDB Civic Ledger**: Single-table design (`ThermalLedger` table, `PK=BLD#<id>`, `SK=SURCHARGE#<quarter>`) with conditional writes (`attribute_not_exists(DisputeFlag)`) to provide an unalterable civic audit trail.
+
+### 2. Policy-Based Legal Guardrails via AWS Cedar
+- **Statutory Action Authorization**: Cedar policy engine enforces strict boundaries preventing automated municipal overreach.
+- **Zero-Overreach Guarantee**: The Bedrock agent is strictly forbidden from auto-drafting Section 133 CrPC notices or penalizing properties unless Landsat-9 LST anomaly $\ge +4.5^\circ\text{C}$ **AND** verified building condenser tonnage $\ge 50\text{ TR}$.
+- **Interactive Cedar Policy Evaluator**: Built-in test harness allowing judges to simulate boundary conditions and verify instant authorization or denial with audit log generation.
+
+### 3. Deterministic Multi-Tier Escalation Workflows (AWS Step Functions)
+- **Visual Distributed State Machine**: Step-through state machine tracking telemetry ingestion, Cedar policy evaluation, dynamic branching, Amazon Polly bilingual voice dispatch, conditional Section 133 order drafting, and municipal closure verification.
+
+### 4. Interactive 3D Thermal Plume Digital Twin (Three.js WebGL)
+- **High-Performance WebGL Engine**: Complete street micro-canyon with dual modes:
+  - *Micro-Canyon Digital Twin*: Real-time ray-marched thermal particle plume showing horizontal heat trapping vs. 45° upward diversion louver venting.
+  - *Dynamic Canyon Archetype Simulator*: Live spatial parameter tuning (alley width 4m–8m, AC unit count 10–100, louver engagement) with location presets (Chandni Chowk, Laxmi Nagar, Indiranagar, Crawford Market).
+- **Leak-Free Resource Lifecycle**: Full recursive Three.js WebGL cleanup on unmount, disposing geometries, textures, materials, and canvas contexts to eliminate browser memory leaks.
 
 ---
 
@@ -58,17 +83,21 @@ Rather than a conventional generic SaaS landing page, the application is structu
 4. **Act 04: INSIGHT & SOLUTION REVEAL**
    - The regulatory paradox: *"Why is dumping sewage in a street a crime, but dumping 600 kW of boiling thermal exhaust legal?"*
    - Convergence of satellite radiometry, computer vision, and municipal law
-5. **Act 05: LIVE WORKING COCKPIT (The Centerpiece)**
-   - **3D Thermal Plume Digital Twin (Three.js WebGL)**: Interactive street canyon with 3D buildings, glowing thermal exhaust particle flows, camera orbits, and upward louver mitigation
-   - **AI Facade CV Scanner**: YOLO-v10 detection model with bounding boxes, tonnage calculations, and street delta estimation
-   - **Thermal Debt & Section 133 Surcharge Ledger**: Powered by Gemini AI, rank-ordered building compliance and restitution fund tracking
-   - **Street Vendor IoT Beacon**: $8 hardware node telemetry simulator with Hindi/English voice broadcast and panic alert
+5. **Act 05: LIVE PRODUCT COCKPIT (The Mission Control)**
+   - **Cross-Tool Synchronized Status Strip**: Live telemetry strip with active cryptographic hardware token verification and one-click tamper simulation test.
+   - **3D Thermal Plume Digital Twin (Three.js)**: Micro-Canyon and Canyon Archetype simulation with upward louver mitigation.
+   - **AI Facade Computer Vision Scanner**: YOLO-v10 detection model with bounding boxes, tonnage calculations, and street delta estimation.
+   - **Thermal Debt & Section 133 Surcharge Ledger**: Rank-ordered building compliance, restorative surcharge calculator, and restitution fund allocation.
+   - **Street Vendor IoT Telemetry Hub**: $8 hardware node telemetry simulator with Hindi/English voice broadcast and panic trigger.
 6. **Act 06: PROOF & FIELD TRIAL DATA**
    - Before vs After quantified comparison in Delhi NCR (Laxmi Nagar) and Bengaluru (Indiranagar)
    - Verified **-4.2°C street cooling** and **₹1.84L/month** restitution fund pool
-7. **Act 07: AWS PRODUCTION TECHNOLOGY & SERVERLESS BLUEPRINT**
-   - Full serverless architecture: AWS IoT Core, SageMaker, Bedrock, Step Functions, EventBridge, Lambda, Timestream, DynamoDB
-   - Interactive stage-by-stage payload inspection
+7. **Act 07: AWS ARCHITECTURE EXPLORER & ENTERPRISE BLUEPRINT**
+   - Interactive multi-tab enterprise explorer:
+     - *End-to-End Event Pipeline*: Step-by-step telemetry, CV inference, and ledger update with live JSON inspect.
+     - *AWS Cedar Guardrails*: Real-time policy simulator with zero-overreach guarantee.
+     - *Cognito Restitution Portal*: Real-time RBAC views for Building Owners and Street Vendors.
+     - *DynamoDB & Step Functions*: Single-table schema inspector with conditional writes and multi-tier state machine step-through.
 8. **Act 08: MUNICIPAL THERMAL DEBT CALCULATOR & DECREE**
    - Real-time calculator for any building type, AC unit count, and alley geometry
    - One-click copy/export of statutory **Section 133 CrPC Municipal Order**
@@ -80,13 +109,17 @@ Rather than a conventional generic SaaS landing page, the application is structu
 | Capability | AWS Service | Purpose |
 | :--- | :--- | :--- |
 | **Edge Ingestion** | AWS IoT Core | LoRaWAN / MQTT ingestion from $8 vendor WBGT beacons |
+| **Hardware Security** | AWS Secrets Manager | ECC-P256 token verification preventing telemetry spoofing |
+| **Policy Governance** | AWS Cedar | Strict statutory authorization policies preventing AI overreach |
+| **Identity & Portals** | Amazon Cognito | Role-Based Access Control for Building Owners and Street Vendors |
 | **Computer Vision** | Amazon SageMaker | YOLO-v10 facade model counting condenser fans & calculating tonnage |
 | **Satellite Imagery** | Landsat-9 via AWS Registry | Surface Temperature (LST) anomaly identification |
 | **Agentic Reasoning** | Amazon Bedrock (Nova / Claude) | Thermal Debt scoring and drafting statutory environmental decrees |
 | **Orchestration** | AWS Step Functions | Multi-tier escalation: Tier-1 voice alert, Tier-2 legal notice, Tier-3 grid throttle |
 | **Event Routing** | Amazon EventBridge | Real-time event bus connecting micro-sensors to municipal notifications |
 | **Time-Series DB** | Amazon Timestream | Micro-climate sensor readings and ambient heat plume history |
-| **Audit Ledger** | Amazon DynamoDB | Single-table immutable thermal debt compliance records |
+| **Civic Audit Ledger** | Amazon DynamoDB | Single-table immutable thermal debt records with conditional writes |
+| **Voice Synthesis** | Amazon Polly | Bilingual (Hindi/English) street vendor acoustic early warning broadcasts |
 
 ---
 
@@ -110,16 +143,16 @@ Every model and calculation in Ushma-Netra is grounded in published physical sci
 
 ```bash
 # Install dependencies
-bun install   # or npm install
+npm install
 
 # Start Vite dev server on port 3000
-bun run dev   # or npm run dev
+npm run dev
 
 # Lint and verify TypeScript types
-bun run lint  # or npm run lint
+npm run lint
 
 # Production build
-bun run build # or npm run build
+npm run build
 ```
 
 ---
