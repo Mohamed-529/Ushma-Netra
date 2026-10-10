@@ -41,35 +41,79 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
     { id: 'final_demo', label: 'Civic Impact' },
   ];
 
+  const telemetryItems = [
+    { id: '1', badge: 'LIVE TELEMETRY', text: 'REAL-TIME EDGE SENSOR INGESTION ACTIVE', color: 'text-red-400', isLive: true },
+    { id: '2', badge: 'EXHAUST PLUMES', text: '53.6°C JET ANTHROPOGENIC HEAT DUMP MONITORED', color: 'text-amber-400' },
+    { id: '3', badge: 'EQUITY THRESHOLD', text: '14 STREET VENDORS IN CRITICAL WBGT EXPOSURE ZONE', color: 'text-rose-400' },
+    { id: '4', badge: 'SURCHARGE AGENT', text: 'AUTONOMOUS SECTION 133 CIVIC SURCHARGES ACTIVE', color: 'text-sky-400' },
+    { id: '5', badge: 'AWS CLOUD', text: 'IOT CORE MQTT & BEDROCK AUDIT AGENTS ONLINE', color: 'text-emerald-400' },
+    { id: '6', badge: '3D CFD TWIN', text: 'PHYSICS-INFORMED TURBULENCE SIMULATION AT 60 FPS', color: 'text-purple-400' },
+    { id: '7', badge: 'HARDWARE MESH', text: 'ESP32 LoRaWAN NODES (99.98% PACKET INTEGRITY)', color: 'text-cyan-400' },
+    { id: '8', badge: 'HEAT OFFSETS', text: 'MICRO-THERMAL EQUITY CREDITS DISTRIBUTING LIVE', color: 'text-emerald-300' },
+    { id: '9', badge: 'AWS TIMESTREAM', text: '12ms INGESTION LATENCY ACROSS CLOUD EDGES', color: 'text-zinc-300' },
+  ];
+
   return (
     <div className="relative min-h-screen w-full bg-transparent text-zinc-100 selection:bg-amber-500/20 selection:text-amber-200 antialiased overflow-x-hidden font-sans">
-      {/* Tactical Marquee Ribbon Outperforming Game Reference */}
-      <div className="w-full bg-black border-b border-zinc-800 text-[11px] font-mono py-1 px-4 overflow-hidden flex items-center justify-between text-zinc-400 select-none z-50 relative">
-        <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap animate-marquee">
-          <span className="flex items-center gap-1.5 text-red-400 font-bold">
-            <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
-            LIVE TELEMETRY
-          </span>
-          <span className="text-zinc-600">/</span>
-          <span>53.6°C ANTHROPOGENIC EXHAUST JETS DETECTED</span>
-          <span className="text-zinc-600">·</span>
-          <span className="text-amber-400 font-semibold">14 STREET VENDORS MONITORED IN CRITICAL WBGT ZONE</span>
-          <span className="text-zinc-600">·</span>
-          <span>AUTONOMOUS SECTION 133 CIVIC SURCHARGES ACTIVE</span>
-          <span className="text-zinc-600">·</span>
-          <span className="text-emerald-400">AWS IOT CORE & BEDROCK AGENTS ONLINE</span>
-          <span className="text-zinc-600">·</span>
-          <span className="text-sky-400">3D CFD DIGITAL TWIN SIMULATION READY</span>
+      {/* Tactical Marquee Ribbon: Infinite Seamless Snake Looping Stream */}
+      <div className="w-full bg-[#08080a] border-b border-zinc-800/80 text-[11px] font-mono py-1.5 px-0 overflow-hidden flex items-center justify-between text-zinc-400 select-none z-50 relative">
+        <div className="flex-1 overflow-hidden relative marquee-mask">
+          <div className="flex w-max animate-marquee">
+            {/* Primary Track */}
+            <div className="flex items-center gap-6 shrink-0 pr-6">
+              {telemetryItems.map((item) => (
+                <div key={`track-a-${item.id}`} className="flex items-center gap-2 shrink-0">
+                  {item.isLive && (
+                    <span className="relative flex h-2 w-2 mr-0.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                    </span>
+                  )}
+                  <span className={`font-bold tracking-wider ${item.color}`}>
+                    {item.badge}
+                  </span>
+                  <span className="text-zinc-600">/</span>
+                  <span className="text-zinc-300">{item.text}</span>
+                  <span className="text-zinc-700 ml-4 font-bold">✦</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Cloned Duplicate Track for 100% Mathematically Seamless Snake Looping */}
+            <div className="flex items-center gap-6 shrink-0 pr-6" aria-hidden="true">
+              {telemetryItems.map((item) => (
+                <div key={`track-b-${item.id}`} className="flex items-center gap-2 shrink-0">
+                  {item.isLive && (
+                    <span className="relative flex h-2 w-2 mr-0.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                    </span>
+                  )}
+                  <span className={`font-bold tracking-wider ${item.color}`}>
+                    {item.badge}
+                  </span>
+                  <span className="text-zinc-600">/</span>
+                  <span className="text-zinc-300">{item.text}</span>
+                  <span className="text-zinc-700 ml-4 font-bold">✦</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="hidden lg:flex items-center gap-3 shrink-0 font-mono text-[10px] text-zinc-500 pl-4 border-l border-zinc-800">
-          <span>LATENCY: 12ms</span>
-          <span>·</span>
-          <span className="text-emerald-400">AWS APPSYNC: CONNECTED</span>
+
+        {/* Static Low-Latency Telemetry Badge on Right */}
+        <div className="hidden lg:flex items-center gap-3 shrink-0 font-mono text-[10px] text-zinc-500 px-4 border-l border-zinc-800/80 bg-[#08080a] z-10 shadow-[-10px_0_15px_rgba(8,8,10,0.9)]">
+          <span className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            LATENCY: 12ms
+          </span>
+          <span className="text-zinc-700">·</span>
+          <span className="text-emerald-400 font-medium">AWS APPSYNC: ONLINE</span>
         </div>
       </div>
 
       {/* Sleek Header with Tactile Drill Launcher */}
-      <header className="sticky top-0 z-50 w-full bg-zinc-950/85 backdrop-blur-xl border-b border-zinc-800/80 transition-all">
+      <header className="sticky top-0 z-50 w-full bg-[#08080a]/85 backdrop-blur-xl border-b border-zinc-800/40 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-16 flex items-center justify-between gap-4">
           
           {/* Brand Signature */}

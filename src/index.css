@@ -98,18 +98,28 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
 }
 
-/* Marquee infinite scroll */
+/* Marquee infinite seamless scroll */
 @keyframes marqueeScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 .animate-marquee {
   display: flex;
   width: max-content;
-  animation: marqueeScroll 35s linear infinite;
+  will-change: transform;
+  animation: marqueeScroll 40s linear infinite;
 }
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
 }

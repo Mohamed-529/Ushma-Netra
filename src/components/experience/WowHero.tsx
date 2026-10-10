@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'motion/react';
 import { ArrowDown, Flame, Sparkles, Zap, Eye, Volume2, VolumeX, Thermometer, ShieldCheck, Crosshair } from 'lucide-react';
 import { soundEngine } from '../../utils/audioSynthesizer';
+import { ThermalFlowVortex } from './ThermalFlowVortex';
 
 interface Props {
   onScrollToProblem: () => void;
@@ -162,130 +163,148 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
         </div>
       </div>
 
-      {/* Central Provocative Typographic Architecture */}
-      <div className="relative z-10 my-auto max-w-5xl space-y-6 pt-8 pb-4">
-        {/* Provocative Kicker with Clean Typography (Anti-Slop No-Pill) */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="flex items-center gap-2 text-xs font-mono text-red-400"
-        >
-          <Flame className="w-3.5 h-3.5 text-red-400 animate-pulse" />
-          <span className="font-semibold uppercase tracking-wider">ANTHROPOGENIC CANYON INJUSTICE</span>
-          <span className="text-slate-600">·</span>
-          <span className="text-slate-400">THE AC EXHAUST "DEATH LOOP" IN INDIAN MEGACITIES</span>
-        </motion.div>
+      {/* Central Provocative Typographic Architecture & Interactive 3D ThermalFlowVortex */}
+      <div className="relative z-10 my-auto w-full py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          {/* Left Column: Typographic Provocation & 4-Step Pipeline */}
+          <div className="lg:col-span-7 xl:col-span-7 space-y-6">
+            {/* Provocative Kicker with Clean Typography (Anti-Slop No-Pill) */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              className="flex items-center gap-2 text-xs font-mono text-red-400"
+            >
+              <Flame className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+              <span className="font-semibold uppercase tracking-wider">ANTHROPOGENIC CANYON INJUSTICE</span>
+              <span className="text-slate-600">·</span>
+              <span className="text-slate-400">THE AC EXHAUST "DEATH LOOP" IN INDIAN MEGACITIES</span>
+            </motion.div>
 
-        {/* Master Provocative Contrast Headline with Word Text-Masking Reveal */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: { staggerChildren: 0.045, delayChildren: 0.1 },
-            },
-          }}
-          className="text-4xl sm:text-6xl lg:text-7xl font-extralight text-zinc-100 tracking-tight leading-[1.08] text-balance font-sans"
-        >
-          {/* Word-masking staggered reveal */}
-          {[
-            { text: 'While', highlight: false },
-            { text: 'the', highlight: false },
-            { text: 'penthouse', highlight: false },
-            { text: 'stays', highlight: false },
-            { text: 'cool', highlight: false },
-            { text: 'at', highlight: false },
-            { text: '21°C,', highlight: 'sky' },
-            { text: 'street', highlight: false },
-            { text: 'vendors', highlight: false },
-            { text: 'burn', highlight: 'red' },
-            { text: 'under', highlight: false },
-            { text: '54°C', highlight: 'amber' },
-            { text: 'blast', highlight: 'red' },
-            { text: 'jets.', highlight: 'red' },
-          ].map((item, idx) => (
-            <span key={idx} className="inline-block overflow-hidden mr-[0.22em] pb-1 align-bottom">
-              <motion.span
-                variants={{
-                  hidden: { y: '100%', opacity: 0 },
-                  visible: {
-                    y: '0%',
-                    opacity: 1,
-                    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-                  },
-                }}
-                className={`inline-block ${
-                  item.highlight === 'sky'
-                    ? 'text-sky-400 font-normal'
-                    : item.highlight === 'amber'
-                    ? 'text-amber-400 font-semibold'
-                    : item.highlight === 'red'
-                    ? 'bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent font-semibold'
-                    : 'text-zinc-100 font-light'
-                }`}
-              >
-                {item.text}
-              </motion.span>
-            </span>
-          ))}
-        </motion.div>
+            {/* Master Provocative Contrast Headline with Word Text-Masking Reveal */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.045, delayChildren: 0.1 },
+                },
+              }}
+              className="text-4xl sm:text-5xl xl:text-6xl font-extralight text-zinc-100 tracking-tight leading-[1.08] text-balance font-sans"
+            >
+              {/* Word-masking staggered reveal */}
+              {[
+                { text: 'While', highlight: false },
+                { text: 'the', highlight: false },
+                { text: 'penthouse', highlight: false },
+                { text: 'stays', highlight: false },
+                { text: 'cool', highlight: false },
+                { text: 'at', highlight: false },
+                { text: '21°C,', highlight: 'sky' },
+                { text: 'street', highlight: false },
+                { text: 'vendors', highlight: false },
+                { text: 'burn', highlight: 'red' },
+                { text: 'under', highlight: false },
+                { text: '54°C', highlight: 'amber' },
+                { text: 'blast', highlight: 'red' },
+                { text: 'jets.', highlight: 'red' },
+              ].map((item, idx) => (
+                <span key={idx} className="inline-block overflow-hidden mr-[0.22em] pb-1 align-bottom">
+                  <motion.span
+                    variants={{
+                      hidden: { y: '100%', opacity: 0 },
+                      visible: {
+                        y: '0%',
+                        opacity: 1,
+                        transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+                      },
+                    }}
+                    className={`inline-block ${
+                      item.highlight === 'sky'
+                        ? 'text-sky-400 font-normal'
+                        : item.highlight === 'amber'
+                        ? 'text-amber-400 font-semibold'
+                        : item.highlight === 'red'
+                        ? 'bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent font-semibold'
+                        : 'text-zinc-100 font-light'
+                    }`}
+                  >
+                    {item.text}
+                  </motion.span>
+                </span>
+              ))}
+            </motion.div>
 
-        {/* Core Scientific Briefing */}
-        <motion.p
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.45 }}
-          className="text-base sm:text-xl text-zinc-400 max-w-3xl font-light leading-relaxed tracking-normal"
-        >
-          Air conditioners do not destroy heat — they extract indoor warmth and blast superheated 54°C sensible exhaust directly into pedestrian alleys at face level. Ushma-Netra computes the invisible thermal debt, penalizes commercial violators, and autonomously protects informal street workers.
-        </motion.p>
+            {/* Core Scientific Briefing */}
+            <motion.p
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.45 }}
+              className="text-sm sm:text-base text-zinc-400 max-w-2xl font-light leading-relaxed tracking-normal"
+            >
+              Air conditioners do not destroy heat — they extract indoor warmth and blast superheated 54°C sensible exhaust directly into pedestrian alleys at face level. Ushma-Netra computes the invisible thermal debt, penalizes commercial violators, and autonomously protects informal street workers.
+            </motion.p>
 
-        {/* The 4-Pillar Pipeline Ribbon with Razor-Thin Kinetic Minimalist Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 text-xs font-mono"
-        >
-          <div className="p-3.5 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1.5 hover:border-zinc-700/60 transition-all">
-            <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
-              <span>STEP 01</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            </div>
-            <div className="font-semibold text-zinc-200 font-mono">SageMaker CV</div>
-            <div className="text-[11px] text-zinc-400 font-sans font-light">Counts facade condensers & computes heat load</div>
+            {/* The 4-Pillar Pipeline Ribbon with Razor-Thin Kinetic Minimalist Cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 text-xs font-mono"
+            >
+              <div className="p-3 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1 hover:border-zinc-700/60 transition-all">
+                <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+                  <span>STEP 01</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                </div>
+                <div className="font-semibold text-zinc-200 font-mono text-[11px]">SageMaker CV</div>
+                <div className="text-[10px] text-zinc-400 font-sans font-light">Counts facade condensers & computes heat</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1 hover:border-zinc-700/60 transition-all">
+                <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+                  <span>STEP 02</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                </div>
+                <div className="font-semibold text-sky-400 font-mono text-[11px]">Landsat Thermal</div>
+                <div className="text-[10px] text-zinc-400 font-sans font-light">Maps canyon micro-plume hitting sidewalk</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1 hover:border-zinc-700/60 transition-all">
+                <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+                  <span>STEP 03</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                </div>
+                <div className="font-semibold text-amber-400 font-mono text-[11px]">Bedrock Legal</div>
+                <div className="text-[10px] text-zinc-400 font-sans font-light">Assesses Thermal Debt & statutory ₹ Tax</div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1 hover:border-zinc-700/60 transition-all">
+                <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+                  <span>STEP 04</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                </div>
+                <div className="font-semibold text-emerald-400 font-mono text-[11px]">Section 133</div>
+                <div className="text-[10px] text-zinc-400 font-sans font-light">Enforces skyward louvers & hydration</div>
+              </div>
+            </motion.div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1.5 hover:border-zinc-700/60 transition-all">
-            <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
-              <span>STEP 02</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-            </div>
-            <div className="font-semibold text-sky-400 font-mono">Landsat-9 Thermal</div>
-            <div className="text-[11px] text-zinc-400 font-sans font-light">Maps canyon micro-plume hitting adjacent sidewalk</div>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1.5 hover:border-zinc-700/60 transition-all">
-            <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
-              <span>STEP 03</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-            </div>
-            <div className="font-semibold text-amber-400 font-mono">Bedrock Legal Agent</div>
-            <div className="text-[11px] text-zinc-400 font-sans font-light">Assesses Thermal Debt & assesses statutory ₹ Tax</div>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1.5 hover:border-zinc-700/60 transition-all">
-            <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
-              <span>STEP 04</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            </div>
-            <div className="font-semibold text-emerald-400 font-mono">Section 133 Shield</div>
-            <div className="text-[11px] text-zinc-400 font-sans font-light">Enforces skyward louvers & hydration re-routing</div>
-          </div>
-        </motion.div>
+          {/* Right Column: 3D Interactive ThermalFlowVortex Hero Object */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 xl:col-span-5 flex flex-col items-center justify-center relative"
+          >
+            <ThermalFlowVortex
+              flirMode={flirMode}
+              className="w-full"
+            />
+          </motion.div>
+        </div>
       </div>
 
       {/* Bottom Quantitative Telemetry Bar & Investigation Button */}

@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AWSArchitectureExplorer } from '../AWSArchitectureExplorer';
-import { Cloud, Cpu, Database, Server, ShieldCheck, Zap } from 'lucide-react';
+import { FloatingTechWorkspace } from './FloatingTechWorkspace';
+import { Cloud, Cpu, Database, Server, ShieldCheck, Zap, Layers, Sparkles } from 'lucide-react';
 
 export const TechnologyBlueprint: React.FC = () => {
+  const [activeView, setActiveView] = useState<'3d_workspace' | 'architecture_pipeline'>('3d_workspace');
+
   return (
     <section id="technology-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-zinc-800/40">
       {/* Dynamic Data Wave & Signal Traces Glow */}
@@ -10,19 +13,47 @@ export const TechnologyBlueprint: React.FC = () => {
 
       <div className="max-w-7xl mx-auto w-full space-y-10 relative z-10">
         {/* Header */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-xs font-mono text-sky-400">
-            <Cloud className="w-4 h-4 text-sky-400" />
-            <span>06 · AWS PRODUCTION ARCHITECTURE & DATA PIPELINE</span>
-            <span className="text-zinc-600">·</span>
-            <span className="text-zinc-400">SERVERLESS CITY-SCALE TOPOLOGY</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-xs font-mono text-sky-400">
+              <Cloud className="w-4 h-4 text-sky-400" />
+              <span>06 · AWS PRODUCTION ARCHITECTURE & DATA PIPELINE</span>
+              <span className="text-zinc-600">·</span>
+              <span className="text-zinc-400">SERVERLESS CITY-SCALE TOPOLOGY</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-light text-zinc-100 tracking-tight font-sans">
+              Serverless Infrastructure Engineered for City-Scale Enforcement
+            </h2>
+            <p className="text-sm sm:text-base text-zinc-400 max-w-3xl font-light leading-relaxed">
+              Every edge reading, street-view computer vision bounding box, and statutory Section 133 environmental decree is orchestrated across AWS serverless services with sub-second event latency.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-light text-zinc-100 tracking-tight font-sans">
-            Serverless Infrastructure Engineered for City-Scale Enforcement
-          </h2>
-          <p className="text-sm sm:text-base text-zinc-400 max-w-3xl font-light leading-relaxed">
-            Every edge reading, street-view computer vision bounding box, and statutory Section 133 environmental decree is orchestrated across AWS serverless services with sub-second event latency.
-          </p>
+
+          {/* Dual Mode Switcher: 3D Workspace vs Detailed Pipeline Blueprint */}
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-900/90 border border-zinc-800/80 backdrop-blur-md self-start md:self-auto">
+            <button
+              onClick={() => setActiveView('3d_workspace')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono flex items-center gap-2 transition-all cursor-pointer ${
+                activeView === '3d_workspace'
+                  ? 'bg-zinc-800 text-sky-400 border border-zinc-700/60 shadow-sm'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>3D TECH WORKSPACE</span>
+            </button>
+            <button
+              onClick={() => setActiveView('architecture_pipeline')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono flex items-center gap-2 transition-all cursor-pointer ${
+                activeView === 'architecture_pipeline'
+                  ? 'bg-zinc-800 text-sky-400 border border-zinc-700/60 shadow-sm'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>AWS PIPELINE EXPLORER</span>
+            </button>
+          </div>
         </div>
 
         {/* Real-Time AWS Cloud Performance Strip */}
@@ -64,10 +95,16 @@ export const TechnologyBlueprint: React.FC = () => {
           </div>
         </div>
 
-        {/* AWS Explorer Wrapper */}
-        <div className="rounded-2xl overflow-hidden border border-zinc-800/60 bg-zinc-950/40 backdrop-blur-md shadow-xl p-4 sm:p-6">
-          <AWSArchitectureExplorer />
-        </div>
+        {/* Active Display Panel */}
+        {activeView === '3d_workspace' ? (
+          <div className="space-y-6">
+            <FloatingTechWorkspace />
+          </div>
+        ) : (
+          <div className="rounded-2xl overflow-hidden border border-zinc-800/60 bg-zinc-950/40 backdrop-blur-md shadow-xl p-4 sm:p-6">
+            <AWSArchitectureExplorer />
+          </div>
+        )}
       </div>
     </section>
   );
