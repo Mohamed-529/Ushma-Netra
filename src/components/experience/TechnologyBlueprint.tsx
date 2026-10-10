@@ -4,7 +4,7 @@ import { FloatingTechWorkspace } from './FloatingTechWorkspace';
 import { Cloud, Cpu, Database, Server, ShieldCheck, Zap, Layers, Sparkles } from 'lucide-react';
 
 export const TechnologyBlueprint: React.FC = () => {
-  const [activeView, setActiveView] = useState<'3d_workspace' | 'architecture_pipeline'>('3d_workspace');
+  const [activeView, setActiveView] = useState<'3d_workspace' | 'architecture_pipeline'>('architecture_pipeline');
 
   return (
     <section id="technology-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-zinc-800/40">

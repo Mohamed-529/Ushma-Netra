@@ -1,9 +1,28 @@
 import React, { useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Float } from '@react-three/drei';
+import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
-import { Layers, Activity, Eye, Play, Sparkles, RefreshCw, Cpu, Database, Shield, Zap, Lock, Radio } from 'lucide-react';
+import {
+  Layers,
+  Activity,
+  Sparkles,
+  RefreshCw,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Palette,
+  Sun,
+  Moon,
+  Sparkle,
+  Radio,
+  Cpu,
+  Database,
+  Shield,
+  Zap,
+} from 'lucide-react';
 import { soundEngine } from '../../utils/audioSynthesizer';
+
+export type WorkspaceTheme = 'pure_white' | 'multicolor' | 'dark_noir';
 
 export interface TechCardData {
   id: string;
@@ -120,7 +139,8 @@ const InteractiveTechCard: React.FC<{
   isSelected: boolean;
   onSelect: (card: TechCardData) => void;
   onHover: (card: TechCardData | null) => void;
-}> = ({ card, isDocked, isSelected, onSelect, onHover }) => {
+  themeMode: WorkspaceTheme;
+}> = ({ card, isDocked, isSelected, onSelect, onHover, themeMode }) => {
   const meshRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
 
@@ -132,8 +152,6 @@ const InteractiveTechCard: React.FC<{
     if (!meshRef.current) return;
 
     // Target position calculation:
-    // When docked: sits in slot at Y ~ 0.28, with slight hover lift if hovered or selected
-    // When undocked: floats high in the air
     const targetY = isDocked
       ? card.slotPos[1] + (hovered ? 0.75 : isSelected ? 0.45 : 0)
       : card.elevatedPos[1] + (hovered ? 0.5 : Math.sin(Date.now() * 0.002 + card.slotIndex) * 0.15);
@@ -141,7 +159,6 @@ const InteractiveTechCard: React.FC<{
     const targetX = card.slotPos[0];
     const targetZ = card.slotPos[2];
 
-    // Smooth spring-like lerping
     const lerpSpeed = Math.min(delta * 7.5, 1);
     currentPos.current.x += (targetX - currentPos.current.x) * lerpSpeed;
     currentPos.current.y += (targetY - currentPos.current.y) * lerpSpeed;
@@ -149,7 +166,6 @@ const InteractiveTechCard: React.FC<{
 
     meshRef.current.position.copy(currentPos.current);
 
-    // Subtle tilt when hovered or selected
     const targetRotX = hovered ? -0.08 : 0;
     const targetRotY = hovered ? 0.05 : 0;
     const targetRotZ = hovered ? (card.slotIndex % 2 === 0 ? 0.03 : -0.03) : 0;
@@ -168,6 +184,14 @@ const InteractiveTechCard: React.FC<{
   const cardWidth = 2.1;
   const cardHeight = 0.22;
   const cardDepth = 2.6;
+
+  // Adapt card chassis color based on theme
+  const cardChassisColor = useMemo(() => {
+    if (themeMode === 'pure_white') {
+      return isSelected ? '#18181b' : hovered ? '#27272a' : '#1f2937';
+    }
+    return isSelected ? '#18181b' : hovered ? '#27272a' : '#0f1015';
+  }, [themeMode, isSelected, hovered]);
 
   return (
     <group
@@ -192,13 +216,13 @@ const InteractiveTechCard: React.FC<{
       <mesh castShadow receiveShadow>
         <boxGeometry args={[cardWidth, cardHeight, cardDepth]} />
         <meshStandardMaterial
-          color={isSelected ? '#18181b' : hovered ? '#27272a' : '#0f1015'}
+          color={cardChassisColor}
           roughness={0.25}
           metalness={0.7}
         />
       </mesh>
 
-      {/* Glossy Top Glass Plate */}
+      {/* Glossy Top Plate */}
       <mesh position={[0, cardHeight / 2 + 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[cardWidth - 0.12, cardDepth - 0.12]} />
         <meshPhysicalMaterial
@@ -211,7 +235,7 @@ const InteractiveTechCard: React.FC<{
         />
       </mesh>
 
-      {/* Vivid Accent Header Ribbon */}
+      {/* Vivid Multicolor Accent Header Ribbon */}
       <mesh position={[0, cardHeight / 2 + 0.02, -cardDepth / 2 + 0.35]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[cardWidth - 0.2, 0.4]} />
         <meshBasicMaterial color={card.color} />
@@ -225,7 +249,7 @@ const InteractiveTechCard: React.FC<{
         </lineSegments>
       )}
 
-      {/* 3D Dynamic Text / Monospace Data Layer */}
+      {/* 3D Dynamic Monospace Data Layer */}
       <group position={[0, cardHeight / 2 + 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         {/* Service Subtitle */}
         <Text
@@ -251,7 +275,7 @@ const InteractiveTechCard: React.FC<{
           {card.name}
         </Text>
 
-        {/* Primary Metric */}
+        {/* Primary Metric in Vivid Vibrant Color */}
         <Text
           position={[-cardWidth / 2 + 0.2, 0.1, 0]}
           fontSize={0.17}
@@ -294,15 +318,12 @@ const InteractiveTechCard: React.FC<{
 
 // Main Minimalist Matte Gray/White Deck Console Geometry
 const MainDeckConsole: React.FC<{
-  hoveredCard: TechCardData | null;
-  selectedCard: TechCardData | null;
-}> = () => {
-  // Geometric plate dimensions
+  themeMode: WorkspaceTheme;
+}> = ({ themeMode }) => {
   const deckWidth = 11.0;
   const deckHeight = 0.5;
   const deckDepth = 7.6;
 
-  // Structural notches & grid slots
   const slots = useMemo(() => {
     return CARDS_DATA.map((card) => ({
       id: card.id,
@@ -314,69 +335,69 @@ const MainDeckConsole: React.FC<{
     }));
   }, []);
 
+  const isWhite = themeMode === 'pure_white';
+
   return (
     <group position={[0, -0.25, 0]}>
-      {/* 1. Main Matte Gray/White Console Base Plate */}
+      {/* 1. Main Matte Architectural Console Base Plate */}
       <mesh castShadow receiveShadow position={[0, 0, 0]}>
         <boxGeometry args={[deckWidth, deckHeight, deckDepth]} />
         <meshStandardMaterial
-          color="#e4e4e7" // zinc-200 matte architectural white/gray
+          color={isWhite ? '#f4f4f5' : '#e4e4e7'}
           roughness={0.65}
           metalness={0.15}
         />
       </mesh>
 
-      {/* 2. Top Precision Architectural Grid Layer */}
+      {/* 2. Top Precision Face Plate */}
       <mesh position={[0, deckHeight / 2 + 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[deckWidth - 0.4, deckDepth - 0.4]} />
         <meshStandardMaterial
-          color="#f4f4f5" // zinc-100 high-key clean architectural face
-          roughness={0.5}
+          color={isWhite ? '#ffffff' : '#f4f4f5'}
+          roughness={0.45}
           metalness={0.08}
         />
       </mesh>
 
       {/* Fine Monospace Grid Lines on the deck surface */}
       <gridHelper
-        args={[10.0, 20, '#d4d4d8', '#e4e4e7']}
+        args={[10.0, 20, isWhite ? '#e2e8f0' : '#d4d4d8', isWhite ? '#f1f5f9' : '#e4e4e7']}
         position={[0, deckHeight / 2 + 0.005, 0]}
       />
 
-      {/* 3. Recessed Modular Docking Slots with technical metallic bevels */}
+      {/* 3. Recessed Modular Docking Slots */}
       {slots.map((s, idx) => (
         <group key={s.id} position={[s.pos[0], deckHeight / 2 + 0.008, s.pos[2]]}>
-          {/* Recessed well border */}
           <lineSegments rotation={[-Math.PI / 2, 0, 0]}>
             <edgesGeometry args={[new THREE.PlaneGeometry(s.w, s.d)]} />
-            <lineBasicMaterial color="#a1a1aa" linewidth={1} />
+            <lineBasicMaterial color={isWhite ? '#cbd5e1' : '#a1a1aa'} linewidth={1} />
           </lineSegments>
 
-          {/* Recessed Slot Floor with darker inset */}
           <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
             <planeGeometry args={[s.w - 0.06, s.d - 0.06]} />
             <meshStandardMaterial
-              color="#d4d4d8"
+              color={isWhite ? '#e2e8f0' : '#d4d4d8'}
               roughness={0.8}
               metalness={0.2}
             />
           </mesh>
 
-          {/* Micro Technical Corner Brackets */}
+          {/* Micro Corner Brackets */}
           <mesh position={[-s.w / 2 + 0.12, 0.01, -s.d / 2 + 0.12]}>
             <boxGeometry args={[0.16, 0.02, 0.04]} />
-            <meshStandardMaterial color="#71717a" />
+            <meshStandardMaterial color={isWhite ? '#94a3b8' : '#71717a'} />
           </mesh>
           <mesh position={[s.w / 2 - 0.12, 0.01, -s.d / 2 + 0.12]}>
             <boxGeometry args={[0.16, 0.02, 0.04]} />
-            <meshStandardMaterial color="#71717a" />
+            <meshStandardMaterial color={isWhite ? '#94a3b8' : '#71717a'} />
           </mesh>
           <mesh position={[-s.w / 2 + 0.12, 0.01, s.d / 2 - 0.12]}>
             <boxGeometry args={[0.16, 0.02, 0.04]} />
-            <meshStandardMaterial color="#71717a" />
+            <meshStandardMaterial color={isWhite ? '#94a3b8' : '#71717a'} />
           </mesh>
           <mesh position={[s.w / 2 - 0.12, 0.01, s.d / 2 - 0.12]}>
             <boxGeometry args={[0.16, 0.02, 0.04]} />
-            <meshStandardMaterial color="#71717a" />
+            <meshStandardMaterial color={isWhite ? '#94a3b8' : '#71717a'} />
           </mesh>
 
           {/* Monospace Slot Label */}
@@ -384,7 +405,7 @@ const MainDeckConsole: React.FC<{
             position={[-s.w / 2 + 0.25, 0.015, -s.d / 2 + 0.25]}
             rotation={[-Math.PI / 2, 0, 0]}
             fontSize={0.09}
-            color="#71717a"
+            color={isWhite ? '#64748b' : '#71717a'}
             anchorX="left"
             anchorY="middle"
           >
@@ -394,24 +415,21 @@ const MainDeckConsole: React.FC<{
       ))}
 
       {/* 4. Peripheral Architectural Notches & Heat-Sink Exhaust Vents */}
-      {/* Front Edge Chamfer Accent Strip */}
       <mesh position={[0, 0, deckDepth / 2 + 0.02]} receiveShadow>
         <boxGeometry args={[deckWidth - 0.8, 0.18, 0.05]} />
-        <meshStandardMaterial color="#27272a" metalness={0.8} roughness={0.3} />
+        <meshStandardMaterial color={isWhite ? '#1e293b' : '#27272a'} metalness={0.8} roughness={0.3} />
       </mesh>
 
-      {/* Status Markings on Front Bezel */}
       <Text
         position={[-deckWidth / 2 + 0.8, 0, deckDepth / 2 + 0.06]}
         fontSize={0.11}
-        color="#a1a1aa"
+        color={isWhite ? '#94a3b8' : '#a1a1aa'}
         anchorX="left"
         anchorY="middle"
       >
         USHMA-NETRA · AUTONOMOUS THERMAL INFRASTRUCTURE BENCH v3.8 · SEC_133 COMPLIANT
       </Text>
 
-      {/* LED Power / Bus Indicator */}
       <mesh position={[deckWidth / 2 - 0.8, 0, deckDepth / 2 + 0.06]}>
         <sphereGeometry args={[0.06, 16, 16]} />
         <meshBasicMaterial color="#10b981" />
@@ -422,19 +440,19 @@ const MainDeckConsole: React.FC<{
         <group key={`conduit-${i}`} position={[xPos, -0.05, -deckDepth / 2 - 0.35]}>
           <mesh castShadow receiveShadow>
             <cylinderGeometry args={[0.18, 0.18, 0.8, 16]} />
-            <meshStandardMaterial color="#3f3f46" metalness={0.9} roughness={0.2} />
+            <meshStandardMaterial color={isWhite ? '#475569' : '#3f3f46'} metalness={0.9} roughness={0.2} />
           </mesh>
           <mesh position={[0, -0.2, 0]}>
             <cylinderGeometry args={[0.12, 0.12, 0.7, 16]} />
-            <meshStandardMaterial color="#18181b" />
+            <meshStandardMaterial color={isWhite ? '#0f172a' : '#18181b'} />
           </mesh>
         </group>
       ))}
 
       {/* 5. Infinite Soft Shadow Catching Ground Floor (Sub-surface) */}
       <mesh position={[0, -0.26, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[28, 24]} />
-        <shadowMaterial opacity={0.28} />
+        <planeGeometry args={[32, 28]} />
+        <shadowMaterial opacity={isWhite ? 0.16 : 0.28} />
       </mesh>
     </group>
   );
@@ -447,10 +465,11 @@ const TechWorkspaceScene: React.FC<{
   onSelectCard: (card: TechCardData) => void;
   hoveredCard: TechCardData | null;
   setHoveredCard: (card: TechCardData | null) => void;
-}> = ({ isDocked, selectedCard, onSelectCard, hoveredCard, setHoveredCard }) => {
+  themeMode: WorkspaceTheme;
+}> = ({ isDocked, selectedCard, onSelectCard, hoveredCard, setHoveredCard, themeMode }) => {
   const rootGroupRef = useRef<THREE.Group>(null);
 
-  // Subtle breathing oscillation for the entire tilted platform
+  // Subtle breathing oscillation for the platform
   useFrame((state) => {
     if (!rootGroupRef.current) return;
     const time = state.clock.getElapsedTime();
@@ -460,10 +479,7 @@ const TechWorkspaceScene: React.FC<{
   return (
     <group ref={rootGroupRef} rotation={[0.48, -0.58, 0.28]}>
       {/* Structural Minimalist Matte White Console Tray */}
-      <MainDeckConsole
-        hoveredCard={hoveredCard}
-        selectedCard={selectedCard}
-      />
+      <MainDeckConsole themeMode={themeMode} />
 
       {/* Floating / Dockable High-Density Infrastructure Cards */}
       {CARDS_DATA.map((card) => (
@@ -474,6 +490,7 @@ const TechWorkspaceScene: React.FC<{
           isSelected={selectedCard?.id === card.id}
           onSelect={onSelectCard}
           onHover={setHoveredCard}
+          themeMode={themeMode}
         />
       ))}
     </group>
@@ -481,16 +498,18 @@ const TechWorkspaceScene: React.FC<{
 };
 
 // Lighting Rig: Neutral high-key fill + Strong Directional Light for crisp architectural shadows
-const TechnicalLightingRig: React.FC = () => {
+const TechnicalLightingRig: React.FC<{ themeMode: WorkspaceTheme }> = ({ themeMode }) => {
+  const isWhite = themeMode === 'pure_white';
+
   return (
     <>
       {/* 1. Neutral Ambient High-Key Fill */}
-      <ambientLight intensity={1.1} />
+      <ambientLight intensity={isWhite ? 1.35 : 1.1} />
 
       {/* 2. Strong Crisp Directional Key Light Casting Sharp Shadow Definition */}
       <directionalLight
         position={[14, 22, 12]}
-        intensity={2.8}
+        intensity={isWhite ? 3.0 : 2.8}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
@@ -506,14 +525,14 @@ const TechnicalLightingRig: React.FC = () => {
       {/* 3. Soft Opposite Secondary Fill Light to preserve depth without pitch-black crevices */}
       <directionalLight
         position={[-12, 10, -10]}
-        intensity={0.65}
-        color="#e0e7ff"
+        intensity={isWhite ? 0.85 : 0.65}
+        color={isWhite ? '#f8fafc' : '#e0e7ff'}
       />
 
       {/* 4. Top Rim Accent Light */}
       <pointLight
         position={[0, 16, 0]}
-        intensity={0.9}
+        intensity={isWhite ? 1.1 : 0.9}
         color="#ffffff"
       />
     </>
@@ -526,50 +545,196 @@ export const FloatingTechWorkspace: React.FC = () => {
   const [selectedCard, setSelectedCard] = useState<TechCardData | null>(CARDS_DATA[0]);
   const [hoveredCard, setHoveredCard] = useState<TechCardData | null>(null);
   const [cameraZoom, setCameraZoom] = useState<number>(44);
+  // Default to pure_white as requested by user!
+  const [themeMode, setThemeMode] = useState<WorkspaceTheme>('pure_white');
+  const [orbitResetTrigger, setOrbitResetTrigger] = useState<number>(0);
 
   const handleToggleDock = () => {
     setIsDocked((prev) => !prev);
     soundEngine.playSpikeAlert();
   };
 
+  const handleZoomIn = () => {
+    setCameraZoom((prev) => Math.min(prev + 5, 68));
+    soundEngine.playTone(600, 'sine', 0.05);
+  };
+
+  const handleZoomOut = () => {
+    setCameraZoom((prev) => Math.max(prev - 5, 28));
+    soundEngine.playTone(450, 'sine', 0.05);
+  };
+
+  const handleResetCamera = () => {
+    setCameraZoom(44);
+    setOrbitResetTrigger((prev) => prev + 1);
+    soundEngine.playTone(520, 'triangle', 0.08);
+  };
+
   const activeCard = hoveredCard || selectedCard;
+  const isWhite = themeMode === 'pure_white';
+  const isMulticolor = themeMode === 'multicolor';
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-800/60 bg-[#08080a] shadow-2xl flex flex-col">
+    <div
+      className={`relative w-full rounded-3xl overflow-hidden border transition-all duration-300 shadow-2xl flex flex-col ${
+        isWhite
+          ? 'bg-white border-zinc-200/90 text-zinc-900 shadow-zinc-200/60'
+          : isMulticolor
+          ? 'bg-gradient-to-br from-slate-50 via-sky-50/70 to-indigo-50/60 border-sky-200/80 text-zinc-900'
+          : 'bg-[#08080a] border-zinc-800/80 text-zinc-100 shadow-black/80'
+      }`}
+    >
       {/* Top Telemetry Header & Interactive HUD Ribbon */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 border-b border-zinc-800/40 bg-zinc-950/60 backdrop-blur-md z-10">
+      <div
+        className={`flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 border-b backdrop-blur-md z-10 transition-colors ${
+          isWhite
+            ? 'bg-white/95 border-zinc-200/80 text-zinc-900'
+            : isMulticolor
+            ? 'bg-white/90 border-sky-100 text-zinc-900'
+            : 'bg-zinc-950/80 border-zinc-800/50 text-zinc-100'
+        }`}
+      >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-sky-400">
+          <div
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+              isWhite
+                ? 'bg-sky-50 text-sky-600 border border-sky-200'
+                : isMulticolor
+                ? 'bg-gradient-to-br from-sky-100 to-indigo-100 text-indigo-600 border border-indigo-200'
+                : 'bg-zinc-900 border border-zinc-800 text-sky-400'
+            }`}
+          >
             <Layers className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-medium text-zinc-100 tracking-wide">
+              <span className="text-xs font-mono font-bold tracking-wider">
                 FLOATING HARDWARE TEST-BENCH
               </span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-sky-950/60 text-sky-400 border border-sky-800/60">
+              <span
+                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
+                  isWhite
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    : isMulticolor
+                    ? 'bg-indigo-50 text-indigo-700 border-indigo-300'
+                    : 'bg-sky-950/60 text-sky-400 border-sky-800/60'
+                }`}
+              >
                 R3F ISOMETRIC CANVAS
               </span>
             </div>
-            <p className="text-[11px] text-zinc-400 font-light">
+            <p className={`text-[11px] font-light ${isWhite || isMulticolor ? 'text-zinc-600' : 'text-zinc-400'}`}>
               Interactive 3D docking console mapping satellite layers, serverless micro-services, and legal decree pipelines.
             </p>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        {/* Action Controls & Aesthetic Switcher */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Aesthetic Theme Switcher (Pure White / Multicolor / Dark Noir) */}
+          <div
+            className={`flex items-center p-0.5 rounded-lg border text-xs font-mono ${
+              isWhite
+                ? 'bg-zinc-100 border-zinc-200'
+                : isMulticolor
+                ? 'bg-white/80 border-sky-200'
+                : 'bg-zinc-900 border-zinc-800'
+            }`}
+          >
+            <button
+              onClick={() => {
+                setThemeMode('pure_white');
+                soundEngine.playTone(550, 'sine', 0.05);
+              }}
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                themeMode === 'pure_white'
+                  ? 'bg-white text-zinc-900 shadow-sm border border-zinc-200'
+                  : 'text-zinc-500 hover:text-zinc-900'
+              }`}
+              title="Pure White Architectural Lab Deck (Requested)"
+            >
+              <Sun className="w-3 h-3 text-amber-500" />
+              <span>PURE WHITE</span>
+            </button>
+            <button
+              onClick={() => {
+                setThemeMode('multicolor');
+                soundEngine.playTone(600, 'sine', 0.05);
+              }}
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                themeMode === 'multicolor'
+                  ? 'bg-white text-indigo-700 shadow-sm border border-indigo-200'
+                  : 'text-zinc-500 hover:text-zinc-900'
+              }`}
+              title="Multicolor Spectrum Deck"
+            >
+              <Palette className="w-3 h-3 text-indigo-500" />
+              <span>MULTICOLOR</span>
+            </button>
+            <button
+              onClick={() => {
+                setThemeMode('dark_noir');
+                soundEngine.playTone(450, 'sine', 0.05);
+              }}
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                themeMode === 'dark_noir'
+                  ? 'bg-zinc-800 text-zinc-100 shadow-sm border border-zinc-700'
+                  : 'text-zinc-500 hover:text-zinc-200'
+              }`}
+              title="Neo-Noir Dark Matrix Deck"
+            >
+              <Moon className="w-3 h-3 text-sky-400" />
+              <span>DARK NOIR</span>
+            </button>
+          </div>
+
+          {/* Camera Zoom In / Out HUD Buttons (Replaces wheel so scroll is never hijacked) */}
+          <div
+            className={`flex items-center rounded-lg border text-xs font-mono overflow-hidden ${
+              isWhite
+                ? 'bg-zinc-100 border-zinc-200'
+                : isMulticolor
+                ? 'bg-white border-sky-200'
+                : 'bg-zinc-900 border-zinc-800'
+            }`}
+          >
+            <button
+              onClick={handleZoomIn}
+              className="p-1.5 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
+              title="Zoom In 3D View"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleZoomOut}
+              className="p-1.5 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
+              title="Zoom Out 3D View"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleResetCamera}
+              className="px-2 py-1 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[10px] border-l border-zinc-200 dark:border-zinc-800 transition-colors cursor-pointer flex items-center gap-1"
+              title="Reset Isometric Angle"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>RESET</span>
+            </button>
+          </div>
+
           {/* Dock / Undock Physics Trigger */}
           <button
             onClick={handleToggleDock}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm ${
               isDocked
-                ? 'bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700/60 shadow-sm'
-                : 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-md shadow-amber-950/40'
+                ? isWhite
+                  ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
+                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700/60'
+                : 'bg-amber-500 text-zinc-950 border border-amber-400 shadow-amber-500/30'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{isDocked ? 'EJECT / FLOAT CARDS' : 'DOCK CARDS INTO BENCH'}</span>
+            <span>{isDocked ? 'EJECT / FLOAT' : 'DOCK INTO BENCH'}</span>
           </button>
 
           {/* Quick Select Cycle */}
@@ -579,31 +744,62 @@ export const FloatingTechWorkspace: React.FC = () => {
               setSelectedCard(CARDS_DATA[nextIndex]);
               soundEngine.playTone(480, 'sine', 0.06);
             }}
-            className="px-3 py-1.5 rounded-lg bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer border ${
+              isWhite
+                ? 'bg-zinc-100 hover:bg-zinc-200/80 border-zinc-200 text-zinc-700'
+                : isMulticolor
+                ? 'bg-white hover:bg-sky-50 border-sky-200 text-sky-800'
+                : 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-800'
+            }`}
             title="Cycle next subsystem card"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">CYCLE CARD</span>
+            <span className="hidden sm:inline">CYCLE</span>
           </button>
         </div>
       </div>
 
-      {/* Main 3D Canvas Viewport */}
-      <div className="relative h-[480px] sm:h-[580px] lg:h-[640px] w-full bg-[#08080a] cursor-grab active:cursor-grabbing">
+      {/* Main 3D Canvas Viewport (Free-flowing scroll: enableZoom=false, touchAction: pan-y, transparent pass-through wheel) */}
+      <div
+        className={`relative h-[480px] sm:h-[580px] lg:h-[640px] w-full cursor-grab active:cursor-grabbing transition-colors duration-300 overflow-hidden ${
+          isWhite
+            ? 'bg-[#ffffff]'
+            : isMulticolor
+            ? 'bg-gradient-to-b from-[#f8fafc] via-[#f0f9ff] to-[#f5f3ff]'
+            : 'bg-[#08080a]'
+        }`}
+        style={{ touchAction: 'pan-y' }}
+        onWheel={(e) => {
+          // Guarantee buttery page scroll whenever scrolling anywhere over the 3D canvas
+          window.scrollBy({ top: e.deltaY, behavior: 'auto' });
+        }}
+      >
         {/* Subtle engineering background grid behind 3D render */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-20"
+          className={`absolute inset-0 pointer-events-none transition-opacity ${
+            isWhite
+              ? 'opacity-40'
+              : isMulticolor
+              ? 'opacity-30'
+              : 'opacity-20'
+          }`}
           style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
-            `,
+            backgroundImage: isWhite
+              ? `
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px)
+              `
+              : `
+                linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
+              `,
             backgroundSize: '40px 40px',
           }}
         />
 
         {/* 3D Canvas Instance */}
         <Canvas
+          key={`canvas-reset-${orbitResetTrigger}`}
           shadows
           orthographic
           camera={{
@@ -613,9 +809,10 @@ export const FloatingTechWorkspace: React.FC = () => {
             far: 100,
           }}
           className="w-full h-full"
+          gl={{ antialias: true, alpha: true }}
         >
-          {/* Lighting Rig */}
-          <TechnicalLightingRig />
+          {/* Lighting Rig tailored to theme */}
+          <TechnicalLightingRig themeMode={themeMode} />
 
           {/* Isometric Tech Deck with Cards */}
           <TechWorkspaceScene
@@ -624,14 +821,13 @@ export const FloatingTechWorkspace: React.FC = () => {
             onSelectCard={setSelectedCard}
             hoveredCard={hoveredCard}
             setHoveredCard={setHoveredCard}
+            themeMode={themeMode}
           />
 
-          {/* Smooth Orbital Controls (Constrained for pristine isometric view) */}
+          {/* Smooth Orbital Controls: enableZoom=FALSE SO MOUSE WHEEL SCROLLS FREELY! */}
           <OrbitControls
             enablePan={false}
-            enableZoom={true}
-            minZoom={28}
-            maxZoom={70}
+            enableZoom={false} // CRITICAL: NEVER block page scroll wheel!
             maxPolarAngle={Math.PI / 2.1}
             minPolarAngle={Math.PI / 6}
             dampingFactor={0.06}
@@ -640,56 +836,86 @@ export const FloatingTechWorkspace: React.FC = () => {
 
         {/* Floating Active Inspector Card HUD Overlay */}
         {activeCard && (
-          <div className="absolute top-4 left-4 max-w-sm w-full p-4 rounded-xl bg-zinc-950/85 backdrop-blur-md border border-zinc-800/80 shadow-2xl pointer-events-none z-10 transition-all">
-            <div className="flex items-center justify-between border-b border-zinc-800/60 pb-2 mb-2">
+          <div
+            className={`absolute top-4 left-4 max-w-sm w-full p-4 rounded-2xl backdrop-blur-xl border shadow-2xl pointer-events-none z-10 transition-all ${
+              isWhite
+                ? 'bg-white/95 border-zinc-200/90 text-zinc-900 shadow-zinc-300/50'
+                : isMulticolor
+                ? 'bg-white/95 border-sky-200 text-zinc-900 shadow-sky-200/50'
+                : 'bg-zinc-950/85 border-zinc-800/80 text-zinc-100 shadow-black/80'
+            }`}
+          >
+            <div className={`flex items-center justify-between border-b pb-2 mb-2 ${isWhite || isMulticolor ? 'border-zinc-200' : 'border-zinc-800/60'}`}>
               <div className="flex items-center gap-2">
                 <div
-                  className="w-2.5 h-2.5 rounded-full"
+                  className="w-2.5 h-2.5 rounded-full ring-2 ring-white/50"
                   style={{ backgroundColor: activeCard.color }}
                 />
-                <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
+                <span className={`text-[10px] font-mono uppercase tracking-wider font-semibold ${isWhite || isMulticolor ? 'text-zinc-500' : 'text-zinc-400'}`}>
                   {activeCard.category} // BAY-0{activeCard.slotIndex + 1}
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 font-bold">
+              <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
                 {isDocked ? 'DOCKED IN BENCH' : 'FLOATING STATE'}
               </span>
             </div>
 
             <div className="space-y-1">
-              <h4 className="text-sm font-semibold text-zinc-100 tracking-tight">
+              <h4 className="text-sm font-bold tracking-tight">
                 {activeCard.name}
               </h4>
-              <p className="text-xs text-zinc-300 font-mono">
+              <p className={`text-xs font-mono ${isWhite || isMulticolor ? 'text-zinc-600' : 'text-zinc-300'}`}>
                 {activeCard.service}
               </p>
             </div>
 
-            <div className="mt-3 p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800/60 space-y-1 font-mono text-xs">
+            <div
+              className={`mt-3 p-2.5 rounded-xl border space-y-1 font-mono text-xs ${
+                isWhite
+                  ? 'bg-zinc-50 border-zinc-200'
+                  : isMulticolor
+                  ? 'bg-sky-50/60 border-sky-200'
+                  : 'bg-zinc-900/80 border-zinc-800/60'
+              }`}
+            >
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 text-[11px]">Primary Telemetry:</span>
-                <span className="font-bold" style={{ color: activeCard.color }}>
+                <span className={`text-[11px] ${isWhite || isMulticolor ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                  Primary Telemetry:
+                </span>
+                <span className="font-bold text-sm" style={{ color: activeCard.color }}>
                   {activeCard.metric}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-zinc-500 text-[11px]">Engine Spec:</span>
-                <span className="text-zinc-300 text-[11px]">{activeCard.subtext}</span>
+                <span className={`text-[11px] ${isWhite || isMulticolor ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                  Engine Spec:
+                </span>
+                <span className={`text-[11px] font-medium ${isWhite || isMulticolor ? 'text-zinc-700' : 'text-zinc-300'}`}>
+                  {activeCard.subtext}
+                </span>
               </div>
             </div>
 
-            <div className="mt-2 text-[10px] font-mono text-zinc-500 flex items-center justify-between">
-              <span>CLICK TO FOCUS</span>
-              <span>ORBIT CANVAS TO INSPECT</span>
+            <div className={`mt-2 text-[10px] font-mono flex items-center justify-between ${isWhite || isMulticolor ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              <span>CLICK CARD TO FOCUS</span>
+              <span>DRAG TRAY TO ROTATE</span>
             </div>
           </div>
         )}
 
         {/* Micro Telemetry Legend in bottom-right */}
-        <div className="absolute bottom-4 right-4 p-3 rounded-lg bg-zinc-950/80 backdrop-blur-md border border-zinc-800/60 text-[10px] font-mono text-zinc-400 space-y-1 pointer-events-none">
-          <div className="text-zinc-300 font-semibold mb-1 flex items-center gap-1.5">
-            <Activity className="w-3 h-3 text-sky-400" />
-            <span>DECK RECEPTION CHANNELS</span>
+        <div
+          className={`absolute bottom-4 right-4 p-3 rounded-xl backdrop-blur-md border text-[10px] font-mono space-y-1 pointer-events-none hidden sm:block ${
+            isWhite
+              ? 'bg-white/90 border-zinc-200/90 text-zinc-700 shadow-md'
+              : isMulticolor
+              ? 'bg-white/90 border-sky-200 text-zinc-700 shadow-md'
+              : 'bg-zinc-950/80 border-zinc-800/60 text-zinc-400 shadow-black/80'
+          }`}
+        >
+          <div className="font-bold mb-1 flex items-center gap-1.5">
+            <Activity className="w-3 h-3 text-sky-500" />
+            <span>MULTICOLOR DECK CHANNELS</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-cyan-500 inline-block" />
@@ -713,22 +939,54 @@ export const FloatingTechWorkspace: React.FC = () => {
           </div>
         </div>
 
-        {/* Canvas interaction hints */}
-        <div className="absolute bottom-4 left-4 flex items-center gap-2 text-[10px] font-mono text-zinc-500 pointer-events-none">
-          <span className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
-            DRAG TO ROTATE
+        {/* Free-flow Scroll & Gesture Guidance in bottom-left */}
+        <div className="absolute bottom-4 left-4 flex flex-wrap items-center gap-2 text-[10px] font-mono pointer-events-none">
+          <span
+            className={`px-2 py-0.5 rounded-md border font-semibold ${
+              isWhite
+                ? 'bg-white/90 border-zinc-300 text-zinc-800 shadow-xs'
+                : isMulticolor
+                ? 'bg-white/90 border-sky-300 text-sky-900 shadow-xs'
+                : 'bg-zinc-900 border-zinc-800 text-zinc-300'
+            }`}
+          >
+            👆 DRAG TO ROTATE 3D TRAY
           </span>
-          <span className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
-            SCROLL TO ZOOM
+          <span
+            className={`px-2 py-0.5 rounded-md border font-semibold ${
+              isWhite
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs'
+                : isMulticolor
+                ? 'bg-indigo-50 border-indigo-300 text-indigo-800 shadow-xs'
+                : 'bg-emerald-950/60 border-emerald-800/80 text-emerald-400'
+            }`}
+          >
+            ✓ MOUSE WHEEL SCROLLS PAGE FREELY
           </span>
-          <span className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
-            HOVER CARDS FOR LIFT & SHADOWS
+          <span
+            className={`hidden md:inline-block px-2 py-0.5 rounded-md border ${
+              isWhite
+                ? 'bg-white/90 border-zinc-300 text-zinc-600'
+                : isMulticolor
+                ? 'bg-white/90 border-sky-300 text-sky-800'
+                : 'bg-zinc-900 border-zinc-800 text-zinc-400'
+            }`}
+          >
+            HOVER CARDS FOR RAYCASTER LIFT
           </span>
         </div>
       </div>
 
       {/* Quick Interactive Card Dock Selector Bar */}
-      <div className="p-3 bg-zinc-950/80 border-t border-zinc-800/40 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      <div
+        className={`p-3 border-t grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 transition-colors ${
+          isWhite
+            ? 'bg-zinc-50 border-zinc-200 text-zinc-900'
+            : isMulticolor
+            ? 'bg-sky-50/50 border-sky-200 text-zinc-900'
+            : 'bg-zinc-950/80 border-zinc-800/40 text-zinc-100'
+        }`}
+      >
         {CARDS_DATA.map((card) => {
           const isCurrent = selectedCard?.id === card.id;
           return (
@@ -740,22 +998,30 @@ export const FloatingTechWorkspace: React.FC = () => {
               }}
               onMouseEnter={() => setHoveredCard(card)}
               onMouseLeave={() => setHoveredCard(null)}
-              className={`p-2 rounded-lg text-left transition-all border font-mono text-[11px] cursor-pointer ${
+              className={`p-2 rounded-xl text-left transition-all border font-mono text-[11px] cursor-pointer ${
                 isCurrent
-                  ? 'bg-zinc-900 border-zinc-600 text-zinc-100 shadow-md'
+                  ? isWhite
+                    ? 'bg-white border-zinc-400 text-zinc-950 shadow-md ring-2 ring-sky-500/20'
+                    : isMulticolor
+                    ? 'bg-white border-indigo-400 text-zinc-950 shadow-md ring-2 ring-indigo-500/20'
+                    : 'bg-zinc-900 border-zinc-600 text-zinc-100 shadow-md'
+                  : isWhite
+                  ? 'bg-white/60 hover:bg-white border-zinc-200 text-zinc-600'
+                  : isMulticolor
+                  ? 'bg-white/60 hover:bg-white border-sky-200 text-sky-900'
                   : 'bg-zinc-950/50 hover:bg-zinc-900/60 border-zinc-800/60 text-zinc-400'
               }`}
             >
               <div className="flex items-center gap-1.5 truncate mb-1">
                 <span
-                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  className="w-2 h-2 rounded-full flex-shrink-0"
                   style={{ backgroundColor: card.color }}
                 />
-                <span className="truncate font-semibold text-zinc-300">
+                <span className={`truncate font-bold ${isWhite || isMulticolor ? 'text-zinc-800' : 'text-zinc-200'}`}>
                   BAY-0{card.slotIndex + 1}
                 </span>
               </div>
-              <div className="text-[10px] text-zinc-400 truncate">
+              <div className={`text-[10px] truncate ${isWhite || isMulticolor ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 {card.name.split(' ')[0]}
               </div>
             </button>

@@ -3,6 +3,8 @@ export interface BuildingAudit {
   name: string;
   location: string;
   city: string;
+  district?: string;
+  coordinates?: { lat: number; lng: number };
   canyonWidthMeters: number;
   facadeOrientation: string;
   detectedOutdoorUnits: {
@@ -15,6 +17,7 @@ export interface BuildingAudit {
   exhaustAirTempCelsius: number;
   ambientBaselineTempCelsius: number;
   streetPlumeTempCelsius: number;
+  satelliteTirTempCelsius?: number; // Landsat-9 TIR Band 10 surface reading
   thermalDebtScore: number; // 0 - 100
   monthlyExhaustTaxInr: number;
   adjacentVulnerablePopulation: {

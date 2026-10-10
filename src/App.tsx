@@ -1,22 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { BuildingAudit, VendorTelemetry, IncidentLog } from './types';
 import { INITIAL_BUILDINGS, INITIAL_VENDORS, INITIAL_LOGS } from './data/mockData';
 import { DynamicAtmosphere, StoryAct } from './components/experience/DynamicAtmosphere';
 import { ProfessionalLandingLayout } from './components/ProfessionalLandingLayout';
-import { WowHero } from './components/experience/WowHero';
-import { VisceralProblem } from './components/experience/VisceralProblem';
-import { WhyThisMatters } from './components/experience/WhyThisMatters';
-import { SolutionReveal } from './components/experience/SolutionReveal';
-import { LiveProductCockpit } from './components/experience/LiveProductCockpit';
-import { ProofValidation } from './components/experience/ProofValidation';
-import { TechnologyBlueprint } from './components/experience/TechnologyBlueprint';
-import { FinalDemoDecree } from './components/experience/FinalDemoDecree';
-import { MunicipalDefenseChallenge } from './components/experience/MunicipalDefenseChallenge';
-import { GrandFinaleFooter } from './components/experience/GrandFinaleFooter';
+import { HomePage } from './pages/HomePage';
+import { ThermalGridPage } from './pages/ThermalGridPage';
+import { HowItWorksPage } from './pages/HowItWorksPage';
+import { MethodologyPage } from './pages/MethodologyPage';
+import { WatchlistPage } from './pages/WatchlistPage';
+import { LedgerPage } from './pages/LedgerPage';
+import { TwinLabPage } from './pages/TwinLabPage';
+import { ScannerPage } from './pages/ScannerPage';
 import { soundEngine } from './utils/audioSynthesizer';
-import { Flame, AlertTriangle, ShieldCheck, X, Activity } from 'lucide-react';
+import { Flame, AlertTriangle, ShieldCheck, X } from 'lucide-react';
 
-export default function App() {
+// Scroll-to-top handler on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname]);
+
+  return null;
+}
+
+// Inner Application Component with Route-Aware Atmosphere
+function AppContent() {
+  const location = useLocation();
   const [activeAct, setActiveAct] = useState<StoryAct>('wow_hero');
   const [buildings, setBuildings] = useState<BuildingAudit[]>(INITIAL_BUILDINGS);
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingAudit>(INITIAL_BUILDINGS[0]);
@@ -26,7 +38,28 @@ export default function App() {
   const [logs, setLogs] = useState<IncidentLog[]>(INITIAL_LOGS);
   const [surgeModalOpen, setSurgeModalOpen] = useState<boolean>(false);
 
-  // Smooth scroll to target story act
+  // Map route to theme atmosphere
+  useEffect(() => {
+    if (location.pathname === '/') {
+      setActiveAct('wow_hero');
+    } else if (location.pathname.startsWith('/grid')) {
+      setActiveAct('tension');
+    } else if (location.pathname.startsWith('/how-it-works') || location.pathname.startsWith('/pipeline')) {
+      setActiveAct('solution');
+    } else if (location.pathname.startsWith('/methodology') || location.pathname.startsWith('/science')) {
+      setActiveAct('proof');
+    } else if (location.pathname.startsWith('/watchlist') || location.pathname.startsWith('/alerts')) {
+      setActiveAct('problem');
+    } else if (location.pathname.startsWith('/ledger') || location.pathname.startsWith('/audit')) {
+      setActiveAct('final_demo');
+    } else if (location.pathname.startsWith('/twin') || location.pathname.startsWith('/digital-twin')) {
+      setActiveAct('live_cockpit');
+    } else if (location.pathname.startsWith('/scanner') || location.pathname.startsWith('/vision')) {
+      setActiveAct('technology');
+    }
+  }, [location.pathname]);
+
+  // Smooth scroll to target story act on Home page
   const scrollToAct = (act: StoryAct) => {
     const el = document.getElementById(act);
     if (el) {
@@ -35,45 +68,7 @@ export default function App() {
     setActiveAct(act);
   };
 
-  // Track active act on scroll using IntersectionObserver
-  useEffect(() => {
-    const actIds: StoryAct[] = [
-      'wow_hero',
-      'problem',
-      'tension',
-      'solution',
-      'live_cockpit',
-      'proof',
-      'technology',
-      'final_demo',
-      'challenge',
-    ];
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.id as StoryAct;
-            if (actIds.includes(id)) {
-              setActiveAct(id);
-            }
-          }
-        });
-      },
-      {
-        threshold: 0.25,
-      }
-    );
-
-    actIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Trigger peak crisis simulation
+  // Trigger peak crisis heat surge simulation
   const handleSimulateSurge = () => {
     setIsMitigated(false);
     setSurgeModalOpen(true);
@@ -100,7 +95,7 @@ export default function App() {
             ...b,
             mitigationStatus: 'compliant',
             monthlyExhaustTaxInr: Math.round(b.monthlyExhaustTaxInr * 0.35),
-            streetPlumeTempCelsius: b.ambientBaselineTempCelsius + 1.2,
+            streetPlumeTempCelsius: +(b.ambientBaselineTempCelsius + 1.2).toFixed(1),
             thermalDebtScore: Math.round(b.thermalDebtScore * 0.4),
           };
         }
@@ -117,7 +112,6 @@ export default function App() {
       detail: `${selectedBuilding.name} deployed verified thermal diversion. Street heat delta reduced by 4.2°C; surcharge discounted.`,
     };
     setLogs((prev) => [newLog, ...prev]);
-    scrollToAct('live_cockpit');
   };
 
   return (
@@ -125,7 +119,7 @@ export default function App() {
       {/* Dynamic Background with scroll-aware color temperatures, mesh gradients & particles */}
       <DynamicAtmosphere activeAct={activeAct} isSurgeActive={surgeModalOpen} />
 
-      {/* Elite Console Wrapper: Sticky Header Navigation & Absolute Bottom Status Ribbon */}
+      {/* Global Layout: Sticky Header Navigation with Infinite Ticker & Routing */}
       <ProfessionalLandingLayout
         activePresetName={`${selectedBuilding.name} Canyon`}
         isHardwareConnected={false}
@@ -137,135 +131,242 @@ export default function App() {
         onToggleMitigation={() => setIsMitigated(!isMitigated)}
         onConnectHardware={() => scrollToAct('live_cockpit')}
       >
-        {/* Narrative Sequence: WOW -> PROBLEM -> TENSION -> SOLUTION -> LIVE TWIN -> PROOF -> TECH -> IMPACT */}
-        <div id="wow_hero">
-          <WowHero
-            onScrollToProblem={() => scrollToAct('problem')}
-            onJumpToLive={() => scrollToAct('live_cockpit')}
+        <Routes>
+          {/* Flagship Home Page */}
+          <Route
+            path="/"
+            element={
+              <HomePage
+                buildings={buildings}
+                selectedBuilding={selectedBuilding}
+                onSelectBuilding={setSelectedBuilding}
+                vendors={vendors}
+                selectedVendor={selectedVendor}
+                onSelectVendor={setSelectedVendor}
+                isMitigated={isMitigated}
+                onMitigationToggle={setIsMitigated}
+                onApplyMitigation={handleApplyMitigation}
+                onSimulateSurge={handleSimulateSurge}
+                onScrollToAct={scrollToAct}
+              />
+            }
           />
-        </div>
 
-        {/* Act 2: PROBLEM (Anthropogenic Canyon Thermodynamics) */}
-        <div id="problem">
-          <VisceralProblem />
-        </div>
-
-        {/* Act 3: TENSION & HUMAN COLLATERAL (Physiological Limit & Rameshwar Pal Story) */}
-        <div id="tension">
-          <WhyThisMatters />
-        </div>
-
-        {/* Act 4: INSIGHT & SOLUTION REVEAL (The Architectural Convergence) */}
-        <div id="solution">
-          <SolutionReveal onScrollToLive={() => scrollToAct('live_cockpit')} />
-        </div>
-
-        {/* Act 5: LIVE WORKING PRODUCT COCKPIT (3D WebGL Twin + CV Scanner + Surcharge Ledger + IoT Beacon) */}
-        <div id="live_cockpit">
-          <LiveProductCockpit
-            building={selectedBuilding}
-            allBuildings={buildings}
-            onSelectBuilding={setSelectedBuilding}
-            vendor={selectedVendor}
-            allVendors={vendors}
-            onSelectVendor={setSelectedVendor}
-            isMitigated={isMitigated}
-            onMitigationToggle={(m) => setIsMitigated(m)}
-            onApplyMitigation={handleApplyMitigation}
-            onSimulateSurge={handleSimulateSurge}
+          {/* National Thermal Grid & Hotspot Registry */}
+          <Route
+            path="/grid"
+            element={
+              <ThermalGridPage
+                buildings={buildings}
+                selectedBuilding={selectedBuilding}
+                onSelectBuilding={setSelectedBuilding}
+                onApplyMitigation={handleApplyMitigation}
+                vendors={vendors}
+              />
+            }
           />
-        </div>
+          <Route
+            path="/grid/:zoneId"
+            element={
+              <ThermalGridPage
+                buildings={buildings}
+                selectedBuilding={selectedBuilding}
+                onSelectBuilding={setSelectedBuilding}
+                onApplyMitigation={handleApplyMitigation}
+                vendors={vendors}
+              />
+            }
+          />
 
-        {/* Act 6: PROOF & FIELD VALIDATION (Delhi & Bengaluru Field Trial Data) */}
-        <div id="proof">
-          <ProofValidation />
-        </div>
+          {/* 6-Stage Autonomous Pipeline */}
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/pipeline" element={<HowItWorksPage />} />
 
-        {/* Act 7: AWS PRODUCTION TECHNOLOGY & SERVERLESS BLUEPRINT */}
-        <div id="technology">
-          <TechnologyBlueprint />
-        </div>
+          {/* Scientific Methodology & Live Thermodynamic Calculator */}
+          <Route path="/methodology" element={<MethodologyPage />} />
+          <Route path="/science" element={<MethodologyPage />} />
 
-        {/* Act 8: MUNICIPAL THERMAL DEBT CALCULATOR, SECTION 133 DECREE & JUDGE EVALUATION */}
-        <div id="final_demo">
-          <FinalDemoDecree />
-        </div>
+          {/* Heat Surge Watchlist & Community SMS/WhatsApp Alerts */}
+          <Route
+            path="/watchlist"
+            element={
+              <WatchlistPage
+                buildings={buildings}
+                logs={logs}
+                onSimulateSurge={handleSimulateSurge}
+              />
+            }
+          />
+          <Route
+            path="/alerts"
+            element={
+              <WatchlistPage
+                buildings={buildings}
+                logs={logs}
+                onSimulateSurge={handleSimulateSurge}
+              />
+            }
+          />
 
-        {/* Act 9: INTERACTIVE FINALE - 48-HOUR HEATWAVE DEFENSE CHALLENGE */}
-        <div id="challenge">
-          <MunicipalDefenseChallenge />
-        </div>
+          {/* Municipal Section 133 CrPC Thermal Debt Ledger */}
+          <Route
+            path="/ledger"
+            element={
+              <LedgerPage
+                buildings={buildings}
+                selectedBuilding={selectedBuilding}
+                onSelectBuilding={setSelectedBuilding}
+                vendor={selectedVendor}
+                onApplyMitigation={handleApplyMitigation}
+              />
+            }
+          />
+          <Route
+            path="/audit"
+            element={
+              <LedgerPage
+                buildings={buildings}
+                selectedBuilding={selectedBuilding}
+                onSelectBuilding={setSelectedBuilding}
+                vendor={selectedVendor}
+                onApplyMitigation={handleApplyMitigation}
+              />
+            }
+          />
 
-      {/* Peak Heat Crisis Simulation Modal */}
+          {/* Full-Bleed 3D CFD Digital Twin & SCADA Lab */}
+          <Route
+            path="/twin"
+            element={
+              <TwinLabPage
+                building={selectedBuilding}
+                allBuildings={buildings}
+                onSelectBuilding={setSelectedBuilding}
+                vendor={selectedVendor}
+                isMitigated={isMitigated}
+                onMitigationToggle={setIsMitigated}
+                onSimulateSurge={handleSimulateSurge}
+              />
+            }
+          />
+          <Route
+            path="/digital-twin"
+            element={
+              <TwinLabPage
+                building={selectedBuilding}
+                allBuildings={buildings}
+                onSelectBuilding={setSelectedBuilding}
+                vendor={selectedVendor}
+                isMitigated={isMitigated}
+                onMitigationToggle={setIsMitigated}
+                onSimulateSurge={handleSimulateSurge}
+              />
+            }
+          />
+
+          {/* AI Façade Computer Vision Scanner */}
+          <Route
+            path="/scanner"
+            element={
+              <ScannerPage
+                building={selectedBuilding}
+                allBuildings={buildings}
+                onSelectBuilding={setSelectedBuilding}
+              />
+            }
+          />
+          <Route
+            path="/vision"
+            element={
+              <ScannerPage
+                building={selectedBuilding}
+                allBuildings={buildings}
+                onSelectBuilding={setSelectedBuilding}
+              />
+            }
+          />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ProfessionalLandingLayout>
+
+      {/* Emergency Heat Surge Crisis Modal */}
       {surgeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className="max-w-md w-full bg-slate-950 border-2 border-red-600 rounded-3xl p-6 shadow-2xl shadow-red-950/80 space-y-4">
-            <div className="flex items-center justify-between border-b border-red-900/60 pb-3">
-              <div className="flex items-center gap-2 text-red-500 font-bold text-sm font-mono">
-                <Flame className="w-5 h-5 animate-pulse" />
-                <span>54°C PEAK EXHAUST SPIKE DETECTED</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#12080a] border border-red-800 rounded-2xl max-w-lg w-full p-6 space-y-6 shadow-2xl shadow-red-950/80">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-red-950 rounded-xl border border-red-800 text-red-500 animate-pulse">
+                  <Flame className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-red-400 tracking-wider">
+                    Tier-1 Anthropogenic Heat Alert
+                  </span>
+                  <h3 className="text-lg font-bold text-white">Peak Cooling Crisis Triggered</h3>
+                </div>
               </div>
               <button
                 onClick={() => setSurgeModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-900 cursor-pointer"
+                className="text-zinc-500 hover:text-zinc-300 p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="text-xs text-slate-300 space-y-3 font-sans leading-relaxed">
-              <p>
-                Commercial AC systems at <strong>{selectedBuilding.name}</strong> surged to maximum load during 42.5°C peak afternoon ambient heat.
+            <div className="space-y-3 text-xs font-mono text-zinc-300">
+              <p className="leading-relaxed">
+                Aggregated commercial AC condensers rejection surged past{' '}
+                <span className="text-red-400 font-bold">638.4 kW</span> at{' '}
+                <span className="text-white font-bold">{selectedBuilding.name}</span>.
               </p>
-              <div className="p-3 bg-red-950/40 rounded-xl border border-red-900 text-xs font-mono space-y-1">
+              <div className="p-3 bg-red-950/40 rounded-xl border border-red-900/60 space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Outdoor Sensible Blast:</span>
-                  <span className="text-red-400 font-bold">53.6°C Direct Jet</span>
+                  <span className="text-zinc-400">Exhaust Air Jet:</span>
+                  <span className="text-red-400 font-bold">55.4°C</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Total Rejected Heat:</span>
-                  <span className="text-red-400 font-bold">638.4 kW sensible</span>
+                  <span className="text-zinc-400">Street Alley WBGT:</span>
+                  <span className="text-red-400 font-bold">36.8°C (Lethal Limit Crossed)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Vendor Rameshwar Pal WBGT:</span>
-                  <span className="text-red-500 font-bold">36.8°C (Extreme Lethality)</span>
+                  <span className="text-zinc-400">Affected Cart:</span>
+                  <span className="text-white font-bold">{selectedVendor.vendorName} (2.8m from vent)</span>
                 </div>
               </div>
-              <p>
-                Ushma-Netra has autonomously dispatched an automated Hindi voice evacuation advisory to the vendor's IoT beacon and generated a Section 133 Municipal Exhaust Tax Notice of <strong>₹{selectedBuilding.monthlyExhaustTaxInr.toLocaleString('en-IN')}/month</strong>.
-              </p>
             </div>
 
-            <div className="pt-2 flex justify-end gap-3 font-mono">
+            <div className="flex items-center justify-between gap-3 pt-2">
               <button
                 onClick={() => {
+                  handleApplyMitigation(selectedBuilding.id, 'Pneumatic Deflection Louvers + Misting');
                   setSurgeModalOpen(false);
-                  scrollToAct('live_cockpit');
                 }}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-medium cursor-pointer border border-slate-700"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
               >
-                Inspect Live Twin
+                <ShieldCheck className="w-4 h-4 fill-current text-zinc-950" />
+                <span>Deploy Autonomous Mitigation</span>
               </button>
               <button
-                onClick={() => {
-                  setSurgeModalOpen(false);
-                  scrollToAct('final_demo');
-                }}
-                className="px-4 py-2 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white rounded-xl text-xs font-bold cursor-pointer shadow-lg"
+                onClick={() => setSurgeModalOpen(false)}
+                className="py-2.5 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 text-xs font-mono"
               >
-                Review Section 133 Order
+                Dismiss
               </button>
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
 
-      {/* Grand Finale Footer Outperforming Reference (Massive Wordmark, Multi-Tab Verification Terminal, Audio Dispatch & Spec Sheets) */}
-      <GrandFinaleFooter
-        onNavigateTo={scrollToAct}
-        onSimulateSurge={handleSimulateSurge}
-      />
-    </ProfessionalLandingLayout>
-  </div>
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <AppContent />
+    </BrowserRouter>
   );
 }

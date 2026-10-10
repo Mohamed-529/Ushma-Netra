@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 
 export type StoryAct =
   | 'wow_hero'
+  | 'workspace'
   | 'problem'
   | 'tension'
   | 'solution'
@@ -32,15 +33,28 @@ export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive })
     switch (activeAct) {
       case 'wow_hero':
         return {
-          bgColor: '#040711',
-          mesh1: 'rgba(239, 68, 68, 0.22)',
-          mesh2: 'rgba(245, 158, 11, 0.18)',
-          mesh3: 'rgba(30, 58, 138, 0.35)',
-          meshPos1: '60% 30%',
-          meshPos2: '30% 70%',
-          particleColor: '#f59e0b',
-          heatAuraOpacity: 0.15,
+          bgColor: '#faf7f2', // mild pleasant sandalwood white canvas
+          mesh1: 'rgba(237, 222, 206, 0.65)', // warm sandalwood glow
+          mesh2: 'rgba(247, 240, 232, 0.85)', // rich creamy ivory sheen
+          mesh3: 'rgba(254, 243, 199, 0.50)', // soft natural sunlight amber
+          meshPos1: '50% 20%',
+          meshPos2: '35% 65%',
+          particleColor: '#c9b9a6',
+          heatAuraOpacity: 0.04,
           tempIndicator: '38.0°C Ambient',
+          isLight: true,
+        };
+      case 'workspace':
+        return {
+          bgColor: '#05070e',
+          mesh1: 'rgba(6, 182, 212, 0.25)',
+          mesh2: 'rgba(139, 92, 246, 0.22)',
+          mesh3: 'rgba(16, 185, 129, 0.2)',
+          meshPos1: '40% 30%',
+          meshPos2: '70% 65%',
+          particleColor: '#38bdf8',
+          heatAuraOpacity: 0.18,
+          tempIndicator: '3D Spatial Test-Bench',
         };
       case 'problem':
         return {
@@ -199,15 +213,22 @@ export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive })
 
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-colors duration-1000 ease-out bg-[#08080a]"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-colors duration-1000 ease-out"
+      style={{ backgroundColor: theme.bgColor }}
     >
-      {/* 60px Engineering Structural Grid Blocks */}
-      <div className="absolute inset-0 engineering-grid-bg opacity-70" />
+      {/* Structural Grid Blocks */}
+      <div
+        className={`absolute inset-0 engineering-grid-bg transition-opacity duration-700 ${
+          (theme as any).isLight ? 'opacity-25' : 'opacity-70'
+        }`}
+      />
 
       {/* Fluid Kinetic Thermal Waves (WebGL / Canvas Wave Shimmer) */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 opacity-80 mix-blend-screen pointer-events-none"
+        className={`absolute inset-0 pointer-events-none transition-opacity duration-700 ${
+          (theme as any).isLight ? 'opacity-30 mix-blend-multiply' : 'opacity-80 mix-blend-screen'
+        }`}
       />
 
       {/* Dynamic Scroll-Responsive Mesh Gradient Layer 1 */}
