@@ -27,30 +27,30 @@ export const WhyThisMatters: React.FC = () => {
         {/* Sequential Typography Master Statements */}
         <div className="space-y-8">
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            viewport={{ once: true, margin: '-20px' }}
+            transition={{ duration: 0.3 }}
             className="text-2xl sm:text-4xl lg:text-5xl font-extralight text-zinc-400 font-sans"
           >
             This is not seasonal summer weather.
           </motion.p>
 
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true, margin: '-20px' }}
+            transition={{ duration: 0.35, delay: 0.05 }}
             className="text-3xl sm:text-5xl lg:text-6xl font-light text-zinc-100 tracking-tight leading-tight font-sans"
           >
             This is an <span className="text-red-400 font-normal">artificial micro-thermal trap</span> dumped onto public sidewalks.
           </motion.h2>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true, margin: '-20px' }}
+            transition={{ duration: 0.35, delay: 0.1 }}
             className="text-2xl sm:text-4xl lg:text-5xl font-extralight text-zinc-300 font-sans"
           >
             At 35°C Wet Bulb Globe Temperature (WBGT),{' '}
@@ -60,10 +60,10 @@ export const WhyThisMatters: React.FC = () => {
 
         {/* Ground-Truth Subject Profile: Rameshwar Pal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
+          initial={{ opacity: 0, scale: 0.99 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          viewport={{ once: true, margin: '-20px' }}
+          transition={{ duration: 0.35, delay: 0.1 }}
           className="p-6 sm:p-8 rounded-2xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md shadow-xl space-y-5"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/40 pb-4">

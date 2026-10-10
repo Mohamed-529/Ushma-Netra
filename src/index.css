@@ -6,49 +6,58 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
 
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    background-color: #08080a;
-    color: #f4f4f5;
+    background-color: #e6dfd3;
+    color: #0b1b2d;
     font-family: var(--font-sans);
     letter-spacing: -0.015em;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
     letter-spacing: -0.03em;
+    color: #0b1b2d;
   }
 }
 
-/* 60px Engineering Structural Grid Background with Alpha (rgba(63, 63, 70, 0.05)) */
+/* Warm Magazine Architectural Grid Background */
 .engineering-grid-bg {
   background-image: 
-    linear-gradient(to right, rgba(63, 63, 70, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(63, 63, 70, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(11, 27, 45, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11, 27, 45, 0.04) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
-/* Sub-grid micro alignment lines for tactical viewports */
+/* Sub-grid micro alignment lines */
 .micro-alignment-grid {
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, rgba(11, 27, 45, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11, 27, 45, 0.02) 1px, transparent 1px);
   background-size: 15px 15px;
 }
 
-/* Custom scrollbars for precision control panels */
+/* Custom scrollbars for warm magazine canvas */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #08080a;
+  background: #e6dfd3;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(82, 82, 91, 0.4);
+  background: rgba(184, 173, 157, 0.7);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(161, 161, 170, 0.6);
+  background: rgba(11, 27, 45, 0.35);
 }
 
 @keyframes pulseGlow {

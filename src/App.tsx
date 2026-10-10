@@ -115,8 +115,8 @@ function AppContent() {
   };
 
   return (
-    <div className="relative min-h-screen text-slate-100 font-sans selection:bg-amber-500/30 selection:text-amber-200 antialiased overflow-x-hidden">
-      {/* Dynamic Background with scroll-aware color temperatures, mesh gradients & particles */}
+    <div className="relative min-h-screen bg-[#e6dfd3] text-[#0b1b2d] font-sans selection:bg-amber-900/20 selection:text-[#0b1b2d] antialiased overflow-x-hidden">
+      {/* Dynamic Background with unified warm magazine canvas & ambient mesh */}
       <DynamicAtmosphere activeAct={activeAct} isSurgeActive={surgeModalOpen} />
 
       {/* Global Layout: Sticky Header Navigation with Infinite Ticker & Routing */}

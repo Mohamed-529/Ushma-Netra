@@ -769,10 +769,6 @@ export const FloatingTechWorkspace: React.FC = () => {
             : 'bg-[#08080a]'
         }`}
         style={{ touchAction: 'pan-y' }}
-        onWheel={(e) => {
-          // Guarantee buttery page scroll whenever scrolling anywhere over the 3D canvas
-          window.scrollBy({ top: e.deltaY, behavior: 'auto' });
-        }}
       >
         {/* Subtle engineering background grid behind 3D render */}
         <div

@@ -73,20 +73,20 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
         {/* The Fundamental Question */}
         <div className="space-y-6 max-w-4xl mx-auto">
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            viewport={{ once: true, margin: '-20px' }}
+            transition={{ duration: 0.3 }}
             className="text-lg sm:text-2xl text-slate-400 font-light"
           >
             We asked one simple, urgent question:
           </motion.p>
 
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true, margin: '-20px' }}
+            transition={{ duration: 0.35, delay: 0.05 }}
             className="text-3xl sm:text-5xl lg:text-6xl font-light text-zinc-100 tracking-tight leading-tight font-sans"
           >
             "Why is dumping sewage in a public street a crime, but dumping{' '}
@@ -97,10 +97,10 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
           </motion.h2>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true, margin: '-20px' }}
+            transition={{ duration: 0.35, delay: 0.1 }}
             className="text-sm sm:text-base text-zinc-400 font-light max-w-2xl mx-auto"
           >
             Because until now, municipal bodies lacked the computer vision, edge IoT telemetry, and legal mathematical framework to prove thermal causation and enforce civic accountability.
@@ -109,10 +109,10 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
 
         {/* The 4-Pillar Architectural Assembly */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
+          initial={{ opacity: 0, scale: 0.99 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          viewport={{ once: true, margin: '-20px' }}
+          transition={{ duration: 0.35, delay: 0.1 }}
           className="p-6 sm:p-8 rounded-2xl bg-[#0c0d12]/80 border border-zinc-800/40 backdrop-blur-md shadow-xl space-y-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/40 pb-3 text-left">
