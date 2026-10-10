@@ -250,24 +250,24 @@ export const MunicipalDefenseChallenge: React.FC = () => {
   const protectionScore = Math.round((totalProtectedVendors / totalVendors) * 100);
 
   return (
-    <section id="heat-challenge-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-slate-800/80">
+    <section id="heat-challenge-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-zinc-800/40">
       {/* Background Radiance */}
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(circle_at_50%_20%,#ef4444_0,transparent_60%)]" />
 
       <div className="max-w-7xl mx-auto w-full space-y-12 relative z-10">
         {/* Header Kicker with Clean Typography (Anti-Slop No-Pill) */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-800 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-800/40 pb-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs font-mono text-amber-400">
               <Award className="w-3.5 h-3.5 text-amber-400" />
               <span>08 · INTERACTIVE FINALE: THE 48-HOUR HEATWAVE DEFENSE CHALLENGE</span>
-              <span className="text-slate-600">·</span>
-              <span className="text-slate-400">DECISION SIMULATION</span>
+              <span className="text-zinc-600">·</span>
+              <span className="text-zinc-400">DECISION SIMULATION</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
+            <h2 className="text-3xl sm:text-5xl font-light text-zinc-100 tracking-tight font-sans">
               Take the Commissioner's Hot Seat
             </h2>
-            <p className="text-sm sm:text-base text-slate-300 max-w-2xl font-light">
+            <p className="text-sm sm:text-base text-zinc-400 max-w-2xl font-light">
               It is 43.5°C in Delhi and Bengaluru. Hundreds of commercial AC compressors are baking street vendors with 54°C exhaust. Use Section 133 statutory powers to divert heat, fund misting kiosks, and save informal workers.
             </p>
           </div>

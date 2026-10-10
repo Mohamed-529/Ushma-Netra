@@ -31,7 +31,7 @@ export const WhyThisMatters: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-2xl sm:text-4xl lg:text-5xl font-light text-slate-400"
+            className="text-2xl sm:text-4xl lg:text-5xl font-extralight text-zinc-400 font-sans"
           >
             This is not seasonal summer weather.
           </motion.p>
@@ -41,9 +41,9 @@ export const WhyThisMatters: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight font-serif"
+            className="text-3xl sm:text-5xl lg:text-6xl font-light text-zinc-100 tracking-tight leading-tight font-sans"
           >
-            This is an <span className="text-red-400 underline decoration-red-600/50">artificial micro-thermal trap</span> dumped onto public sidewalks.
+            This is an <span className="text-red-400 font-normal">artificial micro-thermal trap</span> dumped onto public sidewalks.
           </motion.h2>
 
           <motion.p
@@ -51,10 +51,10 @@ export const WhyThisMatters: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-2xl sm:text-4xl lg:text-5xl font-light text-slate-300"
+            className="text-2xl sm:text-4xl lg:text-5xl font-extralight text-zinc-300 font-sans"
           >
             At 35°C Wet Bulb Globe Temperature (WBGT),{' '}
-            <strong className="text-amber-400 font-bold">human sweat physically cannot evaporate.</strong>
+            <strong className="text-amber-400 font-normal">human sweat physically cannot evaporate.</strong>
           </motion.p>
         </div>
 
@@ -64,28 +64,28 @@ export const WhyThisMatters: React.FC = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="p-6 sm:p-8 rounded-2xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md shadow-xl space-y-5"
+          className="p-6 sm:p-8 rounded-2xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md shadow-xl space-y-5"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/60 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/40 pb-4">
             <div>
-              <div className="flex items-center gap-2 text-xs font-mono text-slate-400 uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 uppercase tracking-wider">
                 <span>Ground-Truth Subject Profile</span>
-                <span className="text-slate-600">·</span>
+                <span className="text-zinc-600">·</span>
                 <span>GPS: 28.6304° N, 77.2772° E</span>
               </div>
-              <h3 className="text-xl font-bold text-white mt-0.5">Rameshwar Pal, 52 · Tea Stall Operator</h3>
-              <p className="text-xs text-slate-400">Gali No. 4, District Centre Alleyway, Laxmi Nagar, Delhi NCR</p>
+              <h3 className="text-xl font-semibold text-zinc-100 mt-0.5">Rameshwar Pal, 52 · Tea Stall Operator</h3>
+              <p className="text-xs text-zinc-400 font-light">Gali No. 4, District Centre Alleyway, Laxmi Nagar, Delhi NCR</p>
             </div>
             <div className="text-left sm:text-right font-mono">
-              <span className="text-[10px] text-slate-500 uppercase block">Distance to AC Exhaust Bank</span>
+              <span className="text-[10px] text-zinc-500 uppercase block tracking-wider">Distance to AC Exhaust Bank</span>
               <span className="text-lg font-bold text-red-400 tabular-nums">2.8 meters away</span>
             </div>
           </div>
 
           {/* Interactive Exposure Duration Slider */}
-          <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60 space-y-3">
+          <div className="p-4 rounded-xl bg-black/40 border border-zinc-800/40 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
-              <div className="text-zinc-300 font-bold flex items-center gap-2">
+              <div className="text-zinc-300 font-semibold flex items-center gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
                 <span>Simulate Continuous Daily Exposure at Sidewalk Stall:</span>
               </div>
@@ -105,7 +105,7 @@ export const WhyThisMatters: React.FC = () => {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono pt-1">
               <div className="space-y-0.5">
-                <span className="text-[10px] text-zinc-500 block">ESTIMATED CORE TEMP</span>
+                <span className="text-[10px] text-zinc-500 block tracking-wider">ESTIMATED CORE TEMP</span>
                 <span className={`text-base font-bold ${isCritical ? 'text-red-500' : 'text-amber-400'}`}>
                   {coreBodyTemp}°C
                 </span>

@@ -4,7 +4,7 @@ import { Cloud, Cpu, Database, Server, ShieldCheck, Zap } from 'lucide-react';
 
 export const TechnologyBlueprint: React.FC = () => {
   return (
-    <section id="technology-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-slate-800/80">
+    <section id="technology-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-zinc-800/40">
       {/* Dynamic Data Wave & Signal Traces Glow */}
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(circle_at_70%_25%,#3b82f6_0,transparent_60%)]" />
 
@@ -14,19 +14,19 @@ export const TechnologyBlueprint: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-mono text-sky-400">
             <Cloud className="w-4 h-4 text-sky-400" />
             <span>06 · AWS PRODUCTION ARCHITECTURE & DATA PIPELINE</span>
-            <span className="text-slate-600">·</span>
-            <span className="text-slate-400">SERVERLESS CITY-SCALE TOPOLOGY</span>
+            <span className="text-zinc-600">·</span>
+            <span className="text-zinc-400">SERVERLESS CITY-SCALE TOPOLOGY</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
+          <h2 className="text-3xl sm:text-5xl font-light text-zinc-100 tracking-tight font-sans">
             Serverless Infrastructure Engineered for City-Scale Enforcement
           </h2>
-          <p className="text-sm sm:text-base text-slate-300 max-w-3xl font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-zinc-400 max-w-3xl font-light leading-relaxed">
             Every edge reading, street-view computer vision bounding box, and statutory Section 133 environmental decree is orchestrated across AWS serverless services with sub-second event latency.
           </p>
         </div>
 
         {/* Real-Time AWS Cloud Performance Strip */}
-        <div className="p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md text-xs font-mono grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md text-xs font-mono grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-sky-400 text-[11px]">
               <Cpu className="w-3.5 h-3.5" />

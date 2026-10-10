@@ -141,18 +141,80 @@ export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive })
     }
   }, [activeAct]);
 
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let t = 0;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const render = () => {
+      t += 0.008;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Draw subtle wavy kinetic thermal isotherms
+      ctx.lineWidth = 1;
+      const waveCount = 4;
+      for (let i = 0; i < waveCount; i++) {
+        ctx.beginPath();
+        const baseAlpha = isSurgeActive ? 0.18 : 0.07;
+        const color = i % 2 === 0 ? `rgba(245, 158, 11, ${baseAlpha})` : `rgba(239, 68, 68, ${baseAlpha * 0.8})`;
+        ctx.strokeStyle = color;
+
+        const yOffset = h * 0.45 + i * 85 + Math.sin(t * 0.5 + i) * 35;
+        for (let x = 0; x <= w; x += 15) {
+          const wave1 = Math.sin(x * 0.003 + t + i * 1.2) * 28;
+          const wave2 = Math.cos(x * 0.007 - t * 0.8) * 16;
+          const y = yOffset + wave1 + wave2;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+    };
+  }, [isSurgeActive]);
+
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-colors duration-1000 ease-out"
-      style={{
-        backgroundColor: isSurgeActive ? '#260404' : theme.bgColor,
-      }}
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-colors duration-1000 ease-out bg-[#08080a]"
     >
+      {/* 60px Engineering Structural Grid Blocks */}
+      <div className="absolute inset-0 engineering-grid-bg opacity-70" />
+
+      {/* Fluid Kinetic Thermal Waves (WebGL / Canvas Wave Shimmer) */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 opacity-80 mix-blend-screen pointer-events-none"
+      />
+
       {/* Dynamic Scroll-Responsive Mesh Gradient Layer 1 */}
       <div
         className="absolute inset-0 transition-all duration-1000 ease-out blur-[150px]"
         style={{
-          background: `radial-gradient(circle at ${theme.meshPos1}, ${isSurgeActive ? 'rgba(239, 68, 68, 0.6)' : theme.mesh1} 0%, transparent 60%)`,
+          background: `radial-gradient(circle at ${theme.meshPos1}, ${isSurgeActive ? 'rgba(239, 68, 68, 0.45)' : theme.mesh1} 0%, transparent 60%)`,
           transform: `translateY(${Math.sin(scrollY * 0.001) * 30}px)`,
         }}
       />
@@ -176,20 +238,20 @@ export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive })
 
       {/* Micro-Particle Thermal Mesh */}
       <div
-        className="absolute inset-0 opacity-20 transition-opacity duration-1000"
+        className="absolute inset-0 opacity-15 transition-opacity duration-1000"
         style={{
           backgroundImage: `radial-gradient(${theme.particleColor} 1px, transparent 1px)`,
-          backgroundSize: '28px 28px',
+          backgroundSize: '30px 30px',
         }}
       />
 
-      {/* Thermal Plume Turbulent Distortion Shimmer (peaks during problem/tension) */}
+      {/* Thermal Plume Turbulent Distortion Shimmer */}
       <div
         className="absolute inset-0 transition-opacity duration-1000 pointer-events-none mix-blend-screen"
         style={{
-          opacity: isSurgeActive ? 0.75 : theme.heatAuraOpacity,
+          opacity: isSurgeActive ? 0.65 : theme.heatAuraOpacity * 0.7,
           background:
-            'radial-gradient(ellipse at 50% 100%, rgba(239,68,68,0.4) 0%, rgba(245,158,11,0.2) 30%, transparent 70%)',
+            'radial-gradient(ellipse at 50% 100%, rgba(239,68,68,0.3) 0%, rgba(245,158,11,0.15) 30%, transparent 70%)',
         }}
       />
     </div>

@@ -38,7 +38,7 @@ export const ProofValidation: React.FC = () => {
   const heatStrainIndex = Math.min(200, Math.round((eReq / eMax) * 100));
 
   return (
-    <section id="proof-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 flex flex-col justify-center bg-transparent border-t border-slate-800/80">
+    <section id="proof-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 flex flex-col justify-center bg-transparent border-t border-zinc-800/40">
       {/* Background Soft Glow */}
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(circle_at_60%_40%,#059669_0,transparent_65%)]" />
 
@@ -48,15 +48,15 @@ export const ProofValidation: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>05 · THERMODYNAMIC MODELING & SCIENTIFIC RIGOR</span>
-            <span className="text-slate-600">·</span>
-            <span className="text-slate-400">EMPIRICAL MICRO-CLIMATE EQUATIONS</span>
+            <span className="text-zinc-600">·</span>
+            <span className="text-zinc-400">EMPIRICAL MICRO-CLIMATE EQUATIONS</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
+          <h2 className="text-3xl sm:text-5xl font-light text-zinc-100 tracking-tight font-sans">
             Physics-Grounded Validation & Micro-Climate Fluid Dynamics
           </h2>
 
-          <p className="text-sm sm:text-base text-slate-300 max-w-3xl font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-zinc-400 max-w-3xl font-light leading-relaxed">
             Every temperature anomaly and regulatory penalty in Ushma-Netra is calculated using verified thermodynamic physics (ASHRAE 90.1, Oke Urban Canyon Aerodynamics, and ISO 7243 biometeorology) rather than speculative approximations.
           </p>
 

@@ -87,10 +87,10 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight font-serif"
+            className="text-3xl sm:text-5xl lg:text-6xl font-light text-zinc-100 tracking-tight leading-tight font-sans"
           >
             "Why is dumping sewage in a public street a crime, but dumping{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-red-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-amber-400 to-red-400 bg-clip-text text-transparent font-normal">
               600 kW of blistering thermal waste
             </span>{' '}
             onto public sidewalks completely legal?"
@@ -101,25 +101,25 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-sm sm:text-base text-slate-300 font-light max-w-2xl mx-auto"
+            className="text-sm sm:text-base text-zinc-400 font-light max-w-2xl mx-auto"
           >
-            Because until now, municipal bodies lacked the computer vision, the edge IoT telemetry, and the legal mathematical framework to prove thermal causation and enforce accountability.
+            Because until now, municipal bodies lacked the computer vision, edge IoT telemetry, and legal mathematical framework to prove thermal causation and enforce civic accountability.
           </motion.p>
         </div>
 
         {/* The 4-Pillar Architectural Assembly */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.3 }}
-          className="p-8 sm:p-10 rounded-3xl bg-slate-900/85 border border-slate-800 shadow-2xl space-y-6"
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="p-6 sm:p-8 rounded-2xl bg-[#0c0d12]/80 border border-zinc-800/40 backdrop-blur-md shadow-xl space-y-6"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3 text-left">
-            <div className="text-xs font-mono text-amber-400 uppercase tracking-widest">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/40 pb-3 text-left">
+            <div className="text-xs font-mono text-amber-400 uppercase tracking-wider">
               THE 4 CONVERGING PILLARS (SELECT TO INSPECT SPECIFICATION)
             </div>
-            <div className="text-[11px] font-mono text-slate-400">
+            <div className="text-[11px] font-mono text-zinc-500">
               Pillar {selectedPillar + 1} of 4 Active
             </div>
           </div>
@@ -132,15 +132,15 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
                 <button
                   key={p.id}
                   onClick={() => setSelectedPillar(p.id)}
-                  className={`p-5 rounded-2xl bg-slate-950 border transition-all text-left space-y-2 cursor-pointer ${
+                  className={`p-4 rounded-xl border transition-all text-left space-y-2 cursor-pointer ${
                     isSelected
-                      ? `${p.activeBorder} shadow-lg shadow-cyan-950/40 bg-slate-900`
-                      : 'border-slate-800 hover:border-slate-700'
+                      ? `border-amber-400/80 bg-zinc-900/90 shadow-md`
+                      : 'bg-black/40 border-zinc-800/40 hover:border-zinc-700/60'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${p.color}`} />
-                  <div className="text-sm font-bold text-white">{p.title}</div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
+                  <Icon className={`w-4 h-4 ${p.color}`} />
+                  <div className="text-xs font-semibold text-zinc-200 font-mono">{p.title}</div>
+                  <p className="text-[11px] text-zinc-400 leading-relaxed font-sans font-light">
                     {p.description}
                   </p>
                 </button>
@@ -149,27 +149,27 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
           </div>
 
           {/* Active Pillar Technical Specification Inspection Drawer */}
-          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-left font-mono text-xs space-y-1">
-            <div className="text-[10px] text-amber-400 uppercase">
+          <div className="p-4 rounded-xl bg-black/50 border border-zinc-800/40 text-left font-mono text-xs space-y-1">
+            <div className="text-[10px] text-amber-400 uppercase tracking-wider">
               // ARCHITECTURAL SPECIFICATION: {pillars[selectedPillar].title}
             </div>
-            <p className="text-slate-300 font-sans text-xs leading-relaxed">
+            <p className="text-zinc-300 font-sans text-xs font-light leading-relaxed">
               {pillars[selectedPillar].detail}
             </p>
           </div>
 
-          <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-xs font-mono text-slate-300 text-left">
-              <span className="text-emerald-400 font-bold block text-sm">USHMA-NETRA (उष्मा-नेत्रा)</span>
+          <div className="pt-4 border-t border-zinc-800/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs font-mono text-zinc-400 text-left">
+              <span className="text-emerald-400 font-semibold block text-sm">USHMA-NETRA (उष्मा-नेत्रा)</span>
               The world’s first autonomous thermal equity and exhaust debt orchestration platform.
             </div>
 
             <button
               onClick={onScrollToLive}
-              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs flex items-center gap-2 transition-all shadow-xl shadow-amber-500/20 cursor-pointer shrink-0"
+              className="px-5 py-2.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-bold font-mono text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer shrink-0 border border-zinc-200"
             >
               <span>Explore Live Working System</span>
-              <ArrowDown className="w-4 h-4" />
+              <ArrowDown className="w-3.5 h-3.5" />
             </button>
           </div>
         </motion.div>

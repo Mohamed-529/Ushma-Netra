@@ -19,6 +19,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { verifyDeviceHandshake } from '../../utils/cryptoVerify';
+import { soundEngine } from '../../utils/audioSynthesizer';
 
 interface Props {
   building: BuildingAudit;
@@ -62,8 +63,8 @@ export const LiveProductCockpit: React.FC<Props> = ({
     <section id="live_cockpit" className="relative w-full py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
       <div className="max-w-7xl mx-auto w-full space-y-8 relative z-10">
         
-        {/* Clean, Spacious Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-800/80 pb-6">
+        {/* Clean, Spacious Header with Kinetic Minimal Typography */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-800/40 pb-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -71,7 +72,7 @@ export const LiveProductCockpit: React.FC<Props> = ({
               <span className="text-zinc-600">·</span>
               <span className="text-zinc-400">HARDWARE-SOFTWARE WORKSPACE</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-zinc-100 tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-light text-zinc-100 tracking-tight font-sans">
               Micro-Canyon Digital Twin & Control
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl font-light">
@@ -79,22 +80,28 @@ export const LiveProductCockpit: React.FC<Props> = ({
             </p>
           </div>
 
-          {/* Action Trigger Buttons */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Action Trigger Buttons with Tactile Skeuo-Industrial Finish */}
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
-              onClick={onSimulateSurge}
-              className="px-4 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-800/70 text-red-200 font-mono text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer"
+              onClick={() => {
+                soundEngine.playTone(180, 'sawtooth', 0.35);
+                onSimulateSurge();
+              }}
+              className="px-3.5 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 border border-red-500/40 text-red-200 font-mono text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-sm transition-all"
             >
               <Flame className="w-3.5 h-3.5 text-red-400 animate-pulse" />
               <span>Simulate Surge</span>
             </button>
 
             <button
-              onClick={() => onMitigationToggle(!isMitigated)}
-              className={`px-4 py-2 rounded-xl font-mono text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border ${
+              onClick={() => {
+                soundEngine.playTone(isMitigated ? 420 : 880, 'sine', 0.15);
+                onMitigationToggle(!isMitigated);
+              }}
+              className={`px-3.5 py-1.5 rounded-lg font-mono text-xs font-semibold flex items-center gap-2 cursor-pointer border transition-all ${
                 isMitigated
-                  ? 'bg-emerald-950/70 border-emerald-600 text-emerald-200'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white'
+                  ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 shadow-sm'
+                  : 'bg-[#0c0d12]/80 border-zinc-800/40 text-zinc-300 hover:text-white'
               }`}
             >
               <ShieldCheck className={`w-3.5 h-3.5 ${isMitigated ? 'text-emerald-400' : 'text-zinc-400'}`} />
@@ -103,7 +110,7 @@ export const LiveProductCockpit: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Precinct Switcher (Horizontal Selector Pills) */}
+        {/* Precinct Switcher (Horizontal Selector Ribbon) */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-mono text-zinc-400 flex items-center gap-1.5 mr-2">
             <MapPin className="w-3.5 h-3.5 text-amber-400" />
@@ -115,10 +122,10 @@ export const LiveProductCockpit: React.FC<Props> = ({
               <button
                 key={b.id}
                 onClick={() => onSelectBuilding(b)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border ${
+                className={`px-3 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer border ${
                   isSelected
-                    ? 'bg-amber-500/20 border-amber-500/80 text-amber-300 font-bold'
-                    : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-amber-500/20 border-amber-500/70 text-amber-300 font-semibold shadow-sm'
+                    : 'bg-black/40 border-zinc-800/40 text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 {b.name} ({b.canyonWidthMeters}m Alley)
@@ -127,42 +134,50 @@ export const LiveProductCockpit: React.FC<Props> = ({
           })}
         </div>
 
-        {/* Concise Vital Telemetry Strip (Only the essential numbers) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md text-xs font-mono">
-          <div>
-            <div className="text-[10px] text-zinc-500 uppercase">Sensible Heat Rejected</div>
-            <div className={`text-lg font-bold ${isMitigated ? 'text-emerald-400' : 'text-red-400'}`}>
-              {isMitigated ? '182 kW (Deflected)' : `${building.rejectedHeatKw} kW (Alley Blast)`}
+        {/* Concise Vital Telemetry Strip with Kinetic Skeuo-Industrial Finish */}
+        <div className="relative bg-[#0c0d12]/80 backdrop-blur-md p-4 rounded-xl border border-zinc-800/40 text-xs font-mono overflow-hidden shadow-lg">
+          {/* Subtle Structural Registration Marks */}
+          <span className="absolute top-1 left-2 text-[10px] text-zinc-600 select-none font-mono pointer-events-none">+</span>
+          <span className="absolute top-1 right-2 text-[10px] text-zinc-600 select-none font-mono pointer-events-none">+</span>
+          <span className="absolute bottom-1 left-2 text-[10px] text-zinc-600 select-none font-mono pointer-events-none">+</span>
+          <span className="absolute bottom-1 right-2 text-[10px] text-zinc-600 select-none font-mono pointer-events-none">+</span>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase tracking-wider">Sensible Heat Rejected</div>
+              <div className={`text-lg font-light tabular-nums font-mono ${isMitigated ? 'text-emerald-400' : 'text-red-400'}`}>
+                {isMitigated ? '182 kW (Deflected)' : `${building.rejectedHeatKw} kW (Alley Blast)`}
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="text-[10px] text-zinc-500 uppercase">Vendor Exposure WBGT</div>
-            <div className="text-lg font-bold text-amber-400">
-              {vendor.wetBulbGlobeTempCelsius}°C ({vendor.distanceToExhaustMeters}m away)
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase tracking-wider">Vendor Exposure WBGT</div>
+              <div className="text-lg font-light text-amber-400 tabular-nums font-mono">
+                {vendor.wetBulbGlobeTempCelsius}°C ({vendor.distanceToExhaustMeters}m away)
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="text-[10px] text-zinc-500 uppercase">Statutory Surcharge</div>
-            <div className="text-lg font-bold text-zinc-200">
-              ₹{building.monthlyExhaustTaxInr.toLocaleString('en-IN')}/mo
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase tracking-wider">Statutory Surcharge</div>
+              <div className="text-lg font-light text-zinc-200 tabular-nums font-mono">
+                ₹{building.monthlyExhaustTaxInr.toLocaleString('en-IN')}/mo
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="text-[10px] text-zinc-500 uppercase">Hardware Handshake</div>
-            <div className="text-lg font-bold text-emerald-400 flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5" />
-              <span>{isHardwareVerified ? 'P-256 Verified' : 'Checking'}</span>
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase tracking-wider">Hardware Handshake</div>
+              <div className="text-lg font-light text-emerald-400 flex items-center gap-1.5 font-mono">
+                <Lock className="w-3.5 h-3.5" />
+                <span>{isHardwareVerified ? 'P-256 Verified' : 'Checking'}</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Tool Navigation Tabs */}
-        <div className="flex items-center gap-2 p-1.5 bg-zinc-950/60 rounded-xl border border-zinc-800/80 overflow-x-auto">
+        <div className="flex items-center gap-2 p-1.5 bg-[#0c0d12]/70 rounded-xl border border-zinc-800/40 overflow-x-auto backdrop-blur-md">
           <button
             onClick={() => setActiveTool('3d_twin')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === '3d_twin'
-                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                ? 'bg-amber-400 text-zinc-950 shadow-sm'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
             }`}
           >
@@ -172,9 +187,9 @@ export const LiveProductCockpit: React.FC<Props> = ({
 
           <button
             onClick={() => setActiveTool('cv_scanner')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'cv_scanner'
-                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                ? 'bg-amber-400 text-zinc-950 shadow-sm'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
             }`}
           >
@@ -184,9 +199,9 @@ export const LiveProductCockpit: React.FC<Props> = ({
 
           <button
             onClick={() => setActiveTool('thermal_debt')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'thermal_debt'
-                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                ? 'bg-amber-400 text-zinc-950 shadow-sm'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
             }`}
           >
@@ -196,9 +211,9 @@ export const LiveProductCockpit: React.FC<Props> = ({
 
           <button
             onClick={() => setActiveTool('vendor_iot')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'vendor_iot'
-                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                ? 'bg-amber-400 text-zinc-950 shadow-sm'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
             }`}
           >
@@ -208,9 +223,9 @@ export const LiveProductCockpit: React.FC<Props> = ({
 
           <button
             onClick={() => setActiveTool('hardware_serial')}
-            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'hardware_serial'
-                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                ? 'bg-amber-400 text-zinc-950 shadow-sm'
                 : 'text-amber-400/90 hover:text-amber-300 bg-amber-500/10 border border-amber-500/20'
             }`}
           >
@@ -220,7 +235,7 @@ export const LiveProductCockpit: React.FC<Props> = ({
         </div>
 
         {/* Viewport Interactive Container (Spacious, Full Width) */}
-        <div className="w-full rounded-2xl bg-zinc-950/40 backdrop-blur-md border border-zinc-800/80 p-3 sm:p-6 space-y-4">
+        <div className="w-full rounded-2xl bg-[#0c0d12]/75 backdrop-blur-xl border border-zinc-800/40 p-3 sm:p-6 space-y-4 shadow-2xl">
           
           {activeTool === '3d_twin' && (
             <div className="flex flex-wrap items-center justify-between bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 text-xs gap-2">

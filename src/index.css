@@ -2,41 +2,114 @@
 
 @layer base {
   :root {
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 
   body {
-    font-family: var(--font-body);
+    background-color: #08080a;
+    color: #f4f4f5;
+    font-family: var(--font-sans);
+    letter-spacing: -0.015em;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
+    letter-spacing: -0.03em;
   }
 }
 
-/* Custom scrollbars for command panels */
+/* 60px Engineering Structural Grid Background with Alpha (rgba(63, 63, 70, 0.05)) */
+.engineering-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(63, 63, 70, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(63, 63, 70, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Sub-grid micro alignment lines for tactical viewports */
+.micro-alignment-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 15px 15px;
+}
+
+/* Custom scrollbars for precision control panels */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: #08080a;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.4);
-  border-radius: 9999px;
+  background: rgba(82, 82, 91, 0.4);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.6);
+  background: rgba(161, 161, 170, 0.6);
 }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.05); }
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.03); }
 }
 
 .animate-pulse-glow {
-  animation: pulseGlow 3s ease-in-out infinite;
+  animation: pulseGlow 3.5s ease-in-out infinite;
+}
+
+/* Kinetic Minimalism & Neo-Noir Industrialism Hybrid Tokens */
+.kinetic-card {
+  background: rgba(12, 13, 18, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(63, 63, 70, 0.35);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kinetic-card:hover {
+  border-color: rgba(113, 113, 122, 0.55);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.8), 0 0 15px rgba(245, 158, 11, 0.05);
+}
+
+.skeuo-milled-panel {
+  background: linear-gradient(180deg, rgba(18, 18, 22, 0.7) 0%, rgba(9, 9, 12, 0.9) 100%);
+  border: 1px solid rgba(63, 63, 70, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.7);
+}
+
+.skeuo-recessed-slot {
+  background: rgba(5, 5, 8, 0.95);
+  border: 1px solid rgba(39, 39, 42, 0.6);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.skeuo-tactile-btn {
+  background: linear-gradient(180deg, rgba(35, 35, 42, 0.9) 0%, rgba(20, 20, 24, 0.95) 100%);
+  border: 1px solid rgba(82, 82, 91, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 6px rgba(0, 0, 0, 0.6);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.skeuo-tactile-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* Marquee infinite scroll */
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }

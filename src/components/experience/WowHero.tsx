@@ -122,14 +122,14 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
           <span className="hidden sm:inline text-slate-400">MICRO-THERMAL EQUITY AGENT</span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* FLIR Mode Toggle */}
           <button
             onClick={() => setFlirMode(!flirMode)}
-            className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg border text-[11px] font-mono tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
               flirMode
-                ? 'bg-red-950/80 border-red-700/80 text-red-300 shadow-lg shadow-red-950/50'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                ? 'bg-red-950/40 border-red-500/40 text-red-300 shadow-sm'
+                : 'bg-[#0c0d12]/80 border-zinc-800/40 text-zinc-400 hover:text-zinc-200'
             }`}
             title="Toggle simulated FLIR Thermal Infrared spectrum"
           >
@@ -140,21 +140,21 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
           {/* Audio Synthesizer Toggle */}
           <button
             onClick={toggleSound}
-            className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg border text-[11px] font-mono tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
               isAudioPlaying
-                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-md'
-                : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-white'
+                ? 'bg-amber-950/40 border-amber-500/40 text-amber-300 shadow-sm'
+                : 'bg-[#0c0d12]/80 border-zinc-800/40 text-zinc-400 hover:text-zinc-200'
             }`}
             title="Toggle synthesized compressor drone soundscape"
           >
             {isAudioPlaying ? <Volume2 className="w-3.5 h-3.5 text-amber-400" /> : <VolumeX className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{isAudioPlaying ? 'Compressor Hum ON' : 'Audio Drone OFF'}</span>
+            <span className="hidden sm:inline">{isAudioPlaying ? 'Drone ON' : 'Audio OFF'}</span>
           </button>
 
           {/* Jump directly to Live Twin */}
           <button
             onClick={onJumpToLive}
-            className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition-all cursor-pointer flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold font-mono text-xs shadow-md shadow-amber-500/15 transition-all cursor-pointer flex items-center gap-1.5 border border-amber-300"
           >
             <Zap className="w-3.5 h-3.5 fill-current" />
             <span>Launch Live Twin</span>
@@ -177,87 +177,142 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
           <span className="text-slate-400">THE AC EXHAUST "DEATH LOOP" IN INDIAN MEGACITIES</span>
         </motion.div>
 
-        {/* Master Provocative Contrast Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.1 }}
-          className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.04] text-balance font-serif"
+        {/* Master Provocative Contrast Headline with Word Text-Masking Reveal */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.045, delayChildren: 0.1 },
+            },
+          }}
+          className="text-4xl sm:text-6xl lg:text-7xl font-extralight text-zinc-100 tracking-tight leading-[1.08] text-balance font-sans"
         >
-          While the penthouse chills to 20°C,{' '}
-          <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent">
-            the street below is actively baking at 54°C.
-          </span>
-        </motion.h1>
+          {/* Word-masking staggered reveal */}
+          {[
+            { text: 'While', highlight: false },
+            { text: 'the', highlight: false },
+            { text: 'penthouse', highlight: false },
+            { text: 'stays', highlight: false },
+            { text: 'cool', highlight: false },
+            { text: 'at', highlight: false },
+            { text: '21°C,', highlight: 'sky' },
+            { text: 'street', highlight: false },
+            { text: 'vendors', highlight: false },
+            { text: 'burn', highlight: 'red' },
+            { text: 'under', highlight: false },
+            { text: '54°C', highlight: 'amber' },
+            { text: 'blast', highlight: 'red' },
+            { text: 'jets.', highlight: 'red' },
+          ].map((item, idx) => (
+            <span key={idx} className="inline-block overflow-hidden mr-[0.22em] pb-1 align-bottom">
+              <motion.span
+                variants={{
+                  hidden: { y: '100%', opacity: 0 },
+                  visible: {
+                    y: '0%',
+                    opacity: 1,
+                    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+                  },
+                }}
+                className={`inline-block ${
+                  item.highlight === 'sky'
+                    ? 'text-sky-400 font-normal'
+                    : item.highlight === 'amber'
+                    ? 'text-amber-400 font-semibold'
+                    : item.highlight === 'red'
+                    ? 'bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent font-semibold'
+                    : 'text-zinc-100 font-light'
+                }`}
+              >
+                {item.text}
+              </motion.span>
+            </span>
+          ))}
+        </motion.div>
 
         {/* Core Scientific Briefing */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.2 }}
-          className="text-base sm:text-xl text-slate-300 max-w-3xl font-light leading-relaxed"
+          transition={{ duration: 0.8, delay: 0.45 }}
+          className="text-base sm:text-xl text-zinc-400 max-w-3xl font-light leading-relaxed tracking-normal"
         >
-          Air conditioners do not destroy heat — they extract indoor heat and blast superheated 54°C exhaust directly into narrow street canyons at head height. We are artificially baking informal street workers so commercial buildings stay cool.
+          Air conditioners do not destroy heat — they extract indoor warmth and blast superheated 54°C sensible exhaust directly into pedestrian alleys at face level. Ushma-Netra computes the invisible thermal debt, penalizes commercial violators, and autonomously protects informal street workers.
         </motion.p>
 
-        {/* The 4-Pillar Pipeline Ribbon */}
+        {/* The 4-Pillar Pipeline Ribbon with Razor-Thin Kinetic Minimalist Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 text-xs font-mono"
         >
-          <div className="p-3.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
-            <div className="text-[10px] text-zinc-500 uppercase font-mono">STEP 01 // CV SCAN</div>
-            <div className="font-bold text-zinc-100 font-mono">SageMaker CV</div>
-            <div className="text-[11px] text-zinc-400 font-sans">Counts outdoor units & calculates kW load</div>
+          <div className="p-3.5 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1.5 hover:border-zinc-700/60 transition-all">
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+              <span>STEP 01</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            </div>
+            <div className="font-semibold text-zinc-200 font-mono">SageMaker CV</div>
+            <div className="text-[11px] text-zinc-400 font-sans font-light">Counts facade condensers & computes heat load</div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
-            <div className="text-[10px] text-zinc-500 uppercase font-mono">STEP 02 // SATELLITE</div>
-            <div className="font-bold text-sky-400 font-mono">Landsat-9 Thermal</div>
-            <div className="text-[11px] text-zinc-400 font-sans">Maps micro-plume hitting adjacent street</div>
+          <div className="p-3.5 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1.5 hover:border-zinc-700/60 transition-all">
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+              <span>STEP 02</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+            </div>
+            <div className="font-semibold text-sky-400 font-mono">Landsat-9 Thermal</div>
+            <div className="text-[11px] text-zinc-400 font-sans font-light">Maps canyon micro-plume hitting adjacent sidewalk</div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
-            <div className="text-[10px] text-zinc-500 uppercase font-mono">STEP 03 // REASONING</div>
-            <div className="font-bold text-amber-400 font-mono">Bedrock Legal Agent</div>
-            <div className="text-[11px] text-zinc-400 font-sans">Computes Thermal Debt & ₹ Exhaust Tax</div>
+          <div className="p-3.5 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1.5 hover:border-zinc-700/60 transition-all">
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+              <span>STEP 03</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            </div>
+            <div className="font-semibold text-amber-400 font-mono">Bedrock Legal Agent</div>
+            <div className="text-[11px] text-zinc-400 font-sans font-light">Assesses Thermal Debt & assesses statutory ₹ Tax</div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
-            <div className="text-[10px] text-zinc-500 uppercase font-mono">STEP 04 // MITIGATION</div>
-            <div className="font-bold text-emerald-400 font-mono">Section 133 Shield</div>
-            <div className="text-[11px] text-zinc-400 font-sans">Mandates skyward louvers & shade funds</div>
+          <div className="p-3.5 rounded-xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md space-y-1.5 hover:border-zinc-700/60 transition-all">
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 uppercase font-mono tracking-wider">
+              <span>STEP 04</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            </div>
+            <div className="font-semibold text-emerald-400 font-mono">Section 133 Shield</div>
+            <div className="text-[11px] text-zinc-400 font-sans font-light">Enforces skyward louvers & hydration re-routing</div>
           </div>
         </motion.div>
       </div>
 
       {/* Bottom Quantitative Telemetry Bar & Investigation Button */}
-      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-slate-800/80">
-        <div className="flex flex-wrap items-center gap-6 text-xs text-slate-400 font-mono">
+      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-zinc-800/40">
+        <div className="flex flex-wrap items-center gap-6 text-xs text-zinc-400 font-mono">
           <div className="space-y-0.5">
-            <span className="text-slate-500 block text-[10px] uppercase">UNMITIGATED AC EXHAUST</span>
-            <span className="font-bold text-red-400 text-sm">53.6°C Direct Jet</span>
+            <span className="text-zinc-500 block text-[10px] uppercase tracking-wider">UNMITIGATED AC EXHAUST</span>
+            <span className="font-semibold text-red-400 text-sm">53.6°C Direct Jet</span>
           </div>
-          <div className="h-6 w-px bg-slate-800 hidden sm:block" />
+          <div className="h-6 w-px bg-zinc-800/60 hidden sm:block" />
           <div className="space-y-0.5">
-            <span className="text-slate-500 block text-[10px] uppercase">STREET OVERHEAT DELTA</span>
-            <span className="font-bold text-amber-400 text-sm">+6.6°C Artificial Trap</span>
+            <span className="text-zinc-500 block text-[10px] uppercase tracking-wider">STREET OVERHEAT DELTA</span>
+            <span className="font-semibold text-amber-400 text-sm">+6.6°C Artificial Trap</span>
           </div>
-          <div className="h-6 w-px bg-slate-800 hidden sm:block" />
+          <div className="h-6 w-px bg-zinc-800/60 hidden sm:block" />
           <div className="space-y-0.5">
-            <span className="text-slate-500 block text-[10px] uppercase">FIELD VALIDATED HUBS</span>
-            <span className="font-bold text-emerald-400 text-sm">Delhi NCR & Bengaluru</span>
+            <span className="text-zinc-500 block text-[10px] uppercase tracking-wider">FIELD VALIDATED HUBS</span>
+            <span className="font-semibold text-emerald-400 text-sm">Delhi NCR & Bengaluru</span>
           </div>
         </div>
 
         <button
           onClick={onScrollToProblem}
-          className="group px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-xs flex items-center gap-2.5 transition-all shadow-xl shadow-amber-500/20 cursor-pointer shrink-0"
+          className="group px-5 py-2.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-bold font-mono text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer shrink-0 border border-zinc-200"
         >
           <span>Begin The Investigation</span>
-          <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
+          <ArrowDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
         </button>
       </div>
     </section>

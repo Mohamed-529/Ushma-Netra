@@ -43,7 +43,7 @@ AUTHORIZED UNDER MUNICIPAL CLIMATE RESILIENCE COALITION`;
   };
 
   return (
-    <section id="final-demo-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-slate-800/80">
+    <section id="final-demo-act" className="relative min-h-screen w-full py-28 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-zinc-800/40">
       {/* Background Radiance */}
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(circle_at_50%_40%,#d97706_0,transparent_65%)]" />
 
@@ -53,12 +53,12 @@ AUTHORIZED UNDER MUNICIPAL CLIMATE RESILIENCE COALITION`;
           <div className="flex items-center justify-center gap-2 text-xs font-mono text-amber-400">
             <Scale className="w-3.5 h-3.5 text-amber-400" />
             <span>07 · MUNICIPAL THERMAL DEBT CALCULATOR & STATUTORY DECREE</span>
-            <span className="text-slate-600">·</span>
-            <span className="text-slate-400">SECTION 133 ENFORCEMENT</span>
+            <span className="text-zinc-600">·</span>
+            <span className="text-zinc-400">SECTION 133 ENFORCEMENT</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
-            Calculate Any Building's Thermal Debt in Real Time
+          <h2 className="text-3xl sm:text-5xl font-light text-zinc-100 tracking-tight font-sans">
+            Section 133 Autonomous Legal Decree Generator & Thermal Debt Engine
           </h2>
 
           <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed">

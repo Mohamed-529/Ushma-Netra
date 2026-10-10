@@ -439,6 +439,19 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
     if (onLouversChange) onLouversChange(next);
   };
 
+  // Keyboard shortcut listener for spacebar toggle (Game-grade drill experience)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleLouvers();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [louversEngaged]);
+
   // Verify hardware crypto handshake on demand
   const handleVerifyHardware = () => {
     const mockPayload = {
@@ -452,9 +465,92 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full min-h-[580px] bg-[#090D16] flex flex-col overflow-hidden rounded-2xl border border-slate-800 shadow-2xl">
+    <div className="relative w-full h-full min-h-[580px] bg-[#08080a] flex flex-col overflow-hidden rounded-2xl border border-zinc-800/40 shadow-2xl">
       {/* 3D WebGL Canvas Mount Container */}
       <div ref={mountRef} className="absolute inset-0 w-full h-full" />
+
+      {/* Tactical Objective HUD (Top-Left) */}
+      <div className="absolute top-16 left-4 z-20 bg-[#0c0d12]/85 backdrop-blur-md rounded-xl border border-zinc-800/40 p-3 shadow-xl font-mono text-[10px] space-y-1.5 max-w-xs pointer-events-auto">
+        <div className="flex items-center justify-between border-b border-zinc-800/40 pb-1">
+          <div className="flex items-center gap-1.5 text-amber-400 font-semibold tracking-wider">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
+            <span>DRILL // THERMAL DEFENSE</span>
+          </div>
+          <span className="text-[9px] text-zinc-500 font-semibold">LIVE CFD</span>
+        </div>
+        <p className="text-zinc-300 text-[11px] font-sans font-light leading-tight">
+          {louversEngaged
+            ? '✅ Skyward louvers engaged! Exhaust heat deflected vertically into upper atmosphere.'
+            : '⚠️ 53.6°C exhaust jet hitting pedestrian street corridor. Rameshwar Pal in extreme thermal danger!'}
+        </p>
+        <div className="flex items-center gap-2 pt-0.5 text-[9px] text-zinc-400">
+          <span className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-amber-300 font-semibold">SPACE</span>
+          <span>TOGGLE LOUVERS</span>
+          <span className="text-zinc-600">·</span>
+          <span className="text-zinc-500">DRAG TO ORBIT</span>
+        </div>
+      </div>
+
+      {/* Tactical 2D Radar Minimap (Top-Right) */}
+      <div className="absolute top-16 right-4 z-20 w-44 bg-[#0c0d12]/85 backdrop-blur-md rounded-xl border border-zinc-800/40 p-2.5 shadow-xl font-mono text-[10px] space-y-2 pointer-events-auto">
+        <div className="flex items-center justify-between border-b border-zinc-800/40 pb-1 text-zinc-400">
+          <div className="flex items-center gap-1.5 font-semibold text-zinc-200 tracking-wider">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span>RADAR // SECTOR</span>
+          </div>
+          <span className="text-[9px] text-zinc-500">{alleyWidth.toFixed(1)}m WIDE</span>
+        </div>
+        
+        {/* Vector Top-Down Schematic */}
+        <div className="relative h-20 w-full bg-black/80 rounded-lg border border-zinc-800/60 overflow-hidden flex items-center justify-between px-2">
+          {/* Left Building Facade / AC Units */}
+          <div className="w-2.5 h-full bg-red-950/80 border-r-2 border-red-500 flex flex-col justify-around py-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-400 mx-auto" />
+            <div className="w-1.5 h-1.5 rounded-full bg-red-400 mx-auto" />
+            <div className="w-1.5 h-1.5 rounded-full bg-red-400 mx-auto" />
+          </div>
+
+          {/* Heat Plume Trajectory */}
+          <div className="flex-1 h-full relative overflow-hidden flex items-center">
+            <div 
+              className={`absolute inset-y-1 transition-all duration-500 ${
+                louversEngaged 
+                  ? 'w-6 bg-gradient-to-t from-emerald-500/40 to-sky-400/60 rounded-t-lg'
+                  : 'w-full bg-gradient-to-r from-red-600/60 via-amber-500/40 to-transparent'
+              }`}
+              style={{ left: '4px' }}
+            />
+            {/* Vendor Pin */}
+            <div 
+              className="absolute z-10 flex flex-col items-center"
+              style={{ left: '60%' }}
+            >
+              <div className={`h-2.5 w-2.5 rounded-full border ${louversEngaged ? 'bg-emerald-400 border-white' : 'bg-amber-400 border-red-500 animate-pulse'}`} />
+              <span className="text-[7px] text-zinc-300 font-bold whitespace-nowrap mt-0.5">VENDOR</span>
+            </div>
+
+            {/* Mist Refuge Kiosk */}
+            <div 
+              className="absolute top-1 right-1.5 z-10 flex items-center gap-0.5 text-sky-400 text-[7px]"
+            >
+              <span className="h-1 w-1 rounded-full bg-sky-400" />
+              <span>MIST #3</span>
+            </div>
+          </div>
+
+          {/* Right Building Facade */}
+          <div className="w-2.5 h-full bg-zinc-900 border-l-2 border-zinc-700" />
+        </div>
+
+        {/* Legend & Plume Status */}
+        <div className="flex items-center justify-between text-[9px] pt-0.5 text-zinc-400">
+          <div className="flex items-center gap-1">
+            <span className={`h-1.5 w-1.5 rounded-full ${louversEngaged ? 'bg-emerald-400' : 'bg-red-500'}`} />
+            <span>{louversEngaged ? 'SKYWARD DEFLECTION' : '54°C TRAPPED JET'}</span>
+          </div>
+          <span className="text-zinc-500 font-bold">[SPACE]</span>
+        </div>
+      </div>
 
       {/* Top Floating Telemetry & Preset Ribbon */}
       <div className="relative z-10 p-4 pointer-events-none flex flex-wrap items-center justify-between gap-3">
@@ -514,11 +610,11 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
       </div>
 
       {/* Bottom Interactive Spatial Controls Panel */}
-      <div className="mt-auto relative z-10 p-4 pointer-events-auto bg-slate-950/90 backdrop-blur-md border-t border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+      <div className="mt-auto relative z-10 p-4 pointer-events-auto bg-[#0c0d12]/85 backdrop-blur-md border-t border-zinc-800/40 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
         {/* Alley Width Slider */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-400 flex items-center gap-1.5">
+            <span className="text-zinc-400 flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5 text-sky-400" />
               Alley Width (Canyon Geometry)
             </span>
@@ -531,9 +627,9 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
             step="0.2"
             value={alleyWidth}
             onChange={(e) => setAlleyWidth(parseFloat(e.target.value))}
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400"
+            className="w-full h-1.5 bg-zinc-900 rounded-lg appearance-none cursor-pointer accent-sky-400 border border-zinc-800/60"
           />
-          <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+          <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
             <span>4.0m (Trapped Chasm)</span>
             <span>8.0m (Open Boulevard)</span>
           </div>
@@ -542,7 +638,7 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
         {/* AC Units Count Slider */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-400 flex items-center gap-1.5">
+            <span className="text-zinc-400 flex items-center gap-1.5">
               <Flame className="w-3.5 h-3.5 text-amber-400" />
               Condenser Density (Split & VRF)
             </span>
@@ -555,9 +651,9 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
             step="2"
             value={acUnitsCount}
             onChange={(e) => setAcUnitsCount(parseInt(e.target.value))}
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
+            className="w-full h-1.5 bg-zinc-900 rounded-lg appearance-none cursor-pointer accent-amber-400 border border-zinc-800/60"
           />
-          <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+          <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
             <span>10 units (85 kW heat)</span>
             <span>100 units (850 kW blast)</span>
           </div>
@@ -567,21 +663,21 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
         <div className="flex items-center justify-end">
           <button
             onClick={toggleLouvers}
-            className={`w-full py-3 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-lg ${
+            className={`w-full py-2.5 px-4 rounded-xl font-mono font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md ${
               louversEngaged
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50'
-                : 'bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white shadow-red-950/50'
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40'
+                : 'bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white border border-amber-500/40'
             }`}
           >
             {louversEngaged ? (
               <>
                 <ShieldCheck className="w-4 h-4" />
-                <span>Restorative Skyward Louvers ENGAGED (Deflecting Heat to Sky)</span>
+                <span>Restorative Skyward Louvers ENGAGED</span>
               </>
             ) : (
               <>
                 <Flame className="w-4 h-4 fill-current animate-pulse" />
-                <span>Engage Section 133 Skyward Deflector Louvers</span>
+                <span>Engage Section 133 Skyward Louvers</span>
               </>
             )}
           </button>

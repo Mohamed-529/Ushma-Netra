@@ -20,12 +20,14 @@ export const GrandFinaleFooter: React.FC<Props> = ({
         
         {/* Spacious, Elegant Central Banner */}
         <div className="text-center space-y-6 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-medium">
+          <div className="inline-flex items-center gap-2 text-emerald-400 text-xs font-mono font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>CIVIC HEAT RESTITUTION GRID</span>
+            <span className="text-zinc-600">·</span>
+            <span className="text-zinc-400">TRACK 02: HEAT & WATER</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-zinc-100 tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-5xl font-light text-zinc-100 tracking-tight leading-tight font-sans">
             Thermal Justice at Ground Level.
           </h2>
 
@@ -34,20 +36,20 @@ export const GrandFinaleFooter: React.FC<Props> = ({
           </p>
 
           {/* Clean Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button
               onClick={() => onNavigateTo('live_cockpit')}
-              className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs font-mono transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
+              className="px-5 py-2.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs font-mono transition-all flex items-center gap-2 shadow-sm cursor-pointer border border-zinc-200"
             >
               <span>Explore 3D Digital Twin</span>
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
 
             <button
               onClick={onSimulateSurge}
-              className="px-6 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-200 font-mono text-xs font-medium transition-all flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 rounded-lg bg-[#0c0d12]/80 hover:bg-zinc-900 border border-zinc-800/40 text-zinc-300 font-mono text-xs font-medium transition-all flex items-center gap-2 cursor-pointer"
             >
-              <Flame className="w-4 h-4 text-red-400" />
+              <Flame className="w-3.5 h-3.5 text-red-400" />
               <span>Simulate 54°C Surge</span>
             </button>
           </div>
@@ -55,36 +57,36 @@ export const GrandFinaleFooter: React.FC<Props> = ({
 
         {/* 4 Clean Metric Cards (High Spacing, Minimal Words) */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-4">
-          <div className="p-6 rounded-2xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md text-center space-y-1 hover:border-zinc-700 transition-colors">
-            <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono">
+          <div className="p-6 rounded-2xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md text-center space-y-1 hover:border-zinc-700/60 transition-colors">
+            <div className="text-2xl sm:text-3xl font-extralight text-amber-400 font-mono">
               -12°C
             </div>
             <div className="text-xs text-zinc-300 font-medium pt-1">Plume Deflection</div>
-            <div className="text-[11px] text-zinc-500">Skyward louvers break vortex</div>
+            <div className="text-[11px] text-zinc-500 font-light">Skyward louvers break vortex</div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md text-center space-y-1 hover:border-zinc-700 transition-colors">
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">
+          <div className="p-6 rounded-2xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md text-center space-y-1 hover:border-zinc-700/60 transition-colors">
+            <div className="text-2xl sm:text-3xl font-extralight text-emerald-400 font-mono">
               $8.00
             </div>
             <div className="text-xs text-zinc-300 font-medium pt-1">IoT Beacon Cost</div>
-            <div className="text-[11px] text-zinc-500">ESP32 + SHT31-D + Secrets Mgr</div>
+            <div className="text-[11px] text-zinc-500 font-light">ESP32 + SHT31-D + Secrets Mgr</div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md text-center space-y-1 hover:border-zinc-700 transition-colors">
-            <div className="text-2xl sm:text-3xl font-extrabold text-sky-400 font-mono">
+          <div className="p-6 rounded-2xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md text-center space-y-1 hover:border-zinc-700/60 transition-colors">
+            <div className="text-2xl sm:text-3xl font-extralight text-sky-400 font-mono">
               Sec. 133
             </div>
             <div className="text-xs text-zinc-300 font-medium pt-1">CrPC Legal Basis</div>
-            <div className="text-[11px] text-zinc-500">Public nuisance statutory order</div>
+            <div className="text-[11px] text-zinc-500 font-light">Public nuisance statutory order</div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md text-center space-y-1 hover:border-zinc-700 transition-colors">
-            <div className="text-2xl sm:text-3xl font-extrabold text-purple-400 font-mono">
+          <div className="p-6 rounded-2xl bg-[#0c0d12]/75 border border-zinc-800/40 backdrop-blur-md text-center space-y-1 hover:border-zinc-700/60 transition-colors">
+            <div className="text-2xl sm:text-3xl font-extralight text-purple-400 font-mono">
               100%
             </div>
             <div className="text-xs text-zinc-300 font-medium pt-1">Vendor Restitution</div>
-            <div className="text-[11px] text-zinc-500">Funded misting kiosk network</div>
+            <div className="text-[11px] text-zinc-500 font-light">Funded misting kiosk network</div>
           </div>
         </div>
 
