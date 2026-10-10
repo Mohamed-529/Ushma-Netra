@@ -36,65 +36,65 @@ export const VisceralProblem: React.FC = () => {
 
         {/* Visual Narrative Stage: The 4-Stage Thermodynamic Pipeline with Transfer Links */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
-          <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 relative group hover:border-slate-700 transition-colors">
-            <div className="flex items-center justify-between text-slate-500">
+          <div className="p-4 rounded-xl bg-zinc-950/40 backdrop-blur-md border border-zinc-800/60 space-y-2.5 relative group hover:border-zinc-700 transition-colors">
+            <div className="flex items-center justify-between text-zinc-500 text-[10px]">
               <span>STAGE 01</span>
-              <Snowflake className="w-4 h-4 text-sky-400" />
+              <Snowflake className="w-3.5 h-3.5 text-sky-400" />
             </div>
-            <div className="text-sm font-bold text-white font-sans">Indoor Evaporator</div>
-            <div className="text-2xl font-bold text-sky-400">22.0°C</div>
-            <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
+            <div className="text-xs font-bold text-zinc-100 font-mono">Indoor Evaporator</div>
+            <div className="text-xl font-bold text-sky-400">22.0°C</div>
+            <p className="text-[11px] text-zinc-400 font-sans leading-relaxed">
               Extracts 182 TR sensible and latent heat from corporate offices and luxury mall boutiques.
             </p>
-            <div className="pt-2 border-t border-slate-900 text-[10px] text-slate-500 flex items-center justify-between">
+            <div className="pt-2 border-t border-zinc-800/60 text-[10px] text-zinc-500 flex items-center justify-between">
               <span>Heat Extracted</span>
               <span className="text-sky-400">→ Dispatched</span>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 relative group hover:border-slate-700 transition-colors">
-            <div className="flex items-center justify-between text-slate-500">
+          <div className="p-4 rounded-xl bg-zinc-950/40 backdrop-blur-md border border-zinc-800/60 space-y-2.5 relative group hover:border-zinc-700 transition-colors">
+            <div className="flex items-center justify-between text-zinc-500 text-[10px]">
               <span>STAGE 02</span>
-              <Zap className="w-4 h-4 text-amber-400" />
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
             </div>
-            <div className="text-sm font-bold text-white font-sans">Compressor Work</div>
-            <div className="text-2xl font-bold text-amber-400">+142 kW</div>
-            <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
-              Compressor motor converts electrical energy into raw mechanical heat, inflating the exhaust load by 35%.
+            <div className="text-xs font-bold text-zinc-100 font-mono">Compressor Work</div>
+            <div className="text-xl font-bold text-amber-400">+142 kW</div>
+            <p className="text-[11px] text-zinc-400 font-sans leading-relaxed">
+              Compressor motor converts electrical energy into raw mechanical heat, inflating exhaust load by 35%.
             </p>
-            <div className="pt-2 border-t border-slate-900 text-[10px] text-slate-500 flex items-center justify-between">
+            <div className="pt-2 border-t border-zinc-800/60 text-[10px] text-zinc-500 flex items-center justify-between">
               <span>Electrical Added</span>
               <span className="text-amber-400">→ +35% Load</span>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-950/80 border border-red-900/60 bg-red-950/20 space-y-3 shadow-lg shadow-red-950/40 relative group hover:border-red-700 transition-colors">
-            <div className="flex items-center justify-between text-red-400">
+          <div className="p-4 rounded-xl bg-red-950/30 backdrop-blur-md border border-red-900/60 space-y-2.5 shadow-lg shadow-red-950/20 relative group hover:border-red-700 transition-colors">
+            <div className="flex items-center justify-between text-red-400 text-[10px]">
               <span>STAGE 03</span>
-              <Flame className="w-4 h-4 text-red-500" />
+              <Flame className="w-3.5 h-3.5 text-red-500" />
             </div>
-            <div className="text-sm font-bold text-white font-sans">Exhaust Blast</div>
-            <div className="text-2xl font-bold text-red-400">{exhaustTemp}°C</div>
-            <p className="text-[11px] text-slate-300 font-sans leading-relaxed">
+            <div className="text-xs font-bold text-zinc-100 font-mono">Exhaust Blast</div>
+            <div className="text-xl font-bold text-red-400">{exhaustTemp}°C</div>
+            <p className="text-[11px] text-zinc-300 font-sans leading-relaxed">
               64 outdoor condenser units vent 53.6°C sensible heat horizontally at 1.5m pedestrian head height.
             </p>
-            <div className="pt-2 border-t border-red-950 text-[10px] text-red-400 flex items-center justify-between">
+            <div className="pt-2 border-t border-red-900/60 text-[10px] text-red-400 flex items-center justify-between">
               <span>Sensible Discharge</span>
               <span className="text-red-400">→ Sidewalk Level</span>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-slate-950/80 border border-red-900/60 bg-red-950/20 space-y-3 shadow-lg shadow-red-950/40 relative group hover:border-red-700 transition-colors">
-            <div className="flex items-center justify-between text-red-400">
+          <div className="p-4 rounded-xl bg-red-950/30 backdrop-blur-md border border-red-900/60 space-y-2.5 shadow-lg shadow-red-950/20 relative group hover:border-red-700 transition-colors">
+            <div className="flex items-center justify-between text-red-400 text-[10px]">
               <span>STAGE 04</span>
-              <AlertOctagon className="w-4 h-4 text-red-500" />
+              <AlertOctagon className="w-3.5 h-3.5 text-red-500" />
             </div>
-            <div className="text-sm font-bold text-white font-sans">Canyon Trapping</div>
-            <div className="text-2xl font-bold text-red-500">{streetTemp}°C</div>
-            <p className="text-[11px] text-slate-300 font-sans leading-relaxed">
+            <div className="text-xs font-bold text-zinc-100 font-mono">Canyon Trapping</div>
+            <div className="text-xl font-bold text-red-500">{streetTemp}°C</div>
+            <p className="text-[11px] text-zinc-300 font-sans leading-relaxed">
               7.2m narrow street canyon traps the thermal plume. Ambient WBGT crosses 36.8°C lethal threshold.
             </p>
-            <div className="pt-2 border-t border-red-950 text-[10px] text-red-400 flex items-center justify-between">
+            <div className="pt-2 border-t border-red-900/60 text-[10px] text-red-400 flex items-center justify-between">
               <span>Vortex Stagnation</span>
               <span className="text-red-500 font-bold">Lethal WBGT</span>
             </div>
@@ -102,14 +102,14 @@ export const VisceralProblem: React.FC = () => {
         </div>
 
         {/* Interactive Dynamic Chiller Load Stress Tester */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-slate-950/90 border border-red-900/40 shadow-2xl space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div className="p-5 sm:p-6 rounded-2xl bg-zinc-950/50 backdrop-blur-md border border-zinc-800/80 shadow-2xl space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/80 pb-4">
             <div>
-              <div className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                <Activity className="w-4 h-4 text-amber-400" />
+              <div className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                <Activity className="w-3.5 h-3.5 text-amber-400" />
                 Live Canyon Thermodynamics Engine
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-zinc-400 mt-0.5">
                 Drag the building AC cooling load to simulate real-time thermal plume expansion in the alleyway.
               </p>
             </div>

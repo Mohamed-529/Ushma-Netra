@@ -49,9 +49,7 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
       ref={heroRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`relative min-h-screen w-full flex flex-col justify-between p-6 sm:p-10 lg:p-16 overflow-hidden transition-colors duration-1000 ${
-        flirMode ? 'bg-[#06040e]' : 'bg-[#040711]'
-      }`}
+      className="relative min-h-screen w-full flex flex-col justify-between p-6 sm:p-10 lg:p-16 overflow-hidden bg-transparent transition-colors duration-1000"
     >
       {/* Dynamic FLIR Thermal Infrared Heat Matrix Simulation */}
       {flirMode ? (
@@ -209,28 +207,28 @@ export const WowHero: React.FC<Props> = ({ onScrollToProblem, onJumpToLive }) =>
           transition={{ duration: 0.9, delay: 0.3 }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 text-xs font-mono"
         >
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 backdrop-blur-sm space-y-1">
-            <div className="text-[10px] text-slate-500 uppercase">STEP 01 // CV SCAN</div>
-            <div className="font-bold text-white">SageMaker CV</div>
-            <div className="text-[11px] text-slate-400 font-sans">Counts outdoor units & calculates kW load</div>
+          <div className="p-3.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
+            <div className="text-[10px] text-zinc-500 uppercase font-mono">STEP 01 // CV SCAN</div>
+            <div className="font-bold text-zinc-100 font-mono">SageMaker CV</div>
+            <div className="text-[11px] text-zinc-400 font-sans">Counts outdoor units & calculates kW load</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 backdrop-blur-sm space-y-1">
-            <div className="text-[10px] text-slate-500 uppercase">STEP 02 // SATELLITE</div>
-            <div className="font-bold text-sky-400">Landsat-9 Thermal</div>
-            <div className="text-[11px] text-slate-400 font-sans">Maps micro-plume hitting adjacent street</div>
+          <div className="p-3.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
+            <div className="text-[10px] text-zinc-500 uppercase font-mono">STEP 02 // SATELLITE</div>
+            <div className="font-bold text-sky-400 font-mono">Landsat-9 Thermal</div>
+            <div className="text-[11px] text-zinc-400 font-sans">Maps micro-plume hitting adjacent street</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 backdrop-blur-sm space-y-1">
-            <div className="text-[10px] text-slate-500 uppercase">STEP 03 // REASONING</div>
-            <div className="font-bold text-amber-400">Bedrock Legal Agent</div>
-            <div className="text-[11px] text-slate-400 font-sans">Computes Thermal Debt & ₹ Exhaust Tax</div>
+          <div className="p-3.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
+            <div className="text-[10px] text-zinc-500 uppercase font-mono">STEP 03 // REASONING</div>
+            <div className="font-bold text-amber-400 font-mono">Bedrock Legal Agent</div>
+            <div className="text-[11px] text-zinc-400 font-sans">Computes Thermal Debt & ₹ Exhaust Tax</div>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 backdrop-blur-sm space-y-1">
-            <div className="text-[10px] text-slate-500 uppercase">STEP 04 // MITIGATION</div>
-            <div className="font-bold text-emerald-400">Section 133 Shield</div>
-            <div className="text-[11px] text-slate-400 font-sans">Mandates skyward louvers & shade funds</div>
+          <div className="p-3.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
+            <div className="text-[10px] text-zinc-500 uppercase font-mono">STEP 04 // MITIGATION</div>
+            <div className="font-bold text-emerald-400 font-mono">Section 133 Shield</div>
+            <div className="text-[11px] text-zinc-400 font-sans">Mandates skyward louvers & shade funds</div>
           </div>
         </motion.div>
       </div>

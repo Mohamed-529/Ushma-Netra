@@ -64,9 +64,9 @@ export const WhyThisMatters: React.FC = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="p-6 sm:p-8 rounded-3xl bg-slate-950/90 border border-slate-800 shadow-2xl space-y-6"
+          className="p-6 sm:p-8 rounded-2xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md shadow-xl space-y-5"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/60 pb-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-mono text-slate-400 uppercase tracking-wider">
                 <span>Ground-Truth Subject Profile</span>
@@ -83,9 +83,9 @@ export const WhyThisMatters: React.FC = () => {
           </div>
 
           {/* Interactive Exposure Duration Slider */}
-          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
+          <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
-              <div className="text-slate-300 font-bold flex items-center gap-2">
+              <div className="text-zinc-300 font-bold flex items-center gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
                 <span>Simulate Continuous Daily Exposure at Sidewalk Stall:</span>
               </div>
@@ -105,49 +105,49 @@ export const WhyThisMatters: React.FC = () => {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono pt-1">
               <div className="space-y-0.5">
-                <span className="text-[10px] text-slate-500 block">ESTIMATED CORE TEMP</span>
+                <span className="text-[10px] text-zinc-500 block">ESTIMATED CORE TEMP</span>
                 <span className={`text-base font-bold ${isCritical ? 'text-red-500' : 'text-amber-400'}`}>
                   {coreBodyTemp}°C
                 </span>
               </div>
               <div className="space-y-0.5">
-                <span className="text-[10px] text-slate-500 block">DEHYDRATION DEFICIT</span>
+                <span className="text-[10px] text-zinc-500 block">DEHYDRATION DEFICIT</span>
                 <span className="text-base font-bold text-sky-400">-{sweatDeficitMl} mL</span>
               </div>
               <div className="space-y-0.5">
-                <span className="text-[10px] text-slate-500 block">PHYSIOLOGICAL PHASE</span>
+                <span className="text-[10px] text-zinc-500 block">PHYSIOLOGICAL PHASE</span>
                 <span className={`text-base font-bold ${isCritical ? 'text-red-400' : 'text-amber-300'}`}>
                   {isCritical ? 'Heat Stroke Risk' : 'Severe Exhaustion'}
                 </span>
               </div>
               <div className="space-y-0.5">
-                <span className="text-[10px] text-slate-500 block">REGULATORY ACTION</span>
+                <span className="text-[10px] text-zinc-500 block">REGULATORY ACTION</span>
                 <span className="text-base font-bold text-emerald-400">Tier-1 Audio Alarm</span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
-            <div className="p-4 bg-slate-900/90 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">LOCAL WBGT MEASURED</span>
-              <span className="text-3xl font-extrabold text-red-500 tabular-nums">36.8°C</span>
+            <div className="p-4 bg-zinc-900/40 rounded-xl border border-zinc-800/60">
+              <span className="text-zinc-400 block text-[10px]">LOCAL WBGT MEASURED</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-red-500 tabular-nums">36.8°C</span>
               <span className="text-[10px] text-red-400 block mt-1">Exceeds physiological limit</span>
             </div>
 
-            <div className="p-4 bg-slate-900/90 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">DAILY DURATION OF EXPOSURE</span>
-              <span className="text-3xl font-extrabold text-amber-400 tabular-nums">11.5 Hours</span>
-              <span className="text-[10px] text-slate-400 block mt-1">07:00 to 18:30 daily</span>
+            <div className="p-4 bg-zinc-900/40 rounded-xl border border-zinc-800/60">
+              <span className="text-zinc-400 block text-[10px]">DAILY DURATION OF EXPOSURE</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums">11.5 Hours</span>
+              <span className="text-[10px] text-zinc-400 block mt-1">07:00 to 18:30 daily</span>
             </div>
 
-            <div className="p-4 bg-slate-900/90 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">HEAT STROKE LETHALITY WINDOW</span>
-              <span className="text-3xl font-extrabold text-red-400 tabular-nums">&lt; 40 mins</span>
+            <div className="p-4 bg-zinc-900/40 rounded-xl border border-zinc-800/60">
+              <span className="text-zinc-400 block text-[10px]">HEAT STROKE LETHALITY WINDOW</span>
+              <span className="text-2xl sm:text-3xl font-extrabold text-red-400 tabular-nums">&lt; 40 mins</span>
               <span className="text-[10px] text-red-400 block mt-1">Without active hydration stand-down</span>
             </div>
           </div>
 
-          <blockquote className="p-4 rounded-xl bg-slate-900/50 border-l-2 border-amber-500 text-xs text-slate-300 italic leading-relaxed">
+          <blockquote className="p-4 rounded-xl bg-zinc-900/30 border-l-2 border-amber-500 text-xs text-zinc-300 italic leading-relaxed">
             "By two in the afternoon, the back of my neck feels like it is on a tandoor fire. The air coming from the building's AC boxes smells of hot metal and grease. You cannot breathe. But this is where my customers come. Where else can I go?"
           </blockquote>
         </motion.div>

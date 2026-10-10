@@ -304,34 +304,34 @@ export const MunicipalDefenseChallenge: React.FC = () => {
 
         {/* Real-time KPI Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
-          <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
-            <span className="text-slate-500 block text-[10px] uppercase">EQUITY PROTECTION SCORE</span>
-            <div className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums flex items-center gap-2">
+          <div className="p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
+            <span className="text-zinc-500 block text-[10px] uppercase">EQUITY PROTECTION SCORE</span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-zinc-100 tabular-nums flex items-center gap-2">
               <span className={protectionScore >= 70 ? 'text-emerald-400' : 'text-amber-400'}>
                 {protectionScore}%
               </span>
-              <span className="text-xs text-slate-400 font-sans font-normal">
+              <span className="text-xs text-zinc-400 font-sans font-normal">
                 ({totalProtectedVendors}/{totalVendors} vendors)
               </span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
-            <span className="text-slate-500 block text-[10px] uppercase">HEAT DIVERTED SKYWARD</span>
+          <div className="p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
+            <span className="text-zinc-500 block text-[10px] uppercase">HEAT DIVERTED SKYWARD</span>
             <div className="text-2xl sm:text-3xl font-extrabold text-sky-400 tabular-nums">
               {totalHeatDivertedKw} kW
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
-            <span className="text-slate-500 block text-[10px] uppercase">RESTITUTION POOL BALANCE</span>
+          <div className="p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
+            <span className="text-zinc-500 block text-[10px] uppercase">RESTITUTION POOL BALANCE</span>
             <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 tabular-nums">
               ₹{restorativeFund.toLocaleString('en-IN')}
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1">
-            <span className="text-slate-500 block text-[10px] uppercase">ACTIVE PILOT SECTORS</span>
+          <div className="p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md space-y-1">
+            <span className="text-zinc-500 block text-[10px] uppercase">ACTIVE PILOT SECTORS</span>
             <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums">
               3 Districts
             </div>

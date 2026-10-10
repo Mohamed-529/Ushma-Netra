@@ -145,6 +145,25 @@ Every model and calculation in Ushma-Netra is grounded in published physical sci
 
 ---
 
+## 🎛️ Executive Mission Control Console & UX Architecture
+
+The outer layout of Ushma-Netra is structured as an elite **Mission Control Console** (`src/components/ProfessionalLandingLayout.tsx`), deliberately eliminating generic developer log clutter:
+
+- **Sticky Executive Console Header**:
+  - Precision brand signature with live pulse beacon and ECC-P256 cryptographic hardware verification badge.
+  - Monospace act chapters timeline (`01 FLIR Vision` through `09 Defense Grid`) with smooth scroll navigation.
+  - Real-time action triggers: 54°C Thermal Surge simulation injection, Restorative Louvers toggle, Web Serial USB hook, and acoustic drone synthesizer.
+- **Asymmetrical Tactical Workspace Split** (`src/components/experience/LiveProductCockpit.tsx`):
+  - **Left Narrative Engine**: Monitored precinct building selector, vulnerable worker sensor tracker, live thermodynamic calculations, and expandable structural drawers for Oke canyon vortex physics, hardware cryptographic boundaries, and AWS Cedar statutory guardrails, plus an on-demand live MQTT JSON terminal.
+  - **Right Interactive Workspace**: Houses the 3D WebGL Three.js spatial canyon digital twin, facade computer vision scanner, restitution surcharge ledger, and IoT worker beacon.
+- **Absolute Desktop Status Telemetry Ribbon**:
+  - Running along the bottom row, mirroring enterprise SCADA and network operations consoles. Displays live status indicators: `ONLINE // AWS CEDAR ACTIVE`, Canyon Preset, Crypto Handshake, Statutory Order generation status, MQTT Ingestion throughput (12.4k ev/min), and Indian Standard Time clock.
+- **Atmospheric Continuity & Anti-AI Slop Discipline**:
+  - Translucent glassmorphic overlay pattern (`bg-zinc-950/40 backdrop-blur-md border border-zinc-800/60`) over a continuous, scroll-aware thermal gradient mesh.
+  - Zero-pill discipline with tight tracking, sharp monospace indicators (`text-[10px]` / `text-[11px]`), and high-contrast typography (`text-zinc-100`).
+
+---
+
 ## 🏃 Local Development & Execution
 
 ```bash

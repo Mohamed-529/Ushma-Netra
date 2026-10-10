@@ -6,7 +6,18 @@ import { FacadeComputerVisionScanner } from '../FacadeComputerVisionScanner';
 import { ThermalDebtLedger } from '../ThermalDebtLedger';
 import { VendorIoTBeacon } from '../VendorIoTBeacon';
 import { LiveHardwareControl } from '../LiveHardwareControl';
-import { Box, Scan, Scale, Radio, Flame, ShieldCheck, Lock, CheckCircle2, Sliders, Terminal } from 'lucide-react';
+import {
+  Box,
+  Scan,
+  Scale,
+  Radio,
+  Flame,
+  ShieldCheck,
+  Lock,
+  Sliders,
+  Terminal,
+  MapPin
+} from 'lucide-react';
 import { verifyDeviceHandshake } from '../../utils/cryptoVerify';
 
 interface Props {
@@ -36,9 +47,7 @@ export const LiveProductCockpit: React.FC<Props> = ({
 }) => {
   const [activeTool, setActiveTool] = useState<'3d_twin' | 'cv_scanner' | 'thermal_debt' | 'vendor_iot' | 'hardware_serial'>('3d_twin');
   const [twinMode, setTwinMode] = useState<'facade_twin' | 'parametric_canyon'>('facade_twin');
-  const [hwTokenValid, setHwTokenValid] = useState<boolean>(true);
 
-  // Validate hardware cryptographic payload
   const isHardwareVerified = verifyDeviceHandshake(
     {
       node_id: vendor.id,
@@ -46,199 +55,199 @@ export const LiveProductCockpit: React.FC<Props> = ({
       ambient_temp: vendor.dryBulbTempCelsius,
       timestamp: new Date().toISOString(),
     },
-    hwTokenValid ? 'un_hw_secure_ecc_p256_v01_valid_session' : 'tampered_invalid_token'
+    'un_hw_secure_ecc_p256_v01_valid_session'
   );
 
   return (
-    <section id="live-cockpit" className="relative min-h-screen w-full py-24 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-slate-800/80">
-      {/* Top Ambient Glow */}
-      <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-[#0284c7]/10 to-transparent pointer-events-none" />
-
+    <section id="live_cockpit" className="relative w-full py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
       <div className="max-w-7xl mx-auto w-full space-y-8 relative z-10">
-        {/* Cockpit Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-800 pb-6">
+        
+        {/* Clean, Spacious Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-800/80 pb-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>04 · THE LIVE WORKING SYSTEM CENTERPIECE</span>
-              <span className="text-slate-600">·</span>
-              <span className="text-slate-400">4-TOOL TACTICAL SUITE</span>
+              <span>THE LIVE DIGITAL TWIN</span>
+              <span className="text-zinc-600">·</span>
+              <span className="text-zinc-400">HARDWARE-SOFTWARE WORKSPACE</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-serif">
-              The Autonomous Resilience Engine in Action
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-zinc-100 tracking-tight">
+              Micro-Canyon Digital Twin & Control
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl font-light">
-              Not static cards or mock diagrams. A fully functional WebGL 3D spatial twin with FLIR thermal infrared false-color rendering, computer vision facade scanner, IoT worker beacon, and statutory order ledger.
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl font-light">
+              Interactive 3D WebGL spatial physics, facade computer vision, and statutory municipal restitution ledger.
             </p>
           </div>
 
-          {/* Quick System Action Triggers */}
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {/* Action Trigger Buttons */}
+          <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onSimulateSurge}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-red-900/40 transition-all cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-800/70 text-red-200 font-mono text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer"
             >
-              <Flame className="w-4 h-4 fill-current" />
-              <span>Simulate 54°C Exhaust Surge</span>
+              <Flame className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+              <span>Simulate Surge</span>
             </button>
 
             <button
               onClick={() => onMitigationToggle(!isMitigated)}
-              className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-xl font-mono text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border ${
                 isMitigated
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40'
-                  : 'bg-slate-800 text-slate-300 hover:text-white border border-slate-700'
+                  ? 'bg-emerald-950/70 border-emerald-600 text-emerald-200'
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white'
               }`}
             >
-              <ShieldCheck className="w-4 h-4" />
-              <span>{isMitigated ? 'Mitigation Active (Skyward Venting)' : 'Deploy Restorative Louvers'}</span>
+              <ShieldCheck className={`w-3.5 h-3.5 ${isMitigated ? 'text-emerald-400' : 'text-zinc-400'}`} />
+              <span>{isMitigated ? 'Louvers: Active' : 'Deploy Louvers'}</span>
             </button>
           </div>
         </div>
 
-        {/* Synchronized Cross-Tool Real-Time Status Strip with Hardware Security */}
-        <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono grid grid-cols-2 md:grid-cols-5 gap-3">
-          <div className="space-y-0.5">
-            <span className="text-[10px] text-slate-500 block uppercase">MONITORED TARGET</span>
-            <span className="font-bold text-white truncate block">{building.name}</span>
-          </div>
-          <div className="space-y-0.5">
-            <span className="text-[10px] text-slate-500 block uppercase">OUTDOOR CONDENSERS</span>
-            <span className="font-bold text-amber-400">
-              {building.detectedOutdoorUnits.splitUnits + building.detectedOutdoorUnits.vrfUnits} units (Split & VRF)
-            </span>
-          </div>
-          <div className="space-y-0.5">
-            <span className="text-[10px] text-slate-500 block uppercase">REJECTED SENSIBLE HEAT</span>
-            <span className={`font-bold ${isMitigated ? 'text-emerald-400' : 'text-red-400'}`}>
-              {isMitigated ? '182 kW (Vented Skyward)' : `${building.rejectedHeatKw} kW (Direct Alley Blast)`}
-            </span>
-          </div>
-          <div className="space-y-0.5">
-            <span className="text-[10px] text-slate-500 block uppercase">WORKER EXPOSURE</span>
-            <span className={`font-bold ${isMitigated ? 'text-emerald-400' : 'text-amber-400'}`}>
-              {vendor.vendorName} ({vendor.distanceToExhaustMeters}m away)
-            </span>
-          </div>
-          <div className="space-y-0.5 col-span-2 md:col-span-1 border-t md:border-t-0 md:border-l border-slate-800 md:pl-3 pt-1 md:pt-0">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-slate-500 uppercase flex items-center gap-1">
-                <Lock className="w-2.5 h-2.5 text-sky-400" />
-                <span>HARDWARE CRYPTO</span>
-              </span>
+        {/* Precinct Switcher (Horizontal Selector Pills) */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-mono text-zinc-400 flex items-center gap-1.5 mr-2">
+            <MapPin className="w-3.5 h-3.5 text-amber-400" />
+            <span>Target Precinct:</span>
+          </span>
+          {allBuildings.map((b) => {
+            const isSelected = b.id === building.id;
+            return (
               <button
-                onClick={() => setHwTokenValid(!hwTokenValid)}
-                className="text-[9px] text-slate-400 hover:text-amber-400 underline cursor-pointer"
-                title="Toggle simulated tamper event to test cryptographic rejection"
+                key={b.id}
+                onClick={() => onSelectBuilding(b)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer border ${
+                  isSelected
+                    ? 'bg-amber-500/20 border-amber-500/80 text-amber-300 font-bold'
+                    : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                }`}
               >
-                {hwTokenValid ? 'Simulate Tamper' : 'Restore'}
+                {b.name} ({b.canyonWidthMeters}m Alley)
               </button>
+            );
+          })}
+        </div>
+
+        {/* Concise Vital Telemetry Strip (Only the essential numbers) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md text-xs font-mono">
+          <div>
+            <div className="text-[10px] text-zinc-500 uppercase">Sensible Heat Rejected</div>
+            <div className={`text-lg font-bold ${isMitigated ? 'text-emerald-400' : 'text-red-400'}`}>
+              {isMitigated ? '182 kW (Deflected)' : `${building.rejectedHeatKw} kW (Alley Blast)`}
             </div>
-            <div className="flex items-center gap-1 text-[11px] font-bold">
-              {isHardwareVerified ? (
-                <span className="text-emerald-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> SECRETS MGR P-256 OK
-                </span>
-              ) : (
-                <span className="text-red-400 flex items-center gap-1">
-                  REJECTED: BAD SIGNATURE
-                </span>
-              )}
+          </div>
+          <div>
+            <div className="text-[10px] text-zinc-500 uppercase">Vendor Exposure WBGT</div>
+            <div className="text-lg font-bold text-amber-400">
+              {vendor.wetBulbGlobeTempCelsius}°C ({vendor.distanceToExhaustMeters}m away)
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] text-zinc-500 uppercase">Statutory Surcharge</div>
+            <div className="text-lg font-bold text-zinc-200">
+              ₹{building.monthlyExhaustTaxInr.toLocaleString('en-IN')}/mo
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] text-zinc-500 uppercase">Hardware Handshake</div>
+            <div className="text-lg font-bold text-emerald-400 flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5" />
+              <span>{isHardwareVerified ? 'P-256 Verified' : 'Checking'}</span>
             </div>
           </div>
         </div>
 
-        {/* Tactical Sub-Tool Selector Tabs */}
-        <div className="flex items-center gap-2 p-1.5 bg-slate-900/90 rounded-2xl border border-slate-800 overflow-x-auto">
+        {/* Tool Navigation Tabs */}
+        <div className="flex items-center gap-2 p-1.5 bg-zinc-950/60 rounded-xl border border-zinc-800/80 overflow-x-auto">
           <button
             onClick={() => setActiveTool('3d_twin')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === '3d_twin'
-                ? 'bg-amber-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
             }`}
           >
             <Box className="w-3.5 h-3.5" />
-            <span>1. 3D Thermal Plume Twin (WebGL)</span>
+            <span>1. 3D Digital Twin</span>
           </button>
 
           <button
             onClick={() => setActiveTool('cv_scanner')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'cv_scanner'
-                ? 'bg-amber-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
             }`}
           >
             <Scan className="w-3.5 h-3.5" />
-            <span>2. AI Facade CV Scanner</span>
+            <span>2. AI Facade Scanner</span>
           </button>
 
           <button
             onClick={() => setActiveTool('thermal_debt')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'thermal_debt'
-                ? 'bg-amber-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
             }`}
           >
             <Scale className="w-3.5 h-3.5" />
-            <span>3. Municipal Surcharge Ledger (Gemini)</span>
+            <span>3. Surcharge Ledger</span>
           </button>
 
           <button
             onClick={() => setActiveTool('vendor_iot')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'vendor_iot'
-                ? 'bg-amber-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
             }`}
           >
             <Radio className="w-3.5 h-3.5" />
-            <span>4. Street Vendor IoT Beacon & Audio</span>
+            <span>4. Vendor IoT Beacon</span>
           </button>
 
           <button
             onClick={() => setActiveTool('hardware_serial')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'hardware_serial'
-                ? 'bg-amber-500 text-slate-950 shadow-md'
-                : 'text-amber-400/80 hover:text-amber-300 bg-amber-500/10 border border-amber-500/20'
+                ? 'bg-amber-500 text-zinc-950 shadow-md'
+                : 'text-amber-400/90 hover:text-amber-300 bg-amber-500/10 border border-amber-500/20'
             }`}
           >
             <Terminal className="w-3.5 h-3.5 text-amber-400" />
-            <span>5. Physical ESP32 Serial Hook (Live Edge)</span>
+            <span>5. ESP32 Serial Edge</span>
           </button>
         </div>
 
-        {/* Viewport Render Canvas */}
-        <div className="w-full space-y-3">
+        {/* Viewport Interactive Container (Spacious, Full Width) */}
+        <div className="w-full rounded-2xl bg-zinc-950/40 backdrop-blur-md border border-zinc-800/80 p-3 sm:p-6 space-y-4">
+          
           {activeTool === '3d_twin' && (
-            <div className="flex items-center justify-between bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-xs">
-              <span className="text-slate-400 font-mono text-[11px] px-2">
-                WebGL Spatial Viewport Mode:
+            <div className="flex flex-wrap items-center justify-between bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 text-xs gap-2">
+              <span className="text-zinc-400 font-mono text-[11px] px-1">
+                WebGL Viewport Mode:
               </span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => setTwinMode('facade_twin')}
-                  className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg font-mono font-bold text-[11px] transition-all cursor-pointer ${
                     twinMode === 'facade_twin'
-                      ? 'bg-amber-500 text-slate-950 shadow-sm'
-                      : 'text-slate-400 hover:text-white bg-slate-800/60'
+                      ? 'bg-amber-500 text-zinc-950 shadow-sm'
+                      : 'text-zinc-400 hover:text-white bg-zinc-800/60'
                   }`}
                 >
-                  Monitored Building Micro-Canyon
+                  Monitored Micro-Canyon
                 </button>
                 <button
                   onClick={() => setTwinMode('parametric_canyon')}
-                  className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1 rounded-lg font-mono font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1.5 ${
                     twinMode === 'parametric_canyon'
-                      ? 'bg-amber-500 text-slate-950 shadow-sm'
-                      : 'text-slate-400 hover:text-white bg-slate-800/60'
+                      ? 'bg-amber-500 text-zinc-950 shadow-sm'
+                      : 'text-zinc-400 hover:text-white bg-zinc-800/60'
                   }`}
                 >
                   <Sliders className="w-3 h-3" />
-                  Dynamic Canyon Archetype Simulator
+                  Dynamic Canyon Simulator
                 </button>
               </div>
             </div>
@@ -254,10 +263,10 @@ export const LiveProductCockpit: React.FC<Props> = ({
 
           {activeTool === '3d_twin' && twinMode === 'parametric_canyon' && (
             <ThermalPlumeTwin
-              alleyWidth={6.2}
+              alleyWidth={building.canyonWidthMeters}
               acUnitsCount={building.detectedOutdoorUnits.splitUnits + building.detectedOutdoorUnits.vrfUnits}
               louversEngaged={isMitigated}
-              presetName="Chandni Chowk"
+              presetName={building.name}
               onLouversChange={onMitigationToggle}
             />
           )}

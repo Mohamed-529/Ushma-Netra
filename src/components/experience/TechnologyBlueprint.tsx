@@ -26,14 +26,14 @@ export const TechnologyBlueprint: React.FC = () => {
         </div>
 
         {/* Real-Time AWS Cloud Performance Strip */}
-        <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/60 backdrop-blur-md text-xs font-mono grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-sky-400 text-[11px]">
               <Cpu className="w-3.5 h-3.5" />
               <span>AWS IoT Core</span>
             </div>
-            <div className="text-lg font-bold text-white tabular-nums">12,400 ev/min</div>
-            <div className="text-[10px] text-slate-500">Sub-second MQTT ingest</div>
+            <div className="text-lg font-bold text-zinc-100 tabular-nums">12,400 ev/min</div>
+            <div className="text-[10px] text-zinc-500">Sub-second MQTT ingest</div>
           </div>
 
           <div className="space-y-1">
@@ -42,7 +42,7 @@ export const TechnologyBlueprint: React.FC = () => {
               <span>SageMaker CV</span>
             </div>
             <div className="text-lg font-bold text-amber-400 tabular-nums">240 ms</div>
-            <div className="text-[10px] text-slate-500">YOLO-v10 facade inference</div>
+            <div className="text-[10px] text-zinc-500">YOLO-v10 facade inference</div>
           </div>
 
           <div className="space-y-1">
@@ -51,7 +51,7 @@ export const TechnologyBlueprint: React.FC = () => {
               <span>Bedrock Agent</span>
             </div>
             <div className="text-lg font-bold text-purple-400 tabular-nums">1.8 s</div>
-            <div className="text-[10px] text-slate-500">Statutory notice reasoning</div>
+            <div className="text-[10px] text-zinc-500">Statutory notice reasoning</div>
           </div>
 
           <div className="space-y-1">
@@ -60,12 +60,12 @@ export const TechnologyBlueprint: React.FC = () => {
               <span>DynamoDB Ledger</span>
             </div>
             <div className="text-lg font-bold text-emerald-400 tabular-nums">&lt; 4 ms</div>
-            <div className="text-[10px] text-slate-500">Single-table audit reads</div>
+            <div className="text-[10px] text-zinc-500">Single-table audit reads</div>
           </div>
         </div>
 
         {/* AWS Explorer Wrapper */}
-        <div className="rounded-3xl overflow-hidden border border-slate-800/80 bg-slate-950/70 backdrop-blur-md shadow-2xl p-6 sm:p-8">
+        <div className="rounded-2xl overflow-hidden border border-zinc-800/60 bg-zinc-950/40 backdrop-blur-md shadow-xl p-4 sm:p-6">
           <AWSArchitectureExplorer />
         </div>
       </div>

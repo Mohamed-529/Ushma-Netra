@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BuildingAudit, VendorTelemetry, IncidentLog } from './types';
 import { INITIAL_BUILDINGS, INITIAL_VENDORS, INITIAL_LOGS } from './data/mockData';
 import { DynamicAtmosphere, StoryAct } from './components/experience/DynamicAtmosphere';
-import { DirectorsFloatingHUD } from './components/experience/DirectorsFloatingHUD';
+import { ProfessionalLandingLayout } from './components/ProfessionalLandingLayout';
 import { WowHero } from './components/experience/WowHero';
 import { VisceralProblem } from './components/experience/VisceralProblem';
 import { WhyThisMatters } from './components/experience/WhyThisMatters';
@@ -12,6 +12,7 @@ import { ProofValidation } from './components/experience/ProofValidation';
 import { TechnologyBlueprint } from './components/experience/TechnologyBlueprint';
 import { FinalDemoDecree } from './components/experience/FinalDemoDecree';
 import { MunicipalDefenseChallenge } from './components/experience/MunicipalDefenseChallenge';
+import { GrandFinaleFooter } from './components/experience/GrandFinaleFooter';
 import { soundEngine } from './utils/audioSynthesizer';
 import { Flame, AlertTriangle, ShieldCheck, X, Activity } from 'lucide-react';
 
@@ -124,19 +125,19 @@ export default function App() {
       {/* Dynamic Background with scroll-aware color temperatures, mesh gradients & particles */}
       <DynamicAtmosphere activeAct={activeAct} isSurgeActive={surgeModalOpen} />
 
-      {/* Floating Director's HUD with 8-Act Timeline & Audio Toggle */}
-      <DirectorsFloatingHUD
+      {/* Elite Console Wrapper: Sticky Header Navigation & Absolute Bottom Status Ribbon */}
+      <ProfessionalLandingLayout
+        activePresetName={`${selectedBuilding.name} Canyon`}
+        isHardwareConnected={false}
         activeAct={activeAct}
         onNavigateTo={scrollToAct}
         onSimulateSurge={handleSimulateSurge}
         isSurgeActive={surgeModalOpen}
         isMitigated={isMitigated}
         onToggleMitigation={() => setIsMitigated(!isMitigated)}
-      />
-
-      {/* Narrative Sequence: WOW -> PROBLEM -> TENSION -> SOLUTION -> LIVE TWIN -> PROOF -> TECH -> IMPACT */}
-      <main className="relative z-10 w-full">
-        {/* Act 1: WOW HERO */}
+        onConnectHardware={() => scrollToAct('live_cockpit')}
+      >
+        {/* Narrative Sequence: WOW -> PROBLEM -> TENSION -> SOLUTION -> LIVE TWIN -> PROOF -> TECH -> IMPACT */}
         <div id="wow_hero">
           <WowHero
             onScrollToProblem={() => scrollToAct('problem')}
@@ -144,27 +145,9 @@ export default function App() {
           />
         </div>
 
-        {/* Transition Divider 01 -> 02 */}
-        <div className="flex items-center justify-center py-4 pointer-events-none">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
-            <span>ACT 02 // CANYON THERMODYNAMICS</span>
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
-          </div>
-        </div>
-
         {/* Act 2: PROBLEM (Anthropogenic Canyon Thermodynamics) */}
         <div id="problem">
           <VisceralProblem />
-        </div>
-
-        {/* Transition Divider 02 -> 03 */}
-        <div className="flex items-center justify-center py-4 pointer-events-none">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
-            <span>ACT 03 // PHYSIOLOGICAL LIMIT & HUMAN COLLATERAL</span>
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
-          </div>
         </div>
 
         {/* Act 3: TENSION & HUMAN COLLATERAL (Physiological Limit & Rameshwar Pal Story) */}
@@ -172,27 +155,9 @@ export default function App() {
           <WhyThisMatters />
         </div>
 
-        {/* Transition Divider 03 -> 04 */}
-        <div className="flex items-center justify-center py-4 pointer-events-none">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
-            <span>ACT 04 // THE REGULATORY BREAKTHROUGH</span>
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
-          </div>
-        </div>
-
         {/* Act 4: INSIGHT & SOLUTION REVEAL (The Architectural Convergence) */}
         <div id="solution">
           <SolutionReveal onScrollToLive={() => scrollToAct('live_cockpit')} />
-        </div>
-
-        {/* Transition Divider 04 -> 05 */}
-        <div className="flex items-center justify-center py-4 pointer-events-none">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
-            <span>ACT 05 // LIVE RESILIENCE ENGINE (WORKING TWIN)</span>
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
-          </div>
         </div>
 
         {/* Act 5: LIVE WORKING PRODUCT COCKPIT (3D WebGL Twin + CV Scanner + Surcharge Ledger + IoT Beacon) */}
@@ -211,27 +176,9 @@ export default function App() {
           />
         </div>
 
-        {/* Transition Divider 05 -> 06 */}
-        <div className="flex items-center justify-center py-4 pointer-events-none">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
-            <span>ACT 06 // SCIENTIFIC RIGOR & OKE VORTEX DYNAMICS</span>
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
-          </div>
-        </div>
-
         {/* Act 6: PROOF & FIELD VALIDATION (Delhi & Bengaluru Field Trial Data) */}
         <div id="proof">
           <ProofValidation />
-        </div>
-
-        {/* Transition Divider 06 -> 07 */}
-        <div className="flex items-center justify-center py-4 pointer-events-none">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
-            <span>ACT 07 // AWS PRODUCTION SERVERLESS BLUEPRINT</span>
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
-          </div>
         </div>
 
         {/* Act 7: AWS PRODUCTION TECHNOLOGY & SERVERLESS BLUEPRINT */}
@@ -239,34 +186,15 @@ export default function App() {
           <TechnologyBlueprint />
         </div>
 
-        {/* Transition Divider 07 -> 08 */}
-        <div className="flex items-center justify-center py-4 pointer-events-none">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
-            <span>ACT 08 // STATUTORY SECTION 133 DECREE GENERATOR</span>
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
-          </div>
-        </div>
-
         {/* Act 8: MUNICIPAL THERMAL DEBT CALCULATOR, SECTION 133 DECREE & JUDGE EVALUATION */}
         <div id="final_demo">
           <FinalDemoDecree />
-        </div>
-
-        {/* Transition Divider 08 -> 09 */}
-        <div className="flex items-center justify-center py-4 pointer-events-none">
-          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
-            <span className="w-12 h-px bg-gradient-to-r from-transparent to-slate-800" />
-            <span>ACT 09 // 48-HOUR CRISIS DEFENSE CHALLENGE (FINALE)</span>
-            <span className="w-12 h-px bg-gradient-to-l from-transparent to-slate-800" />
-          </div>
         </div>
 
         {/* Act 9: INTERACTIVE FINALE - 48-HOUR HEATWAVE DEFENSE CHALLENGE */}
         <div id="challenge">
           <MunicipalDefenseChallenge />
         </div>
-      </main>
 
       {/* Peak Heat Crisis Simulation Modal */}
       {surgeModalOpen && (
@@ -332,23 +260,12 @@ export default function App() {
         </div>
       )}
 
-      {/* Cinematic Hackathon Footer */}
-      <footer className="relative z-10 border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-lg py-8 text-xs text-slate-400 font-mono">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-extrabold text-white tracking-wider">USHMA-NETRA</span>
-            <span className="text-slate-600">/</span>
-            <span className="text-amber-400 font-semibold">TRACK 02 (HEAT & WATER)</span>
-            <span className="text-slate-600">/</span>
-            <span className="text-slate-400">AWS ENVIRONMENTAL HACKATHON</span>
-          </div>
-
-          <div className="text-[11px] text-slate-400 text-center md:text-right">
-            Engineered with Amazon Bedrock · SageMaker · AWS IoT Core · Step Functions · Three.js WebGL
-          </div>
-        </div>
-      </footer>
-    </div>
+      {/* Grand Finale Footer Outperforming Reference (Massive Wordmark, Multi-Tab Verification Terminal, Audio Dispatch & Spec Sheets) */}
+      <GrandFinaleFooter
+        onNavigateTo={scrollToAct}
+        onSimulateSurge={handleSimulateSurge}
+      />
+    </ProfessionalLandingLayout>
+  </div>
   );
 }
