@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { BuildingAudit, VendorTelemetry } from '../../types';
 import { Thermal3DTwin } from '../Thermal3DTwin';
+import { ThermalPlumeTwin } from '../ThermalPlumeTwin';
 import { FacadeComputerVisionScanner } from '../FacadeComputerVisionScanner';
 import { ThermalDebtLedger } from '../ThermalDebtLedger';
 import { VendorIoTBeacon } from '../VendorIoTBeacon';
-import { Box, Scan, Scale, Radio, Flame, ShieldCheck } from 'lucide-react';
+import { Box, Scan, Scale, Radio, Flame, ShieldCheck, Lock, CheckCircle2, Sliders } from 'lucide-react';
+import { verifyDeviceHandshake } from '../../utils/cryptoVerify';
 
 interface Props {
   building: BuildingAudit;
@@ -32,6 +34,19 @@ export const LiveProductCockpit: React.FC<Props> = ({
   onSimulateSurge,
 }) => {
   const [activeTool, setActiveTool] = useState<'3d_twin' | 'cv_scanner' | 'thermal_debt' | 'vendor_iot'>('3d_twin');
+  const [twinMode, setTwinMode] = useState<'facade_twin' | 'parametric_canyon'>('facade_twin');
+  const [hwTokenValid, setHwTokenValid] = useState<boolean>(true);
+
+  // Validate hardware cryptographic payload
+  const isHardwareVerified = verifyDeviceHandshake(
+    {
+      node_id: vendor.id,
+      wbgt: vendor.wetBulbGlobeTempCelsius,
+      ambient_temp: vendor.dryBulbTempCelsius,
+      timestamp: new Date().toISOString(),
+    },
+    hwTokenValid ? 'un_hw_secure_ecc_p256_v01_valid_session' : 'tampered_invalid_token'
+  );
 
   return (
     <section id="live-cockpit" className="relative min-h-screen w-full py-24 px-4 sm:px-8 lg:px-12 bg-transparent border-t border-slate-800/80">
@@ -80,8 +95,8 @@ export const LiveProductCockpit: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Synchronized Cross-Tool Real-Time Status Strip */}
-        <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono grid grid-cols-2 md:grid-cols-4 gap-3">
+        {/* Synchronized Cross-Tool Real-Time Status Strip with Hardware Security */}
+        <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono grid grid-cols-2 md:grid-cols-5 gap-3">
           <div className="space-y-0.5">
             <span className="text-[10px] text-slate-500 block uppercase">MONITORED TARGET</span>
             <span className="font-bold text-white truncate block">{building.name}</span>
@@ -103,6 +118,32 @@ export const LiveProductCockpit: React.FC<Props> = ({
             <span className={`font-bold ${isMitigated ? 'text-emerald-400' : 'text-amber-400'}`}>
               {vendor.vendorName} ({vendor.distanceToExhaustMeters}m away)
             </span>
+          </div>
+          <div className="space-y-0.5 col-span-2 md:col-span-1 border-t md:border-t-0 md:border-l border-slate-800 md:pl-3 pt-1 md:pt-0">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-slate-500 uppercase flex items-center gap-1">
+                <Lock className="w-2.5 h-2.5 text-sky-400" />
+                <span>HARDWARE CRYPTO</span>
+              </span>
+              <button
+                onClick={() => setHwTokenValid(!hwTokenValid)}
+                className="text-[9px] text-slate-400 hover:text-amber-400 underline cursor-pointer"
+                title="Toggle simulated tamper event to test cryptographic rejection"
+              >
+                {hwTokenValid ? 'Simulate Tamper' : 'Restore'}
+              </button>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] font-bold">
+              {isHardwareVerified ? (
+                <span className="text-emerald-400 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> SECRETS MGR P-256 OK
+                </span>
+              ) : (
+                <span className="text-red-400 flex items-center gap-1">
+                  REJECTED: BAD SIGNATURE
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -158,12 +199,53 @@ export const LiveProductCockpit: React.FC<Props> = ({
         </div>
 
         {/* Viewport Render Canvas */}
-        <div className="w-full">
+        <div className="w-full space-y-3">
           {activeTool === '3d_twin' && (
+            <div className="flex items-center justify-between bg-slate-900/60 p-2 rounded-xl border border-slate-800 text-xs">
+              <span className="text-slate-400 font-mono text-[11px] px-2">
+                WebGL Spatial Viewport Mode:
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setTwinMode('facade_twin')}
+                  className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
+                    twinMode === 'facade_twin'
+                      ? 'bg-amber-500 text-slate-950 shadow-sm'
+                      : 'text-slate-400 hover:text-white bg-slate-800/60'
+                  }`}
+                >
+                  Monitored Building Micro-Canyon
+                </button>
+                <button
+                  onClick={() => setTwinMode('parametric_canyon')}
+                  className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1.5 ${
+                    twinMode === 'parametric_canyon'
+                      ? 'bg-amber-500 text-slate-950 shadow-sm'
+                      : 'text-slate-400 hover:text-white bg-slate-800/60'
+                  }`}
+                >
+                  <Sliders className="w-3 h-3" />
+                  Dynamic Canyon Archetype Simulator
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTool === '3d_twin' && twinMode === 'facade_twin' && (
             <Thermal3DTwin
               building={building}
               vendor={vendor}
               onMitigationToggle={onMitigationToggle}
+            />
+          )}
+
+          {activeTool === '3d_twin' && twinMode === 'parametric_canyon' && (
+            <ThermalPlumeTwin
+              alleyWidth={6.2}
+              acUnitsCount={building.detectedOutdoorUnits.splitUnits + building.detectedOutdoorUnits.vrfUnits}
+              louversEngaged={isMitigated}
+              presetName="Chandni Chowk"
+              onLouversChange={onMitigationToggle}
             />
           )}
 
