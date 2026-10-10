@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHardwareSerial } from '../hooks/useHardwareSerial';
 import { ThermalPlumeTwin } from './ThermalPlumeTwin';
-import { ShieldAlert, ShieldCheck, Cpu, Terminal, Radio, AlertTriangle, Volume2, Sparkles } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Cpu, Terminal, Radio, AlertTriangle, Volume2, Sparkles, Smartphone, X } from 'lucide-react';
 import { playAudibleBeaconAlert, buildPollySSML } from '../utils/pollyVoiceDispatch';
+import { MobileBeaconClient } from './MobileBeaconClient';
 
 export const LiveHardwareControl: React.FC = () => {
   const [telemetry, setTelemetry] = useState({
@@ -12,10 +13,29 @@ export const LiveHardwareControl: React.FC = () => {
     token: "NONE"
   });
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [showPhoneBeaconModal, setShowPhoneBeaconModal] = useState(false);
 
   const { connectHardware, simulateLivePacket, isConnected, error } = useHardwareSerial((data) => {
     setTelemetry(data);
   });
+
+  // Listen to live data stream broadcast from Android Phone or companion beacon client
+  useEffect(() => {
+    const channel = new BroadcastChannel('ushma_netra_hardware_feed');
+    channel.onmessage = (event) => {
+      if (event.data) {
+        setTelemetry({
+          node_id: event.data.node_id || 'UN-DEL-084',
+          ambient_temp: event.data.ambient_temp || 44.2,
+          wbgt: event.data.wbgt || 36.8,
+          token: event.data.token || 'un_hw_secure_ecc_p256_active'
+        });
+      }
+    };
+    return () => {
+      channel.close();
+    };
+  }, []);
 
   // Determine if incoming telemetry has a valid asymmetric token structure
   const isTokenSecure = telemetry.token.startsWith("un_hw_secure_");
@@ -76,10 +96,19 @@ export const LiveHardwareControl: React.FC = () => {
             )}
           </button>
 
+          <button
+            onClick={() => setShowPhoneBeaconModal(true)}
+            className="px-3 py-1.5 rounded-lg text-xs font-mono border border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+            title="Launch mobile phone beacon client with AirPods audio feed"
+          >
+            <Smartphone className="h-3.5 w-3.5" />
+            <span>PHONE BEACON CLIENT (AIRPODS)</span>
+          </button>
+
           {!isConnected && (
             <button
               onClick={() => simulateLivePacket()}
-              className="px-3 py-1.5 rounded-lg text-xs font-mono border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 transition-colors"
+              className="px-3 py-1.5 rounded-lg text-xs font-mono border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 transition-colors cursor-pointer"
               title="Test serial packet stream without physical hardware plugged in"
             >
               SIMULATE ESP32 PACKET
@@ -204,6 +233,20 @@ export const LiveHardwareControl: React.FC = () => {
           presetName={isConnected ? `LIVE BEACON // ${telemetry.node_id}` : "SIMULATION BASELINE"}
         />
       </div>
+
+      {/* PHONE BEACON CLIENT MODAL (AIRPODS DEMO) */}
+      {showPhoneBeaconModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="max-w-md w-full bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl relative">
+            <MobileBeaconClient
+              onClose={() => setShowPhoneBeaconModal(false)}
+              onSyncTelemetry={(data) => {
+                setTelemetry(data);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
