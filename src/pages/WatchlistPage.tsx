@@ -354,16 +354,16 @@ export const WatchlistPage: React.FC<Props> = ({
       {/* Section 1B: AWS IoT Core Sub-Second MQTT + Amazon EventBridge Custom Event Bus Router */}
       <div className="bg-[#FFFFFF] text-[#111827] rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 space-y-6 shadow-xl">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-200">
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[#a8321a] text-[11px] font-mono font-bold uppercase tracking-wider">
               <Cloud className="w-3.5 h-3.5" />
-              <span>AWS IoT Core MQTT + Amazon EventBridge Custom Event Bus</span>
+              <span>AWS IoT Core MQTT → EventBridge ({eventBusName})</span>
             </div>
-            <h2 className="text-2xl font-black text-[#111827] tracking-tight">
-              Sub-Second Serverless Event Bus Router (<code className="font-mono text-lg text-[#a8321a]">{eventBusName}</code>)
+            <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
+              Sub-Second Alert Router (~36ms Fan-Out)
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
-              Eliminates Team 2&apos;s 15-minute database polling loop. Incoming ESP32 MQTT packets on <code className="font-mono text-slate-900 font-bold">{mqttBroker}</code> trigger <code className="font-mono text-slate-900 font-bold">PutEventsCommand</code> to simultaneously dispatch Target 1 (Watchlist WhatsApp/SMS Alert API) and Target 2 (3D Digital Twin Plume WebSockets).
+            <p className="text-xs sm:text-sm text-slate-600">
+              Routes live ESP32 thermal spikes directly to WhatsApp/Polly Voice Alerts and the 3D Twin without polling.
             </p>
           </div>
 

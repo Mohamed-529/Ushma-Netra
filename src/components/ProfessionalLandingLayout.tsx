@@ -74,13 +74,13 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
     {
       path: '/grid',
       label: 'Thermal Grid',
-      sub: 'Live street heat map & 10 zone cards',
+      sub: 'Live street heat map & 5m geofence',
       icon: MapPin,
     },
     {
       path: '/twin',
       label: '3D Twin',
-      sub: '3D street cooling & ESP32 cart sensor',
+      sub: '3D street cooling & ESP32 MQTT sensor',
       icon: Box,
     },
     {
@@ -92,14 +92,8 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
     {
       path: '/ledger',
       label: 'Debt Ledger',
-      sub: 'Building heat fines & cooling fund',
+      sub: 'Neptune graph, Guardrails & Sec 133',
       icon: Scale,
-    },
-    {
-      path: '/admin',
-      label: 'Infra Compliance (/admin)',
-      sub: 'SAM zero-cost & IAM security test suite',
-      icon: ShieldCheck,
     },
   ];
 
@@ -186,8 +180,13 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
                 Big Picture
               </Link>
 
-              {/* 2. Tools (Dropdown Select with Thermal Grid, 3D Twin, CV Scanner, Debt Ledger) */}
-              <div ref={dropdownRef} className="relative">
+              {/* 2. Tools (Dropdown Select with Thermal Grid, 3D Twin, CV Scanner, Debt Ledger — Opens on Hover) */}
+              <div
+                ref={dropdownRef}
+                className="relative py-2"
+                onMouseEnter={() => setToolsDropdownOpen(true)}
+                onMouseLeave={() => setToolsDropdownOpen(false)}
+              >
                 <button
                   type="button"
                   onClick={() => setToolsDropdownOpen((prev) => !prev)}
@@ -207,10 +206,11 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
                 </button>
 
                 {toolsDropdownOpen && (
-                  <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 rounded-2xl bg-[#FFFFFF] border border-[#E5E7EB] shadow-2xl p-2 z-50">
-                    <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-[#a8321a] font-bold">
-                      Select Platform Tool
-                    </div>
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-72 z-50">
+                    <div className="rounded-2xl bg-[#FFFFFF] border border-[#E5E7EB] shadow-2xl p-2">
+                      <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-[#a8321a] font-bold">
+                        Select Platform Tool (4 Workspaces)
+                      </div>
                     <div className="space-y-1">
                       {toolOptions.map((tool) => {
                         const Icon = tool.icon;
@@ -248,6 +248,7 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
                           </Link>
                         );
                       })}
+                    </div>
                     </div>
                   </div>
                 )}

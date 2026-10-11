@@ -676,18 +676,14 @@ export const ThermalGridPage: React.FC<Props> = ({
         <div className="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-gray-100">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
-              🗺️ Live Spatial Context &amp; Geofence Matrix
+              🗺️ Amazon Location Service · 5.0m Exhaust Geofence
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Real-time centimeter-level urban micro-climate boundary analytics (Collection:{' '}
-              <code className="font-mono font-bold text-[#a8321a]">
-                UshmaNetraExhaustCollection
-              </code>
-              )
+              Tracks vendor carts entering 5m AC exhaust zones in real time (<code className="font-mono font-bold text-[#a8321a]">BatchEvaluateGeofencesCommand</code>).
             </p>
           </div>
           <span className="px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-mono font-bold rounded-full tracking-wide">
-            ● AMAZON LOCATION SERVICE ACTIVE
+            ● 5m GEOFENCE ACTIVE
           </span>
         </div>
 

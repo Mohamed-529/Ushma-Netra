@@ -7,167 +7,102 @@ import {
   ChevronLeft,
   X,
   Compass,
-  ExternalLink,
 } from 'lucide-react';
 import { soundEngine } from '../../utils/audioSynthesizer';
 
-export type TourLanguage = 'en' | 'hi' | 'kn' | 'te';
+export type TourLanguage = 'en' | 'ta' | 'hi';
 
 interface TourStep {
   step: number;
   totalSteps: number;
   targetPath: string;
-  targetAnchor?: string;
+  targetAnchor: string;
   badge: string;
   title: string;
   summary: {
     en: string;
+    ta: string;
     hi: string;
-    kn: string;
-    te: string;
   };
   audioSpeech: {
     en: string;
+    ta: string;
     hi: string;
-    kn: string;
-    te: string;
   };
 }
 
+// Guided Tour focused strictly on the 4 screens of the Hero / Landing Page ('/')
 const TOUR_STEPS: TourStep[] = [
   {
     step: 1,
-    totalSteps: 7,
+    totalSteps: 4,
     targetPath: '/',
     targetAnchor: 'wow_hero',
-    badge: 'STEP 01 · PROJECT IMPACT',
-    title: '54°C AC Waste Heat Dumping on Street Workers',
+    badge: 'HERO SCREEN 01 · THERMAL CONTRAST LENS',
+    title: '20.5°C Indoor Chill vs. 53.6°C Street Exhaust',
     summary: {
-      en: 'Corporate towers stay chilled at 21°C inside while dumping 54°C superheated AC exhaust onto street vendors.',
-      hi: 'वातानुकूलित इमारतें अंदर 21°C का आराम देती हैं, लेकिन बाहर की सड़कों पर 54°C का झुलसाने वाला निकास फेंकती हैं।',
-      kn: 'ವಾತಾನುಕೂಲಿತ ಕಟ್ಟಡಗಳು ಒಳಗೆ 21°C ಆರಾಮವನ್ನು ನೀಡುತ್ತವೆ, ಆದರೆ ರಸ್ತೆಯ ಕಾರ್ಮಿಕರ ಮೇಲೆ 54°C ಬಿಸಿ ಹೊರಹಾಕುತ್ತವೆ.',
-      te: 'ఎయిర్ కండీషనర్లు లోపల 21°C చల్లదనాన్ని ఇస్తాయి, కానీ వీధి కార్మికులపై 54°C వేడిని కుమ్మరిస్తాయి.',
+      en: 'Move your cursor across the FLIR thermal lens. Commercial buildings stay chilled inside while dumping 53.6°C AC exhaust onto street vendors.',
+      ta: 'வணிக வளாகங்கள் உள்ளே 20.5°C குளிரில் இருக்கும்போது, வெளியே சாலையோர வியாபாரிகள் மீது 53.6°C அனல் காற்றை வெளியேற்றுவதை இந்த லென்ஸ் காட்டுகிறது.',
+      hi: 'वातानुकूलित इमारतें अंदर 20.5°C पर ठंडी रहती हैं, लेकिन बाहर सड़क विक्रेताओं पर 53.6°C गर्म हवा फेंकती हैं।',
     },
     audioSpeech: {
-      en: 'Step 1: Welcome to Ushma-Netra. While commercial buildings stay cool at 21 degrees inside, their outdoor AC units dump 54 degree heat onto street workers.',
-      hi: 'चरण 1: उष्मा-नेत्र में आपका स्वागत है। जब इमारतें अंदर 21 डिग्री पर ठंडी रहती हैं, तो उनका निकास सड़क पर 54 डिग्री गर्मी फेंकता है।',
-      kn: 'ಹಂತ 1: ಉಷ್ಮಾ-ನೇತ್ರಕ್ಕೆ ಸ್ವಾಗತ. ಕಟ್ಟಡಗಳು ಒಳಗೆ ತಂಪಾಗಿದ್ದರೆ, ಅವುಗಳ ಶಾಖವು ರಸ್ತೆ ವ್ಯಾಪಾರಿಗಳ ಮೇಲೆ 54 ಡಿಗ್ರಿ ಬೀಳುತ್ತದೆ.',
-      te: 'దశ 1: ఉష్మా-నేత్రకు స్వాగతం. భవనాలు లోపల చల్లగా ఉన్నప్పుడు, వాటి ఎగ్జాస్ట్ వీధి వ్యాపారులపై 54 డిగ్రీల వేడిని చిమ్ముతుంది.',
+      en: 'Screen 1: Move your cursor over the thermal lens to see how commercial buildings stay chilled at 20.5 degrees while dumping 53.6 degree exhaust onto street workers.',
+      ta: 'படி 1: வணிகக் கட்டிடங்கள் வெளியேற்றும் 53.6 டிகிரி வெப்பக் காற்றை இந்த தெர்மல் லென்ஸ் மூலம் நேரடியாகப் பாருங்கள்.',
+      hi: 'चरण 1: थर्मल लेंस पर कर्सर घुमाएं और देखें कि एसी का 53.6 डिग्री निकास सड़क विक्रेताओं को कैसे प्रभावित करता है।',
     },
   },
   {
     step: 2,
-    totalSteps: 7,
+    totalSteps: 4,
     targetPath: '/',
     targetAnchor: 'how_it_works_summary',
-    badge: 'STEP 02 · 4-STEP SYSTEM',
-    title: 'How Ushma-Netra Works in 4 Steps',
+    badge: 'HERO SCREEN 02 · 4-PILLAR SYSTEM',
+    title: 'How Ushma-Netra Works in 4 Crisp Steps',
     summary: {
-      en: 'We combine satellite & AI camera scans, street plume tracking, vendor cart heat alerts, and polluter fines that pay for cooling mist.',
-      hi: 'हम सैटेलाइट और एआई कैमरा स्कैन, स्ट्रीट प्लूम ट्रैकिंग, वेंडर कार्ट अलर्ट और कूलिंग मिस्ट के लिए प्रदूषण जुर्माने को जोड़ते हैं।',
-      kn: 'ಉಪಗ್ರಹ ಮತ್ತು ಎಐ ಕ್ಯಾಮೆರಾ ಸ್ಕ್ಯಾನ್, ಶಾಖದ ಟ್ರ್ಯಾಕಿಂಗ್, ಕಾರ್ಮಿಕರ ಎಚ್ಚರಿಕೆ ಮತ್ತು ತಂಪಾಗಿಸುವ ಮಿಸ್ಟ್ ವ್ಯವಸ್ಥೆ.',
-      te: 'శాటిలైట్ మరియు ఏఐ కెమెరా స్కాన్, వేడి ట్రాకింగ్, కార్మికుల హెచ్చరికలు మరియు కూలింగ్ మిస్ట్ వ్యవస్థ.',
+      en: '1) AI camera counts AC vents, 2) 5m geofence tracks heat plumes, 3) Cart sensor speaks voice alerts, and 4) Polluter fines fund cooling mist.',
+      ta: '1) AI கேமரா AC யூனிட்களை கணக்கிடுகிறது, 2) வெப்ப மண்டலத்தைக் கண்காணிக்கிறது, 3) குரல் எச்சரிக்கை தருகிறது, 4) அபராதம் மூலம் குளிர் நீர்த்தெளிப்பு வழங்குகிறது.',
+      hi: 'चार आसान चरण: एसी वेंट की गिनती, स्ट्रीट हीट ट्रैकिंग, वेंडर वॉइस अलर्ट और कूलिंग मिस्ट के लिए जुर्माना।',
     },
     audioSpeech: {
-      en: 'Step 2: In four simple steps, we detect AC vents, track trapped street heat, warn street vendors by voice, and fine polluting towers to fund street cooling.',
-      hi: 'चरण 2: चार आसान चरणों में हम एसी वेंट पहचानते हैं, फंसी हुई गर्मी ट्रैक करते हैं, विक्रेताओं को सचेत करते हैं और ठंडी मिस्ट चलाते हैं।',
-      kn: 'ಹಂತ 2: ನಾಲ್ಕು ಸರಳ ಹಂತಗಳಲ್ಲಿ ನಾವು ಎಸಿ ಶಾಖವನ್ನು ಪತ್ತೆಹಚ್ಚಿ ರಸ್ತೆ ವ್ಯಾಪಾರಿಗಳಿಗೆ ತಂಪು ನೀಡುತ್ತೇವೆ.',
-      te: 'దశ 2: నాలుగు సులభమైన దశల్లో మేము ఏసీ వేడిని గుర్తించి వీధి వ్యాపారులకు చల్లదనాన్ని అందిస్తాము.',
+      en: 'Screen 2: In four crisp steps, we count AC condensers, map trapped street heat, warn vendors by voice, and bill polluting towers for cooling mist.',
+      ta: 'படி 2: நான்கு எளிய படிகளில் ஏசி வெப்பத்தைக் கண்டறிந்து சாலையோர வியாபாரிகளுக்கு குளிர்ச்சியை வழங்குகிறோம்.',
+      hi: 'चरण 2: चार आसान चरणों में हम एसी वेंट पहचानते हैं और सड़क को ठंडा करते हैं।',
     },
   },
   {
     step: 3,
-    totalSteps: 7,
-    targetPath: '/grid',
-    badge: 'STEP 03 · THERMAL GRID',
-    title: 'National Thermal Grid: Monitored Street Canyons',
+    totalSteps: 4,
+    targetPath: '/',
+    targetAnchor: 'hero_feature_cards',
+    badge: 'HERO SCREEN 03 · AWS LIVE MODULES',
+    title: '4 Deep-Dive Modules (CV, Beacon, Ledger & 3D Twin)',
     summary: {
-      en: 'Explore 10+ monitored commercial alleys across Delhi NCR, Mumbai, Bengaluru, and Ahmedabad with live heat debt scores.',
-      hi: 'दिल्ली, मुंबई, बेंगलुरु और अहमदाबाद में सैटेलाइट इंफ्रारेड द्वारा जांची गई 10+ हॉटस्पॉट साइटें देखें।',
-      kn: 'ದೆಹಲಿ, ಮುಂಬೈ, ಬೆಂಗಳೂರು ಮತ್ತು ಅಹಮದಾಬಾದ್‌ನ ವಾಣಿಜ್ಯ ವಲಯಗಳಲ್ಲಿ ಮೇಲ್ವಿಚಾರಣೆ.',
-      te: 'ఢిల్లీ, ముంబై, బెంగళూరు మరియు అహ్మదాబాద్‌లలో హాట్‌స్పాట్ సైట్ల పర్యవేక్షణ.',
+      en: 'Each card links directly to a live AWS workspace: Rekognition CV Scanner, IoT Core Cart Sensor, Neptune & Bedrock Ledger, and 3D WebGL Twin.',
+      ta: 'ஒவ்வொரு கார்டும் நேரடியாக AI ஸ்கேனர், கார்ட் சென்சார், நெப்டியூன் லெட்ஜர் மற்றும் 3D டிஜிட்டல் ட்வின் பக்கங்களுக்கு அழைத்துச் செல்லும்.',
+      hi: 'प्रत्येक कार्ड सीधे लाइव एआई स्कैनर, कार्ट सेंसर, नेप्च्यून लेजर और 3डी डिजिटल ट्विन से जुड़ता है।',
     },
     audioSpeech: {
-      en: 'Step 3: Here in the Thermal Grid Registry, we monitor high-density commercial street canyons across major Indian cities.',
-      hi: 'चरण 3: राष्ट्रीय थर्मल ग्रिड रजिस्ट्री में प्रमुख भारतीय शहरों के वाणिज्यिक गलियारों की निगरानी की जाती है।',
-      kn: 'ಹಂತ 3: ರಾಷ್ಟ್ರೀಯ ಥರ್ಮಲ್ ಗ್ರಿಡ್ ನೋಂದಣಿಯಲ್ಲಿ ವಾಣಿಜ್ಯ ಕಾರಿಡಾರ್‌ಗಳನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಲಾಗುತ್ತದೆ.',
-      te: 'దశ 3: థర్మల్ గ్రిడ్ రిజిస్ట్రీలో వాణిజ్య కారిడార్లను ఉపగ్రహ డేటాతో పర్యవేక్షిస్తున్నాము.',
+      en: 'Screen 3: Explore the four visual feature cards covering computer vision, vendor voice beacons, Section 133 legal notices, and 3D cooling actuation.',
+      ta: 'படி 3: கணினி பார்வை, குரல் எச்சரிக்கை, சட்ட நோட்டீஸ் மற்றும் 3D கூலிங் ஆகிய நான்கு முக்கிய அம்சங்களை இங்கே காணலாம்.',
+      hi: 'चरण 3: यहां चारों लाइव मॉड्यूल—सीवी स्कैनर, वॉइस अलर्ट, डेट लेजर और 3डी ट्विन दिए गए हैं।',
     },
   },
   {
     step: 4,
-    totalSteps: 7,
-    targetPath: '/twin',
-    badge: 'STEP 04 · 3D DIGITAL TWIN',
-    title: 'Interactive 3D Digital Twin & Skyward Louvers',
+    totalSteps: 4,
+    targetPath: '/',
+    targetAnchor: 'hero_street_diagram',
+    badge: 'HERO SCREEN 04 · INTERACTIVE STREET MAP',
+    title: 'One Street. Four Clickable Hotspots.',
     summary: {
-      en: 'Simulate 54°C AC exhaust jets in 3D and deploy 45° upward louvers + misting relays to cool the sidewalk by 4.2°C.',
-      hi: 'वास्तविक समय 3डी सिमुलेशन। 45° अपवर्ड डिफ्लेक्टर चालू करके गर्म निकास को आकाश की ओर मोड़ें।',
-      kn: 'ನೈಜ-ಸಮಯದ 3D ಸಿಮ್ಯುಲೇಶನ್. 45° ಡಿಫ್ಲೆಕ್ಟರ್‌ಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ ಶಾಖವನ್ನು ಆಕಾಶಕ್ಕೆ ತಿರುಗಿಸಿ.',
-      te: 'రియల్-టైమ్ 3D సిమ್ಯులేషన్. 45° డిఫ్లెక్టర్లను ఆన్ చేసి వేడిని పైకి మళ్లించండి.',
+      en: 'Click pins 01 to 04 on the street canyon photo to inspect how AC heat detection, voice alerts, tower billing, and 45° louvers work together.',
+      ta: 'படத்தில் உள்ள 01 முதல் 04 வரையிலான புள்ளிகளைக் கிளிக் செய்து, ஒரே தெருவில் இந்த நான்கு படிகளும் எப்படி இணைந்து செயல்படுகின்றன என்பதைப் பாருங்கள்.',
+      hi: 'तस्वीर पर 01 से 04 तक के पिन पर क्लिक करके देखें कि पूरी प्रणाली एक साथ कैसे काम करती है।',
     },
     audioSpeech: {
-      en: 'Step 4: Inside the 3D Digital Twin workspace, you can toggle 45 degree upward louvers and see the hot plume deflect safely into the sky.',
-      hi: 'चरण 4: 3डी डिजिटल ट्विन में डिफ्लेक्टर लगाने से 54 डिग्री गर्मी आकाश की ओर मुड़ जाती है।',
-      kn: 'ಹಂತ 4: 3D ಡಿಜಿಟಲ್ ಟ್ವಿನ್‌ನಲ್ಲಿ ಡಿಫ್ಲೆಕ್ಟರ್‌ಗಳು ಶಾಖವನ್ನು ಆಕಾಶಕ್ಕೆ ತಿರುಗಿಸುತ್ತವೆ.',
-      te: 'దశ 4: 3D డిజిటల్ ట్విన్‌లో డిఫ్లెక్టర్లతో వేడిని సురక్షితంగా పైకి పంపుతాము.',
-    },
-  },
-  {
-    step: 5,
-    totalSteps: 7,
-    targetPath: '/scanner',
-    badge: 'STEP 05 · AI CV SCANNER',
-    title: 'AI Camera Scanner for Building Façades',
-    summary: {
-      en: 'Edge YOLOv8 computer vision automatically counts split ACs, VRF units, and rooftop chillers dumping heat into public alleys.',
-      hi: 'एज कंप्यूटर विजन स्वचालित रूप से इमारतों की दीवारों पर लगे स्प्लिट एसी और वीआरएफ कंडेंसर की गिनती करता है।',
-      kn: 'ಎಡ್ಜ್ ಕಂಪ್ಯೂಟರ್ ವಿಷನ್ ಕಟ್ಟಡದ ಗೋಡೆಗಳ ಮೇಲಿನ ಎಸಿ ಘಟಕಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಎಣಿಸುತ್ತದೆ.',
-      te: 'ఎడ్జ్ కంప్యూటర్ విజన్ భవనాలపై ఉన్న ఏసీ యూనిట్లను ఆటోమేటిక్‌గా లెక్కిస్తుంది.',
-    },
-    audioSpeech: {
-      en: 'Step 5: The AI Facade Scanner counts every split AC and VRF unit on a building wall to calculate exact kilowatt heat rejection.',
-      hi: 'चरण 5: एआई फासाड स्कैनर दीवार पर लगे हर एसी यूनिट को गिनकर कुल गर्मी की गणना करता है।',
-      kn: 'ಹಂತ 5: ಎಐ ಸ್ಕ್ಯಾನರ್ ಕಟ್ಟಡದ ಮೇಲಿನ ಪ್ರತಿಯೊಂದು ಎಸಿ ಘಟಕವನ್ನು ಪತ್ತೆ ಮಾಡುತ್ತದೆ.',
-      te: 'దశ 5: ఏఐ స్కానర్ భవనంపై ఉన్న ప్రతి ఏసీ యూనిట్‌ను గుర్తించి వేడిని లెక్కిస్తుంది.',
-    },
-  },
-  {
-    step: 6,
-    totalSteps: 7,
-    targetPath: '/ledger',
-    badge: 'STEP 06 · DEBT LEDGER',
-    title: 'Section 133 CrPC Polluter Debt Ledger',
-    summary: {
-      en: 'Calculates monthly thermal surcharges against commercial heat dumpers and generates legal notices to fund vendor cooling kiosks.',
-      hi: 'धारा 133 सीआरपीसी के तहत जुर्माना तय करता है और विक्रेताओं के कूलिंग कियोस्क के लिए फंड जुटाता है।',
-      kn: 'ಸೆಕ್ಷನ್ 133 ಸಿಆರ್‌ಪಿಸಿ ಅಡಿಯಲ್ಲಿ ಶಾಸನಬದ್ಧ ದಂಡ ಲೆಕ್ಕಾಚಾರ ಮತ್ತು ನೋಟಿಸ್ ಜನರೇಟರ್.',
-      te: 'సెక్షన్ 133 సిఆర్‌పిసి ప్రకారం మున్సిపల్ పెనాల్టీ లెడ్జర్ మరియు లీగల్ నోటీసు.',
-    },
-    audioSpeech: {
-      en: 'Step 6: Under Section 133 CrPC, the Debt Ledger assesses monthly thermal surcharges and drafts statutory legal notices.',
-      hi: 'चरण 6: धारा 133 सीआरपीसी के तहत डेट लेजर मासिक शुल्क और कानूनी नोटिस तैयार करता है।',
-      kn: 'ಹಂತ 6: ಸೆಕ್ಷನ್ 133 ಅಡಿಯಲ್ಲಿ ವಾಣಿಜ್ಯ ಕಟ್ಟಡಗಳಿಗೆ ದಂಡ ವಿಧಿಸಿ ಪರಿಹಾರ ನೀಡಲಾಗುತ್ತದೆ.',
-      te: 'దశ 6: సెక్షన్ 133 ప్రకారం వాణిజ్య భవనాలకు జరిమానా విధించి కార్మికులకు రక్షణ కల్పిస్తాము.',
-    },
-  },
-  {
-    step: 7,
-    totalSteps: 7,
-    targetPath: '/watchlist',
-    badge: 'STEP 07 · HEAT WATCHLIST',
-    title: 'Multilingual Vendor SMS & Voice Early Warnings',
-    summary: {
-      en: 'Dispatches instant Hindi, Tamil, and English emergency heat alerts to street workers when wet-bulb temperature crosses 36°C.',
-      hi: 'जानलेवा तापमान पार होने पर रेहड़ी-पटरी वालों को तुरंत हिंदी और अंग्रेजी में अलर्ट भेजता है।',
-      kn: 'ಗರಿಷ್ಠ ತಾಪಮಾನದ ಸಮಯದಲ್ಲಿ ಕಾರ್ಮಿಕರಿಗೆ ಬಹುಭಾಷಾ ತುರ್ತು ಎಚ್ಚರಿಕೆ ರವಾನೆ.',
-      te: 'తీవ్రమైన వేడి సమయంలో కార్మికులకు బహుభాషా అత్యవసర హెచ్చరికల వ్యవస్థ.',
-    },
-    audioSpeech: {
-      en: 'Step 7: Finally, the Heat Surge Watchlist dispatches instant multilingual warnings to street vendors before heat stroke occurs.',
-      hi: 'चरण 7: अंत में, हीट सर्ज वॉचलिस्ट विक्रेताओं को लू लगने से पहले तुरंत आपातकालीन अलर्ट भेजती है।',
-      kn: 'ಹಂತ 7: ಹೀಟ್ ಸರ್ಜ್ ವಾಚ್‌ಲಿಸ್ಟ್ ಕಾರ್ಮಿಕರಿಗೆ ತುರ್ತು ಎಚ್ಚರಿಕೆಗಳನ್ನು ಕಳುಹಿಸುತ್ತದೆ.',
-      te: 'దశ 7: చివరిగా, ప్రమాదకరమైన వేడి ఉన్నప్పుడు వీధి కార్మికులకు అత్యవసర హెచ్చరికలను పంపుతాము.',
+      en: 'Screen 4: Click numbers 1 through 4 directly on the street canyon diagram to see the complete closed-loop cooling workflow.',
+      ta: 'படி 4: படத்தில் உள்ள எண்களைக் கிளிக் செய்து முழுமையான செயல்பாட்டை நேரடியாகப் பாருங்கள்.',
+      hi: 'चरण 4: स्ट्रीट डायग्राम पर 1 से 4 नंबरों पर क्लिक करके पूरा कूलिंग लूप देखें।',
     },
   },
 ];
@@ -187,28 +122,29 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
 
   const step = TOUR_STEPS[currentStepIndex];
 
-  // Auto-navigate to target page and scroll to anchor on step change
+  // Ensure we are on the Hero page ('/') and smoothly scroll to the active section anchor
   useEffect(() => {
     if (!isOpen) return;
 
-    if (location.pathname !== step.targetPath) {
-      navigate(step.targetPath);
-    }
+    const scrollToHeroSection = () => {
+      const el = document.getElementById(step.targetAnchor);
+      if (el) {
+        const yOffset = -88; // Account for sticky 80px top navbar
+        const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      }
+    };
 
-    if (step.targetAnchor) {
-      const timer = window.setTimeout(() => {
-        const el = document.getElementById(step.targetAnchor || '');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 250);
+    if (location.pathname !== '/') {
+      navigate('/');
+      const timer = window.setTimeout(scrollToHeroSection, 320);
       return () => window.clearTimeout(timer);
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const timer = window.setTimeout(scrollToHeroSection, 120);
+      return () => window.clearTimeout(timer);
     }
-  }, [currentStepIndex, isOpen, step.targetPath, step.targetAnchor, navigate]);
+  }, [currentStepIndex, isOpen, step.targetAnchor, location.pathname, navigate]);
 
-  // Speech synthesizer utilizing Web Speech API
   const handlePlaySpeech = () => {
     try {
       if (!('speechSynthesis' in window)) {
@@ -226,10 +162,9 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
       const text = step.audioSpeech[selectedLanguage] || step.audioSpeech.en;
       const utterance = new SpeechSynthesisUtterance(text);
 
-      if (selectedLanguage === 'hi') utterance.lang = 'hi-IN';
-      else if (selectedLanguage === 'kn') utterance.lang = 'kn-IN';
-      else if (selectedLanguage === 'te') utterance.lang = 'te-IN';
-      else utterance.lang = 'en-US';
+      if (selectedLanguage === 'ta') utterance.lang = 'ta-IN';
+      else if (selectedLanguage === 'hi') utterance.lang = 'hi-IN';
+      else utterance.lang = 'en-IN';
 
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
@@ -246,7 +181,6 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  // Clean up speech synthesis on unmount or close
   useEffect(() => {
     if (!isOpen && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -281,7 +215,7 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none flex items-end sm:items-end justify-center sm:justify-end p-4 sm:p-6">
+    <div className="fixed inset-0 z-[100] pointer-events-none flex items-end justify-center sm:justify-end p-4 sm:p-6">
       {/* Subtle Backdrop Clickable on Mobile */}
       <div
         onClick={() => {
@@ -292,7 +226,7 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
       />
 
       <div className="relative z-10 pointer-events-auto max-w-md w-full select-none animate-in fade-in slide-in-from-bottom-4 duration-200">
-        <div className="rounded-2xl bg-[#0b1b2d] text-white border-2 border-amber-400 shadow-[0_24px_60px_rgba(11,27,45,0.55)] overflow-hidden flex flex-col">
+        <div className="rounded-2xl bg-[#0b1b2d] text-white border-2 border-amber-400 shadow-[0_24px_60px_rgba(11,27,45,0.65)] overflow-hidden flex flex-col">
           {/* Top Header Bar */}
           <div className="px-4 py-3 bg-[#112338] border-b border-slate-700/80 flex items-center justify-between text-xs font-mono">
             <div className="flex items-center gap-2">
@@ -300,10 +234,10 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
                 <Compass className="w-4 h-4" />
               </span>
               <div className="flex items-center gap-1.5 font-bold tracking-wider">
-                <span className="text-amber-400">GUIDED TOUR</span>
+                <span className="text-amber-400">HERO PAGE TOUR</span>
                 <span className="text-slate-500">·</span>
                 <span className="text-white">
-                  STEP {step.step} OF {step.totalSteps}
+                  SCREEN {step.step} OF {step.totalSteps}
                 </span>
               </div>
             </div>
@@ -321,7 +255,7 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Step Quick Dots */}
+          {/* 4 Hero Screen Step Dots */}
           <div className="px-4 pt-3 flex items-center justify-between gap-1.5">
             {TOUR_STEPS.map((s, idx) => (
               <button
@@ -335,26 +269,25 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
                     ? 'bg-emerald-500/70'
                     : 'bg-slate-700 hover:bg-slate-600'
                 }`}
-                title={`Jump to Step ${s.step}: ${s.title}`}
+                title={`Jump to Hero Screen ${s.step}: ${s.title}`}
               />
             ))}
           </div>
 
           {/* Content Body */}
-          <div className="p-4 sm:p-5 space-y-3.5">
+          <div className="p-4 sm:p-5 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold uppercase tracking-wider">
                 {step.badge}
               </span>
 
-              {/* Language Switcher */}
+              {/* Language Switcher: English, Tamil, Hindi */}
               <div className="flex items-center gap-1 bg-[#071320] p-1 rounded-lg border border-slate-700 text-[11px] font-mono font-semibold">
                 {(
                   [
                     { code: 'en', label: 'EN' },
+                    { code: 'ta', label: 'தமிழ்' },
                     { code: 'hi', label: 'हिन्दी' },
-                    { code: 'kn', label: 'ಕನ್ನಡ' },
-                    { code: 'te', label: 'తెలుగు' },
                   ] as const
                 ).map((lang) => (
                   <button
@@ -413,7 +346,7 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
                 onClick={handlePrev}
                 disabled={currentStepIndex === 0}
                 className="p-2 rounded-xl bg-slate-800 text-slate-200 hover:text-white hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
-                title="Previous Step"
+                title="Previous Screen"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -423,7 +356,7 @@ export const NetraGuide: React.FC<NetraGuideProps> = ({ isOpen, onClose }) => {
                 onClick={handleNext}
                 className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
               >
-                <span>{currentStepIndex === TOUR_STEPS.length - 1 ? 'Restart' : 'Next Step'}</span>
+                <span>{currentStepIndex === TOUR_STEPS.length - 1 ? 'Restart' : 'Next Screen'}</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>

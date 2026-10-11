@@ -123,17 +123,13 @@ export const ThermalDebtLedger: React.FC<Props> = ({
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] font-mono font-extrabold text-[#a8321a] uppercase">
               <GitBranch className="w-3.5 h-3.5" />
-              <span>Amazon Neptune Serverless · Relational Spatial-Graph Liability</span>
+              <span>Amazon Neptune Serverless · 3-Hop Liability Graph</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
-              Automated Structural Accountability Graph ({selectedBuilding.name})
+              Automated Accountability Graph ({selectedBuilding.name})
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-3xl">
-              Tracks real-world accountability networks smoothly:{' '}
-              <span className="font-mono font-bold text-[#111827]">
-                [Vendor Cart ID] → exposed to → [Building HVAC Outlet] → operated by → [Corporate Entity]
-              </span>{' '}
-              to calculate municipal thermal debt automatically.
+            <p className="text-xs sm:text-sm text-slate-600">
+              Links <span className="font-mono font-bold text-[#111827]">[VendorCart] → [HVACOutlet] → [CorporateEntity]</span> via OpenCypher &amp; DynamoDB Streams.
             </p>
           </div>
 

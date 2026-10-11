@@ -363,19 +363,15 @@ export const LiveProductCockpit: React.FC<Props> = ({
                     <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
                       <span className="px-2 py-0.5 rounded-md bg-amber-400/15 text-amber-300 border border-amber-400/30 font-bold flex items-center gap-1.5">
                         <Cloud className="w-3.5 h-3.5" />
-                        <span>AWS IoT Core MQTT → EventBridge Custom Bus</span>
+                        <span>AWS IoT Core MQTT → EventBridge</span>
                       </span>
-                      <span className="text-slate-400">Bus:</span>
                       <code className="text-sky-300 font-bold">ushma-netra-thermal-bus</code>
-                      <span className="text-slate-500">·</span>
                       <span className="text-emerald-400 font-bold">
-                        {eventBridgeReceipt
-                          ? `PutEvents Latency: ${eventBridgeReceipt.latencyMs}ms (Sub-Second)`
-                          : 'Replaces Team 2 15-Min Polling'}
+                        {eventBridgeReceipt ? `${eventBridgeReceipt.latencyMs}ms Fan-Out` : '~36ms Sub-Second Stream'}
                       </span>
                     </div>
                     <p className="text-xs text-slate-300">
-                      Publish a live ESP32 MQTT payload to <code className="font-mono text-amber-200">/api/twin/ingest-mqtt</code> to fan out <code className="font-mono text-rose-300">ThermalSpikeAlert</code> events simultaneously to the Watchlist Alert API and 3D Plume canvas.
+                      Streams live ESP32 sensor packets to the 3D Twin and Watchlist Alert API in ~36ms.
                     </p>
                   </div>
 

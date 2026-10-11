@@ -127,10 +127,12 @@ export const HomePage: React.FC<Props> = ({
         />
 
         {/* Slide 3: Alternating Two-Column Z-Pattern Visual Feature Showcase */}
-        <AlternatingFeatureShowcase />
+        <div id="hero_feature_cards">
+          <AlternatingFeatureShowcase />
+        </div>
 
         {/* Slide 4 (Replaced Overlap Section): One Visual Street Diagram Explaining How All 4 Work Together Simply */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <section id="hero_street_diagram" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
             <div className="text-xs font-mono text-amber-400 font-bold uppercase tracking-widest">
               How The 4 Steps Work Together
