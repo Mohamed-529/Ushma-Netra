@@ -38,11 +38,13 @@ function AppContent() {
   const [logs, setLogs] = useState<IncidentLog[]>(INITIAL_LOGS);
   const [surgeModalOpen, setSurgeModalOpen] = useState<boolean>(false);
   const [isIntroRevealed, setIsIntroRevealed] = useState<boolean>(false);
+  const [replayTrigger, setReplayTrigger] = useState<number>(0);
   const handleTypingComplete = React.useCallback(() => {
     setIsIntroRevealed(true);
   }, []);
   const handleReplayIntro = React.useCallback(() => {
     setIsIntroRevealed(false);
+    setReplayTrigger((prev) => prev + 1);
   }, []);
 
   // Map route to theme atmosphere
@@ -163,6 +165,7 @@ function AppContent() {
                 isIntroRevealed={isIntroRevealed}
                 onTypingComplete={handleTypingComplete}
                 onReplayIntro={handleReplayIntro}
+                replayTrigger={replayTrigger}
               />
             }
           />

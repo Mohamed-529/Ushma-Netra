@@ -90,27 +90,12 @@ export const MethodologyPage: React.FC = () => {
       {/* Top Navigation & Breadcrumbs Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              if (window.history.length > 1) {
-                navigate(-1);
-              } else {
-                navigate('/');
-              }
-            }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-bold transition-all cursor-pointer shadow-sm group"
-            title="Return to previous screen"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-            <span>Return</span>
-          </button>
-
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-semibold transition-colors"
             title="Return to Home Overview"
           >
-            <Home className="w-3.5 h-3.5" />
+            <Home className="w-3.5 h-3.5 text-[#a8321a]" />
             <span>Home Overview</span>
           </Link>
         </div>
