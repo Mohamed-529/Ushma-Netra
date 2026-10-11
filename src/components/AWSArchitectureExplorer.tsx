@@ -123,12 +123,12 @@ const CORE_AWS_STACK = [
     services: [
       {
         name: 'AWS IoT Core (Sub-Second MQTT)',
-        desc: 'Securely manages incoming MQTT traffic from thousands of physical ESP32 vendor sensors at sub-second speeds (<180ms p99 latency).',
+        desc: '• Streams ESP32-S3 USB/BLE & Phone telemetry at <180ms p99 latency.',
         metric: '12,500 msg/sec · mTLS X.509 Auth',
       },
       {
         name: 'Amazon EventBridge Custom Event Bus',
-        desc: 'Automatically routes active system alerts to multiple services asynchronously, keeping your tools lightweight and separated.',
+        desc: '• Routes heat spikes asynchronously to Neptune, Location, and Polly AirPods alerts.',
         metric: 'EventBus: ushma-netra-thermal-bus',
       },
     ],
@@ -144,12 +144,12 @@ const CORE_AWS_STACK = [
     services: [
       {
         name: 'Amazon Neptune Serverless (Graph Liability)',
-        desc: 'Tracks real-world accountability networks smoothly: [Vendor Cart ID] → exposed to → [Building HVAC Outlet] → operated by → [Corporate Entity]. Calculates municipal thermal debt automatically.',
+        desc: '• Maps 3-hop liability: [Vendor Cart] → [HVAC Outlet] → [Corporate Entity].',
         metric: 'Gremlin / OpenCypher Graph Traversal',
       },
       {
         name: 'Amazon DynamoDB (With Streams Enabled)',
-        desc: 'Handles rapid status indicators, triggering downstream Lambdas the instant a sensor reports a critical heat surge (NEW_AND_OLD_IMAGES stream view).',
+        desc: '• Fires sub-10ms NEW_AND_OLD_IMAGES stream triggers on heat breaches.',
         metric: 'Sub-10ms State Trigger → AWS Lambda',
       },
     ],
@@ -165,7 +165,7 @@ const CORE_AWS_STACK = [
     services: [
       {
         name: 'Amazon Location Service Geofencing',
-        desc: 'Draws dynamic, precise boundary zones around high-heat commercial ventilation outlets. If a street cart beacon moves inside a geofence, the system fires an ENTER event alert instantly.',
+        desc: '• Evaluates 5.0m HVAC exhaust polygons; fires ENTER alerts when a cart crosses inside.',
         metric: 'Polygon Geofence · <0.5m Street Accuracy',
       },
     ],
@@ -181,12 +181,12 @@ const CORE_AWS_STACK = [
     services: [
       {
         name: 'Amazon Bedrock Agents + OpenSearch Serverless',
-        desc: 'Automatically generates personalized legal warning notifications by matching real-time heat metrics with municipal codes (Section 133 CrPC & NDMA Heat Action Plan vector index).',
+        desc: '• Matches heat deltas with Section 133 CrPC & NDMA vector rules to draft legal orders.',
         metric: 'Vector RAG · k-NN Cosine Similarity',
       },
       {
         name: 'Guardrails for Amazon Bedrock',
-        desc: 'Automatically filters out sensitive personal health records (PII) and blocks malicious prompt injections, making your system fully enterprise-grade.',
+        desc: '• Masks vendor PII/Aadhaar/health telemetry and blocks prompt injection attacks.',
         metric: 'PII Redaction: ACTIVE · Prompt Attack Filter: HIGH',
       },
     ],
@@ -284,9 +284,20 @@ export const AWSArchitectureExplorer: React.FC<Props> = () => {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#111827] tracking-tight">
               Enterprise AWS Geospatial-Graph &amp; Governed RAG Stack
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 max-w-3xl leading-relaxed">
-              Sub-second ESP32 MQTT ingestion via <strong>AWS IoT Core</strong>, structural liability graph traversal in <strong>Amazon Neptune Serverless</strong>, dynamic hazard envelopes with <strong>Amazon Location Service Geofencing</strong>, and PII-redacted statutory notices via <strong>Amazon Bedrock Agents + Guardrails</strong>.
-            </p>
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-700 pt-0.5">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 font-bold">
+                1. AWS IoT Core + EventBridge (~36ms)
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 font-bold">
+                2. Amazon Neptune 3-Hop Graph
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 font-bold">
+                3. Amazon Location 5m Geofence
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 font-bold">
+                4. Bedrock Guardrails + OpenSearch RAG
+              </span>
+            </div>
           </div>
 
           {/* 4 Interactive Architecture Views */}

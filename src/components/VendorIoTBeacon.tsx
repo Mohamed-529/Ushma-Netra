@@ -28,7 +28,7 @@ export const VendorIoTBeacon: React.FC<Props> = ({
 }) => {
   const [simSurge, setSimSurge] = useState<'none' | 'ac_peak' | 'wind_drop'>('none');
   const [voiceActive, setVoiceActive] = useState<string | null>(null);
-  const [language, setLanguage] = useState<'hi' | 'en'>('hi');
+  const [language, setLanguage] = useState<'ta' | 'hi' | 'en'>('ta');
   const [demoMenuOpen, setDemoMenuOpen] = useState<boolean>(false);
   const [iotStreamModalOpen, setIotStreamModalOpen] = useState<boolean>(false);
 
@@ -54,7 +54,7 @@ export const VendorIoTBeacon: React.FC<Props> = ({
       measuredWbgt: currentWbgt,
       nearestKioskMeters: 35,
       exhaustTemp: vendor.dryBulbTempCelsius,
-      preferredLanguage: language === 'hi' ? 'hi-IN' : 'en-IN',
+      preferredLanguage: language === 'ta' ? 'ta-IN' : language === 'hi' ? 'hi-IN' : 'en-IN',
     }).finally(() => {
       setVoiceActive(null);
     });
@@ -193,11 +193,19 @@ export const VendorIoTBeacon: React.FC<Props> = ({
               ? 'CRITICAL ALERT: EXTREME HEAT EXHAUST BLAST'
               : 'SAFE OPERATING ZONE: COOLING MIST ACTIVE'}
           </div>
-          <p className="text-xs sm:text-sm text-white/90 font-medium max-w-2xl">
-            {isCriticalHazard
-              ? `${vendor.vendorName} (${vendor.trade}) is ${vendor.distanceToExhaustMeters}m from commercial AC vents. Wet-bulb heat is ${currentWbgt}°C — immediate shade & water break required.`
-              : `Upward 45° louvers and sidewalk misting have lowered cart wet-bulb temperature to ${currentWbgt}°C.`}
-          </p>
+          <ul className="text-xs sm:text-sm text-white/95 font-medium space-y-0.5">
+            {isCriticalHazard ? (
+              <>
+                <li>• Cart Distance: {vendor.distanceToExhaustMeters}m from AC exhaust vents</li>
+                <li>• Measured WBGT: {currentWbgt}°C (Immediate shade &amp; AirPods alert active)</li>
+              </>
+            ) : (
+              <>
+                <li>• Upward 45° Louvers + Mist Kiosk Active</li>
+                <li>• Cart WBGT lowered to {currentWbgt}°C safe threshold</li>
+              </>
+            )}
+          </ul>
         </div>
 
         {/* Instant Voice Broadcast Action */}
@@ -205,12 +213,12 @@ export const VendorIoTBeacon: React.FC<Props> = ({
           <div className="flex rounded-xl bg-black/25 p-1 border border-white/20 text-xs font-mono font-bold">
             <button
               type="button"
-              onClick={() => setLanguage('hi')}
+              onClick={() => setLanguage('ta')}
               className={`px-3 py-1.5 rounded-lg cursor-pointer transition-colors ${
-                language === 'hi' ? 'bg-white text-slate-950' : 'text-white/80 hover:text-white'
+                language === 'ta' ? 'bg-white text-slate-950' : 'text-white/80 hover:text-white'
               }`}
             >
-              हिंदी
+              தமிழ்
             </button>
             <button
               type="button"
@@ -220,6 +228,15 @@ export const VendorIoTBeacon: React.FC<Props> = ({
               }`}
             >
               EN
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('hi')}
+              className={`px-3 py-1.5 rounded-lg cursor-pointer transition-colors ${
+                language === 'hi' ? 'bg-white text-slate-950' : 'text-white/80 hover:text-white'
+              }`}
+            >
+              हिंदी
             </button>
           </div>
 
@@ -234,7 +251,7 @@ export const VendorIoTBeacon: React.FC<Props> = ({
               }`}
             />
             <span className="pointer-events-none">
-              {voiceActive ? 'Speaking Alert...' : 'Play Voice Warning'}
+              {voiceActive ? 'Playing in AirPods...' : 'Play in AirPods'}
             </span>
           </button>
         </div>

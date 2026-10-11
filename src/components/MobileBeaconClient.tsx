@@ -2,19 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   Radio,
   Battery,
-  Wifi,
   Volume2,
   ShieldCheck,
   Flame,
-  AlertTriangle,
-  ArrowLeft,
-  RefreshCw,
   Lock,
   Smartphone,
-  ShieldAlert,
-  Sliders,
-  CheckCircle2,
-  Copy
+  Copy,
+  Headphones,
 } from 'lucide-react';
 import { playAudibleBeaconAlert } from '../utils/pollyVoiceDispatch';
 
@@ -31,17 +25,17 @@ interface Props {
 }
 
 export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }) => {
-  const [ambientTemp, setAmbientTemp] = useState<number>(44.2);
+  const [ambientTemp, setAmbientTemp] = useState<number>(53.6);
   const [wbgt, setWbgt] = useState<number>(36.8);
-  const [batteryPct, setBatteryPct] = useState<number>(88);
+  const [batteryPct, setBatteryPct] = useState<number>(92);
   const [isAlerting, setIsAlerting] = useState<boolean>(false);
-  const [vendorName, setVendorName] = useState<string>('Rameshwar Pal');
-  const [nodeId, setNodeId] = useState<string>('UN-DEL-084');
+  const [vendorName] = useState<string>('Murugan (T. Nagar Cart #04)');
+  const [nodeId] = useState<string>('ESP32-CHN-04');
   const [authToken, setAuthToken] = useState<string>('un_hw_secure_ecc_p256_active');
   const [louversActive, setLouversActive] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
+  const [voiceLang, setVoiceLang] = useState<'ta-IN' | 'en-IN' | 'hi-IN'>('ta-IN');
 
-  // Attempt to read physical phone battery level if supported by Chrome Android
   useEffect(() => {
     if ('getBattery' in navigator) {
       (navigator as unknown as { getBattery: () => Promise<{ level: number }> })
@@ -49,13 +43,10 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
         .then((battery) => {
           setBatteryPct(Math.round(battery.level * 100));
         })
-        .catch(() => {
-          // Fallback to default
-        });
+        .catch(() => {});
     }
   }, []);
 
-  // Broadcast live telemetry to laptop screen via BroadcastChannel & LocalStorage
   const broadcastSync = (customPayload?: Record<string, unknown>) => {
     const payload = {
       node_id: nodeId,
@@ -67,7 +58,6 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
       ...customPayload,
     };
 
-    // 1. BroadcastChannel (Same-origin tabs/windows)
     try {
       const channel = new BroadcastChannel('ushma_netra_hardware_feed');
       channel.postMessage(payload);
@@ -76,7 +66,6 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
       // Fallback
     }
 
-    // 2. LocalStorage Event (cross-window storage event listener)
     try {
       localStorage.setItem('ushma_netra_hw_sync', JSON.stringify(payload));
     } catch {
@@ -101,8 +90,8 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
         measuredWbgt: wbgt,
         exhaustTemp: ambientTemp,
         nearestKioskMeters: 35,
-        kioskName: 'Chandni Chowk Mist Station #03',
-        preferredLanguage: 'bilingual',
+        kioskName: 'T. Nagar Mist Station #02',
+        preferredLanguage: voiceLang,
       });
     } finally {
       setIsAlerting(false);
@@ -130,7 +119,7 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
 
   const handleCopyBeaconUrl = () => {
     if (typeof window !== 'undefined') {
-      const beaconUrl = `${window.location.origin}${window.location.pathname}?mode=beacon`;
+      const beaconUrl = `${window.location.origin}/twin`;
       navigator.clipboard.writeText(beaconUrl);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
@@ -141,22 +130,21 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
   const isHardwareValid = authToken.startsWith('un_hw_secure_');
 
   return (
-    <div className="min-h-screen w-full bg-zinc-950 text-zinc-100 font-sans p-4 sm:p-6 flex flex-col justify-between selection:bg-amber-500/20">
-      
+    <div className="rounded-3xl w-full bg-zinc-950 text-zinc-100 font-sans p-5 sm:p-6 space-y-5 border border-zinc-800 shadow-2xl">
       {/* Top Beacon Hardware Identity Bar */}
       <div className="space-y-3">
         <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
               <Radio className="w-4 h-4 animate-pulse" />
             </div>
             <div>
               <div className="text-xs font-bold font-mono tracking-wider text-zinc-100 flex items-center gap-1.5">
-                <span>USHMA-NETRA // POCKET BEACON</span>
+                <span>PHONE + ESP32 + AIRPODS BEACON</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
               </div>
               <div className="text-[10px] font-mono text-zinc-400">
-                NODE: {nodeId} · ASYMMETRIC P-256
+                NODE: {nodeId} · USB DATA CABLE + BLE
               </div>
             </div>
           </div>
@@ -205,28 +193,25 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
       </div>
 
       {/* Main Sensor Gauge & Heat Status */}
-      <div className="my-auto py-4 space-y-5 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-          <span>MICRO-CANYON WBGT (PEDESTRIAN HEAD LEVEL)</span>
-        </div>
-
+      <div className="py-2 space-y-4 text-center">
         <div className="space-y-1">
-          <div className={`text-6xl sm:text-7xl font-extrabold font-mono tracking-tight ${isLethal ? 'text-red-500 animate-pulse' : 'text-amber-400'}`}>
-            {wbgt.toFixed(1)}°C
+          <div
+            className={`text-5xl sm:text-6xl font-extrabold font-mono tracking-tight ${
+              isLethal ? 'text-red-500' : 'text-amber-400'
+            }`}
+          >
+            {wbgt.toFixed(1)}°C WBGT
           </div>
           <div className="text-xs font-mono text-zinc-400">
-            Ambient Air: <strong className="text-zinc-200">{ambientTemp.toFixed(1)}°C</strong> · Humidity: <strong className="text-zinc-200">62%</strong>
-          </div>
-          <div className={`text-xs font-bold uppercase tracking-wider ${isLethal ? 'text-red-400' : 'text-amber-400'}`}>
-            {isLethal ? '⚠️ ISO 7243 EXTREME LETHALITY THRESHOLD CROSSED' : 'MODERATE HEAT STRAIN'}
+            Exhaust Jet: <strong className="text-zinc-200">{ambientTemp.toFixed(1)}°C</strong> · Humidity:{' '}
+            <strong className="text-zinc-200">62%</strong>
           </div>
         </div>
 
         {/* Live Thermal Sensor Slider */}
-        <div className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 text-left space-y-3 max-w-sm mx-auto">
+        <div className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 text-left space-y-2.5 max-w-md mx-auto">
           <div className="flex justify-between text-xs font-mono text-zinc-400">
-            <span>Simulate Street AC Exhaust Blast:</span>
+            <span>Slide Phone Sensor Exhaust Temp:</span>
             <span className="text-amber-400 font-bold">{ambientTemp}°C</span>
           </div>
           <input
@@ -245,12 +230,36 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
           <div className="flex justify-between text-[10px] font-mono text-zinc-500">
             <span>32°C (Shaded)</span>
             <span>44°C (Ambient)</span>
-            <span>54°C (Direct Jet)</span>
+            <span>53.6°C (AC Blast)</span>
           </div>
         </div>
 
-        {/* Action Controls for Demo & Video */}
-        <div className="max-w-sm mx-auto space-y-2">
+        {/* Action Controls for Demo & AirPods */}
+        <div className="max-w-md mx-auto space-y-2.5">
+          {/* Language Picker for AirPods */}
+          <div className="flex items-center justify-between p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono">
+            <span className="flex items-center gap-1.5 text-zinc-300 pl-1">
+              <Headphones className="w-3.5 h-3.5 text-amber-400" />
+              <span>AirPods Language:</span>
+            </span>
+            <div className="flex items-center gap-1">
+              {(['ta-IN', 'en-IN', 'hi-IN'] as const).map((lang) => (
+                <button
+                  key={lang}
+                  type="button"
+                  onClick={() => setVoiceLang(lang)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer ${
+                    voiceLang === lang
+                      ? 'bg-amber-400 text-slate-950'
+                      : 'bg-zinc-800 text-zinc-300 hover:text-white'
+                  }`}
+                >
+                  {lang === 'ta-IN' ? 'தமிழ்' : lang === 'en-IN' ? 'EN' : 'हिंदी'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Big AirPods Audio Broadcast Trigger Button */}
           <button
             onClick={handleTriggerAirPodsAlert}
@@ -258,7 +267,13 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-mono font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-red-950/40 transition-all cursor-pointer"
           >
             <Volume2 className={`w-4 h-4 ${isAlerting ? 'animate-bounce' : ''}`} />
-            <span>{isAlerting ? 'BROADCASTING TO AIRPODS...' : 'TEST POLLY AUDIO IN AIRPODS'}</span>
+            <span>
+              {isAlerting
+                ? 'BROADCASTING TO AIRPODS...'
+                : `PLAY POLLY VOICE IN AIRPODS (${
+                    voiceLang === 'ta-IN' ? 'தமிழ்' : voiceLang === 'en-IN' ? 'EN' : 'हिंदी'
+                  })`}
+            </span>
           </button>
 
           <div className="grid grid-cols-2 gap-2">
@@ -267,7 +282,7 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
               className="py-2.5 px-3 rounded-xl bg-red-950/50 hover:bg-red-900/60 border border-red-800/80 text-red-200 text-xs font-mono font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer"
             >
               <Flame className="w-3.5 h-3.5 text-red-400" />
-              <span>Simulate 54°C Surge</span>
+              <span>53.6°C Surge</span>
             </button>
 
             <button
@@ -279,38 +294,25 @@ export const MobileBeaconClient: React.FC<Props> = ({ onClose, onSyncTelemetry }
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{louversActive ? 'Louvers Active' : 'Deploy Louvers'}</span>
+              <span>{louversActive ? 'Louvers ON (38°C)' : 'Deploy 45° Louvers'}</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Bottom Pairing Link & Vendor Metadata */}
-      <div className="space-y-2">
-        <div className="p-3 rounded-xl bg-zinc-900/40 border border-zinc-800/60 text-xs font-mono flex items-center justify-between text-zinc-400">
-          <div className="flex items-center gap-2">
-            <Smartphone className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-[11px] text-zinc-300">Open on Your Phone Browser:</span>
-          </div>
-          <button
-            onClick={handleCopyBeaconUrl}
-            className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer"
-          >
-            <Copy className="w-3 h-3" />
-            <span>{copiedLink ? 'Copied' : 'Copy /?mode=beacon'}</span>
-          </button>
+      {/* Bottom Pairing Link */}
+      <div className="p-3 rounded-xl bg-zinc-900/40 border border-zinc-800/60 text-xs font-mono flex items-center justify-between text-zinc-400">
+        <div className="flex items-center gap-2">
+          <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+          <span className="text-[11px] text-zinc-300">Vendor: {vendorName}</span>
         </div>
-
-        <div className="p-3.5 rounded-xl bg-zinc-900/30 border border-zinc-800/50 text-[11px] font-mono flex items-center justify-between text-zinc-400">
-          <div>
-            <span className="text-zinc-500">VENDOR: </span>
-            <span className="text-zinc-200 font-bold">{vendorName}</span>
-          </div>
-          <div>
-            <span className="text-zinc-500">STIPEND: </span>
-            <span className="text-emerald-400 font-bold">₹3,400 DBT</span>
-          </div>
-        </div>
+        <button
+          onClick={handleCopyBeaconUrl}
+          className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer"
+        >
+          <Copy className="w-3 h-3" />
+          <span>{copiedLink ? 'Copied URL' : 'Copy Phone Link'}</span>
+        </button>
       </div>
     </div>
   );

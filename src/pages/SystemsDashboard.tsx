@@ -215,9 +215,13 @@ export const SystemsDashboard: React.FC = () => {
               <span>🛡️</span>
               <span>Technical Infrascan &amp; Compliance Core</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Real-time architecture assertion logs verifying zero-hourly-billing rules, least-privilege IAM, and serverless scaling across <code className="font-mono text-sky-300">infra/template.yaml</code>
-            </p>
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-300 mt-1.5">
+              <span>• Zero-Hourly Billing ($0.00/hr)</span>
+              <span>·</span>
+              <span>• Zero Wildcard IAM</span>
+              <span>·</span>
+              <span>• Audited: <code className="text-sky-300">infra/template.yaml</code></span>
+            </div>
           </div>
           <span className="px-3.5 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-xs font-mono font-bold rounded-full tracking-wide self-start sm:self-center flex items-center gap-2 shrink-0">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -380,9 +384,9 @@ export const SystemsDashboard: React.FC = () => {
                       <span>vs. Team 1 (JalRekha)</span>
                       <span>30-Day Batch → ~36ms Live</span>
                     </div>
-                    <p className="text-slate-400 text-[11px]">
-                      Replaces monthly macro-satellite batches with sub-second AWS IoT Core MQTT + Amazon Location 5m dynamic geofences.
-                    </p>
+                    <div className="text-slate-300 text-[11px]">
+                      • Sub-second AWS IoT Core MQTT + Amazon Location 5m geofences.
+                    </div>
                   </div>
 
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
@@ -390,9 +394,9 @@ export const SystemsDashboard: React.FC = () => {
                       <span>vs. Team 2 (Pukaar)</span>
                       <span>15m Sweep → EventBridge Bus</span>
                     </div>
-                    <p className="text-slate-400 text-[11px]">
-                      Replaces 15-minute polling and brittle single-table indexes with EventBridge fan-out and Amazon Neptune Serverless 3-hop liability graphs.
-                    </p>
+                    <div className="text-slate-300 text-[11px]">
+                      • EventBridge async fan-out + Amazon Neptune 3-hop liability graph.
+                    </div>
                   </div>
 
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
@@ -400,9 +404,9 @@ export const SystemsDashboard: React.FC = () => {
                       <span>Enterprise AI Governance</span>
                       <span>Bedrock Guardrails v2</span>
                     </div>
-                    <p className="text-slate-400 text-[11px]">
-                      Automatically masks vendor phone/Aadhaar/PHI health telemetry and blocks adversarial prompt injections before LLM invocation.
-                    </p>
+                    <div className="text-slate-300 text-[11px]">
+                      • Masks vendor PII/Aadhaar &amp; blocks prompt injections pre-LLM.
+                    </div>
                   </div>
                 </div>
               </div>

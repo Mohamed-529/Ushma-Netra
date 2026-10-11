@@ -71,9 +71,13 @@ export const LedgerPage: React.FC<Props> = ({
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
           Municipal Thermal Exhaust Debt Ledger
         </h1>
-        <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          Assessing statutory public nuisance and environmental hazard surcharges against commercial towers that dump unconsented 45°C–56°C AC exhaust onto pedestrian rights-of-way, directly funding municipal hydration and cool-island retrofits.
-        </p>
+        <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-300 pt-0.5">
+          <span>• Amazon Neptune 3-Hop Liability Graph</span>
+          <span>·</span>
+          <span>• Bedrock Guardrails v2 PII Redaction</span>
+          <span>·</span>
+          <span>• Section 133 CrPC Restorative Tariffs</span>
+        </div>
 
         {/* Aggregate Counters in Pure White #FFFFFF Floating Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
