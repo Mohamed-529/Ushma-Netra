@@ -420,16 +420,6 @@ export const LiveProductCockpit: React.FC<Props> = ({
                     <span>⚡ Run Whole Closed-Loop Pipeline</span>
                   </button>
 
-                  {/* Jury Defense Modal Trigger */}
-                  <button
-                    type="button"
-                    onClick={() => setIsJuryModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[11px] font-bold bg-purple-100 hover:bg-purple-200 text-purple-950 border border-purple-300 transition-colors cursor-pointer shadow-2xs"
-                    title="How to answer jury questions: Why buttons exist and how Ushma-Netra is 100% autonomous"
-                  >
-                    <HelpCircle className="w-3.5 h-3.5 text-purple-700" />
-                    <span>Jury Q&A: Autonomous Defense ↗</span>
-                  </button>
                 </div>
 
                 <div className="flex flex-wrap items-baseline justify-between gap-4">
@@ -589,15 +579,6 @@ export const LiveProductCockpit: React.FC<Props> = ({
                       <span>
                         {isPublishingMqtt ? 'Executing Closed Loop...' : '⚡ Trigger Autonomous Pipeline (>50°C)'}
                       </span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isPublishingMqtt}
-                      onClick={() => void handlePublishMqttSpike('nominal')}
-                      className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono text-xs font-bold cursor-pointer transition-all disabled:opacity-50"
-                      title="Reset pipeline and return to nominal heartbeat"
-                    >
-                      ↺ Reset to Nominal
                     </button>
                   </div>
                 </div>
