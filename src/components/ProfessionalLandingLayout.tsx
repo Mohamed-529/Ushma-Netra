@@ -7,7 +7,7 @@ import {
   Compass,
 } from 'lucide-react';
 import { NetraGuide } from './experience/NetraGuide';
-import { CustomFloatingCursor } from './experience/CustomFloatingCursor';
+import { soundEngine } from '../utils/audioSynthesizer';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -60,9 +60,6 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
 
   return (
     <div className="relative min-h-screen w-full bg-transparent text-[#0b1b2d] selection:bg-amber-900/20 selection:text-[#0b1b2d] antialiased overflow-x-hidden font-sans">
-      {/* Smooth Custom Floating Cursor */}
-      <CustomFloatingCursor />
-
       {/* Clean, Streamlined Top Navigation Header */}
       <div
         className={`sticky top-0 z-50 w-full transition-all duration-1000 ease-out ${
@@ -153,12 +150,21 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
             {/* Zone 3: Single Clean Primary CTA */}
             <div className="flex items-center gap-3 shrink-0">
               <button
-                onClick={() => setGuideOpen(true)}
-                className="px-4 py-2.5 rounded-xl bg-[#0b1b2d] hover:bg-[#1a2f47] text-white font-sans font-semibold text-sm flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
-                title="Launch 10-step audio & scroll interactive walkthrough tour"
+                type="button"
+                onClick={() => {
+                  soundEngine.playTone(580, 'sine', 0.12);
+                  setGuideOpen((prev) => !prev);
+                }}
+                aria-expanded={guideOpen}
+                className={`px-4 py-2.5 rounded-xl font-sans font-semibold text-sm flex items-center gap-2 shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                  guideOpen
+                    ? 'bg-[#a8321a] hover:bg-[#8e2915] text-white ring-2 ring-amber-400/60'
+                    : 'bg-[#0b1b2d] hover:bg-[#1a2f47] text-white'
+                }`}
+                title="Toggle interactive guided walkthrough tour"
               >
-                <Compass className="w-4 h-4 text-amber-400" />
-                <span>Guided Tour</span>
+                <Compass className={`w-4 h-4 ${guideOpen ? 'text-white animate-spin' : 'text-amber-400'}`} />
+                <span>{guideOpen ? 'Close Tour' : 'Guided Tour'}</span>
               </button>
 
               {/* Mobile Menu Toggle Button */}

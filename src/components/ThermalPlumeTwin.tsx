@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Wind, Flame, ShieldCheck, Sliders, MapPin, RefreshCw, Cpu } from 'lucide-react';
 import { verifyDeviceHandshake } from '../utils/cryptoVerify';
 
@@ -128,6 +129,15 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
 
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 2.5, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.maxPolarAngle = Math.PI / 2 - 0.03;
+    controls.minDistance = 4;
+    controls.maxDistance = 36;
+    controls.update();
 
     // 4. Lighting System
     const ambientLight = new THREE.AmbientLight(0xffeedd, 0.65);
@@ -363,6 +373,7 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
         colAttr.needsUpdate = true;
       }
 
+      controls.update();
       renderer.render(scene, camera);
     };
     animate();

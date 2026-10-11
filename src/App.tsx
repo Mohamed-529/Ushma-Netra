@@ -261,8 +261,11 @@ function AppContent() {
                 allBuildings={buildings}
                 onSelectBuilding={setSelectedBuilding}
                 vendor={selectedVendor}
+                allVendors={vendors}
+                onSelectVendor={setSelectedVendor}
                 isMitigated={isMitigated}
                 onMitigationToggle={setIsMitigated}
+                onApplyMitigation={handleApplyMitigation}
                 onSimulateSurge={handleSimulateSurge}
               />
             }
@@ -275,8 +278,11 @@ function AppContent() {
                 allBuildings={buildings}
                 onSelectBuilding={setSelectedBuilding}
                 vendor={selectedVendor}
+                allVendors={vendors}
+                onSelectVendor={setSelectedVendor}
                 isMitigated={isMitigated}
                 onMitigationToggle={setIsMitigated}
+                onApplyMitigation={handleApplyMitigation}
                 onSimulateSurge={handleSimulateSurge}
               />
             }
