@@ -90,10 +90,37 @@ export const LiveHardwareControl: React.FC = () => {
   const [airpodsLang, setAirpodsLang] = useState<'ta-IN' | 'en-IN' | 'hi-IN'>('ta-IN');
   const [isSpeakingAirpods, setIsSpeakingAirpods] = useState<boolean>(false);
   const [autoVoiceAlertEnabled, setAutoVoiceAlertEnabled] = useState<boolean>(true);
+  const [autoAlertCount, setAutoAlertCount] = useState<number>(0);
   const lastSpokenTimestampRef = React.useRef<number>(0);
+  const [activeSpeechInfo, setActiveSpeechInfo] = useState<{
+    text: string;
+    lang: string;
+  } | null>(null);
   const [copiedSketch, setCopiedSketch] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [copiedBoardUrl, setCopiedBoardUrl] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleStart = (e: Event) => {
+      const customEvent = e as CustomEvent<{ text: string; lang: string }>;
+      if (customEvent.detail) {
+        setActiveSpeechInfo({
+          text: customEvent.detail.text,
+          lang: customEvent.detail.lang,
+        });
+      }
+    };
+    const handleEnd = () => {
+      setActiveSpeechInfo(null);
+    };
+
+    window.addEventListener('ushma_voice_alert_start', handleStart);
+    window.addEventListener('ushma_voice_alert_end', handleEnd);
+    return () => {
+      window.removeEventListener('ushma_voice_alert_start', handleStart);
+      window.removeEventListener('ushma_voice_alert_end', handleEnd);
+    };
+  }, []);
 
   const handleIncomingPacket = async (data: {
     node_id?: string;
@@ -124,22 +151,28 @@ export const LiveHardwareControl: React.FC = () => {
       status: incomingWbgt >= 34.0 ? 'CRITICAL_SPIKE' : 'NOMINAL',
     });
 
-    // Autonomous Trilingual Voice Dispatch: Speaks automatically when temperature crosses 34°C
+    // Autonomous Voice Dispatch: Strictly limited to 2 times to prevent irritating user
     if (autoVoiceAlertEnabled && incomingWbgt >= 34.0) {
-      const now = Date.now();
-      if (now - lastSpokenTimestampRef.current > 15000 && !isSpeakingAirpods) {
-        lastSpokenTimestampRef.current = now;
-        setIsSpeakingAirpods(true);
-        void playAudibleBeaconAlert({
-          vendorName: 'Murugan (T. Nagar Cart #04)',
-          measuredWbgt: incomingWbgt,
-          nearestKioskMeters: 35,
-          exhaustTemp: incomingAmbient,
-          preferredLanguage: airpodsLang,
-        }).finally(() => {
-          setIsSpeakingAirpods(false);
-        });
+      if (autoAlertCount < 2) {
+        const now = Date.now();
+        if (now - lastSpokenTimestampRef.current > 8000 && !isSpeakingAirpods) {
+          lastSpokenTimestampRef.current = now;
+          setAutoAlertCount((prev) => prev + 1);
+          setIsSpeakingAirpods(true);
+          void playAudibleBeaconAlert({
+            vendorName: 'Murugan',
+            measuredWbgt: incomingWbgt,
+            nearestKioskMeters: 35,
+            exhaustTemp: incomingAmbient,
+            preferredLanguage: airpodsLang,
+          }).finally(() => {
+            setIsSpeakingAirpods(false);
+          });
+        }
       }
+    } else if (incomingWbgt < 34.0 && autoAlertCount > 0) {
+      // Cooled down to nominal range: reset counter so future spikes alert strictly twice
+      setAutoAlertCount(0);
     }
 
     const [ingestResult, ebResult] = await Promise.all([
@@ -319,6 +352,27 @@ export const LiveHardwareControl: React.FC = () => {
           >
             <Cpu className="w-3.5 h-3.5 text-sky-600" />
             <span>Virtual ESP32</span>
+          </button>
+
+          {/* Automatic Button to Trigger Whole Closed-Loop Pipeline */}
+          <button
+            type="button"
+            onClick={() => {
+              setAutoVoiceAlertEnabled(true);
+              setAutoAlertCount(0);
+              connectVirtualBridge();
+              void handleIncomingPacket({
+                node_id: 'ESP32_S3_CART_01',
+                wbgt: 36.8,
+                ambient_temp: 53.6,
+                token: 'un_hw_secure_ecc_p256_active',
+              });
+            }}
+            className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-mono text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md ring-2 ring-emerald-400/40"
+            title="Automatically run the whole closed-loop pipeline from ESP32 to AirPods and AWS IoT without errors"
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+            <span>⚡ Run Closed-Loop Pipeline</span>
           </button>
 
           {/* Step-by-Step Setup Guide Modal Toggle */}
@@ -552,40 +606,77 @@ export const LiveHardwareControl: React.FC = () => {
                 <Headphones className="w-3.5 h-3.5" />
                 <span>STEP 3 · AIRPODS VOICE ALERT</span>
               </div>
-              {/* Auto-Alert Switch: OFF by default */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (autoVoiceAlertEnabled) {
-                    stopAudibleBeaconAlert();
-                    setIsSpeakingAirpods(false);
-                  }
-                  setAutoVoiceAlertEnabled(!autoVoiceAlertEnabled);
-                }}
-                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors ${
-                  autoVoiceAlertEnabled
-                    ? 'bg-amber-400 text-slate-950 font-black ring-1 ring-amber-500'
-                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                }`}
-                title="When ON: automatically speaks when temperature crosses 34°C (with 45s cooldown). When OFF: only speaks when you click Play."
-              >
-                <span>Auto-Alert: {autoVoiceAlertEnabled ? 'ON' : 'OFF'}</span>
-              </button>
+              {/* Auto-Alert Switch with strict 2-times limit */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (autoVoiceAlertEnabled) {
+                      stopAudibleBeaconAlert();
+                      setIsSpeakingAirpods(false);
+                    }
+                    setAutoVoiceAlertEnabled(!autoVoiceAlertEnabled);
+                  }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors ${
+                    autoVoiceAlertEnabled
+                      ? autoAlertCount >= 2
+                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                        : 'bg-emerald-600 text-white font-black shadow-2xs'
+                      : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                  }`}
+                  title="Strictly alerts at most 2 times to prevent irritating user"
+                >
+                  <span>
+                    Auto: {autoVoiceAlertEnabled ? `ON (${autoAlertCount}/2)` : 'OFF'}
+                  </span>
+                </button>
+
+                {autoAlertCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAutoAlertCount(0);
+                      lastSpokenTimestampRef.current = 0;
+                    }}
+                    className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 cursor-pointer"
+                    title="Reset alert count back to 0/2"
+                  >
+                    ↺ Reset
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1 pt-0.5">
+            {autoAlertCount >= 2 && (
+              <div className="text-[10px] font-mono text-emerald-800 font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-300 flex items-center justify-between">
+                <span>✓ 2/2 Voice Alerts Dispatched (Strictly silenced to prevent user irritation)</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAutoAlertCount(0);
+                    lastSpokenTimestampRef.current = 0;
+                  }}
+                  className="underline text-emerald-900 hover:text-black cursor-pointer font-black"
+                >
+                  Test Again
+                </button>
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              <span className="text-[10px] font-mono text-slate-500 font-bold mr-1">Voice:</span>
               {(['ta-IN', 'en-IN', 'hi-IN'] as const).map((lang) => (
                 <button
                   key={lang}
                   type="button"
                   onClick={() => setAirpodsLang(lang)}
-                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold cursor-pointer ${
+                  className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold cursor-pointer transition-all ${
                     airpodsLang === lang
-                      ? 'bg-[#111827] text-amber-300'
+                      ? 'bg-[#111827] text-amber-300 ring-2 ring-amber-400/40 shadow-xs'
                       : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                   }`}
                 >
-                  {lang === 'ta-IN' ? 'தமிழ்' : lang === 'en-IN' ? 'EN' : 'हिंदी'}
+                  {lang === 'ta-IN' ? 'தமிழ் (Tamil)' : lang === 'en-IN' ? 'English (Indian)' : 'हिंदी (Hindi)'}
                 </button>
               ))}
 
@@ -593,7 +684,7 @@ export const LiveHardwareControl: React.FC = () => {
               <button
                 type="button"
                 onClick={handleToggleAirPodsAudio}
-                className={`ml-auto px-2.5 py-1 rounded text-white font-mono text-[10px] font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-all ${
+                className={`ml-auto px-3 py-1 rounded-lg text-white font-mono text-[10px] font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-all ${
                   isSpeakingAirpods
                     ? 'bg-rose-600 hover:bg-rose-700 ring-2 ring-rose-400 animate-pulse'
                     : 'bg-emerald-600 hover:bg-emerald-500'
@@ -604,6 +695,24 @@ export const LiveHardwareControl: React.FC = () => {
                 <span>{isSpeakingAirpods ? 'Stop Voice ⏹' : 'Play Voice Alert'}</span>
               </button>
             </div>
+
+            {/* Live Subtitle Transcript Banner */}
+            {activeSpeechInfo && (
+              <div className="p-2.5 rounded-xl bg-slate-900 border border-amber-400/60 text-white text-xs font-mono space-y-1 animate-fadeIn shadow-md">
+                <div className="flex items-center justify-between text-[10px] font-bold text-amber-400">
+                  <span className="flex items-center gap-1.5">
+                    <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                    Now Speaking ({activeSpeechInfo.lang === 'ta-IN' ? 'தமிழ்' : activeSpeechInfo.lang === 'hi-IN' ? 'हिंदी' : 'English'}):
+                  </span>
+                  <span className="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[9px] border border-slate-700">
+                    Alert {Math.min(autoAlertCount, 2)}/2 (Max 2 Times)
+                  </span>
+                </div>
+                <p className="text-emerald-300 font-medium text-xs leading-relaxed italic bg-black/40 p-1.5 rounded border border-slate-800">
+                  &ldquo;{activeSpeechInfo.text}&rdquo;
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
