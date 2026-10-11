@@ -134,3 +134,13 @@ export function playAudibleBeaconAlert(req: PollyDispatchRequest): Promise<void>
     window.speechSynthesis.speak(utterance);
   });
 }
+
+/**
+ * Immediately cancels and silences any active speech synthesis audio
+ */
+export function stopAudibleBeaconAlert(): void {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
