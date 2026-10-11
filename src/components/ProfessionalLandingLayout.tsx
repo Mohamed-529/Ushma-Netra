@@ -13,6 +13,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { NetraGuide } from './experience/NetraGuide';
+import { AutonomousPipelineWalkthrough } from './experience/AutonomousPipelineWalkthrough';
 import { GrandFinaleFooter } from './experience/GrandFinaleFooter';
 import { soundEngine } from '../utils/audioSynthesizer';
 
@@ -36,11 +37,13 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
   onNavigateTo = () => {},
   onSimulateSurge = () => {},
   isIntroRevealed = true,
+  onToggleMitigation,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [guideOpen, setGuideOpen] = useState<boolean>(false);
+  const [autoWalkthroughOpen, setAutoWalkthroughOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -57,6 +60,26 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
     setMobileMenuOpen(false);
     setToolsDropdownOpen(false);
   }, [location.pathname]);
+
+  // Global event listener to open guided tour or autonomous pipeline from anywhere (e.g., hero section)
+  useEffect(() => {
+    const handleOpenTour = () => setGuideOpen(true);
+    const handleCloseTour = () => setGuideOpen(false);
+    const handleOpenAuto = () => setAutoWalkthroughOpen(true);
+    const handleCloseAuto = () => setAutoWalkthroughOpen(false);
+
+    window.addEventListener('ushma_open_guide_tour', handleOpenTour);
+    window.addEventListener('ushma_close_guide_tour', handleCloseTour);
+    window.addEventListener('ushma_open_autonomous_walkthrough', handleOpenAuto);
+    window.addEventListener('ushma_close_autonomous_walkthrough', handleCloseAuto);
+
+    return () => {
+      window.removeEventListener('ushma_open_guide_tour', handleOpenTour);
+      window.removeEventListener('ushma_close_guide_tour', handleCloseTour);
+      window.removeEventListener('ushma_open_autonomous_walkthrough', handleOpenAuto);
+      window.removeEventListener('ushma_close_autonomous_walkthrough', handleCloseAuto);
+    };
+  }, []);
 
   // Close Tools dropdown when clicking outside
   useEffect(() => {
@@ -401,8 +424,17 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
         />
       </div>
 
-      {/* Floating 10-Step Interactive Netra Guide */}
+      {/* Floating 7-Step Interactive Netra Guide */}
       <NetraGuide isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
+
+      {/* Global Interactive Autonomous Closed-Loop Walkthrough Modal */}
+      <AutonomousPipelineWalkthrough
+        isOpen={autoWalkthroughOpen}
+        onClose={() => setAutoWalkthroughOpen(false)}
+        onMitigationApplied={() => {
+          if (onToggleMitigation) onToggleMitigation();
+        }}
+      />
     </div>
   );
 };

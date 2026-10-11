@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ThermalContrastCards } from './ThermalContrastCards';
 import { FluidThermalPlumeMesh } from './FluidThermalPlumeMesh';
-import { ArrowDown, Waves, Camera } from 'lucide-react';
+import { soundEngine } from '../../utils/audioSynthesizer';
+import { ArrowDown, Waves, Camera, Compass } from 'lucide-react';
 
 interface Props {
   onScrollToProblem: () => void;
@@ -122,20 +123,34 @@ export const WowHero: React.FC<Props> = ({
             </h1>
           </div>
 
-          {/* ONE Main Button to Interact Directly with the Impact Statement */}
+          {/* Main Action Group: Guided Tour & Inspect 3D Plume */}
           <div
-            className={`transition-all duration-1000 ease-out ${
+            className={`transition-all duration-1000 ease-out flex flex-wrap items-center justify-center gap-3 ${
               isIntroRevealed
                 ? 'opacity-100 translate-y-0 pointer-events-auto'
                 : 'opacity-0 translate-y-3 pointer-events-none'
             }`}
           >
             <button
-              onClick={handleInteractWithImpact}
-              className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-white hover:bg-[#F3F4F6] text-[#111827] font-bold text-base shadow-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
+              type="button"
+              onClick={() => {
+                soundEngine.playTone(580, 'sine', 0.12);
+                window.dispatchEvent(new CustomEvent('ushma_open_guide_tour'));
+              }}
+              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-white hover:bg-[#F3F4F6] text-[#111827] font-bold text-sm sm:text-base shadow-xl hover:shadow-2xl transition-all cursor-pointer whitespace-nowrap shrink-0 border border-slate-200"
+              title="Start complete 7-screen guided tour from Big Picture"
             >
-              <span>Inspect Live Street Canyon Plume</span>
-              <ArrowDown className="w-4 h-4 text-[#a8321a]" />
+              <Compass className="w-4 h-4 text-[#a8321a]" />
+              <span>Start 7-Screen Guided Tour</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleInteractWithImpact}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-all cursor-pointer whitespace-nowrap shrink-0 border border-white/15"
+            >
+              <span>Inspect 3D Plume Below</span>
+              <ArrowDown className="w-3.5 h-3.5 text-amber-400" />
             </button>
           </div>
         </div>
