@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Play,
@@ -7,16 +7,16 @@ import {
   Radio,
   Scale,
   ArrowRight,
-  Thermometer,
 } from 'lucide-react';
+import { FastTrailerModal } from './FastTrailerModal';
 
 interface ScrollDrivenShowcaseProps {
   onReplayIntro: () => void;
 }
 
-export const ScrollDrivenShowcase: React.FC<ScrollDrivenShowcaseProps> = ({
-  onReplayIntro,
-}) => {
+export const ScrollDrivenShowcase: React.FC<ScrollDrivenShowcaseProps> = () => {
+  const [trailerOpen, setTrailerOpen] = useState<boolean>(false);
+
   const corePillars = [
     {
       num: '01',
@@ -46,24 +46,26 @@ export const ScrollDrivenShowcase: React.FC<ScrollDrivenShowcaseProps> = ({
 
   return (
     <section id="how_it_works_summary" className="relative w-full py-20 sm:py-28 px-4 sm:px-8 lg:px-16 border-t border-[#d6cebe]">
-      {/* Persistent Sticky Floating "Play intro" Control Panel */}
+      {/* Persistent Sticky Floating "30s Fast Tour" Trailer Button */}
       <div className="fixed bottom-6 left-6 z-40">
         <button
-          onClick={() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setTimeout(() => {
-              onReplayIntro();
-            }, 350);
-          }}
+          type="button"
+          onClick={() => setTrailerOpen(true)}
           className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#0b1b2d]/95 hover:bg-[#162a42] text-white border border-slate-700/80 shadow-[0_10px_30px_rgba(11,27,45,0.28)] backdrop-blur-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 group"
-          title="Scroll to top and replay typewriter intro"
+          title="Watch full-screen 30-second platform trailer"
         >
           <span className="w-6 h-6 rounded-full bg-[#a8321a] text-white flex items-center justify-center group-hover:scale-105 transition-transform">
             <Play className="w-3 h-3 fill-current ml-0.5" />
           </span>
-          <span className="font-semibold tracking-tight pr-1">Play intro</span>
+          <span className="font-semibold tracking-tight pr-1">30s Fast Tour</span>
         </button>
       </div>
+
+      {/* Full-Screen 30-Second Trailer Showcase Modal */}
+      <FastTrailerModal
+        isOpen={trailerOpen}
+        onClose={() => setTrailerOpen(false)}
+      />
 
       {/* Single Clean Two-Column Block: Left = 4 Short Crisp Points, Right = Related Visual Picture */}
       <div className="max-w-7xl mx-auto">
