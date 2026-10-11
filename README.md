@@ -6,7 +6,7 @@ Ushma-Netra is a real-time urban micro-climate liability and autonomous cooling 
 
 Built for **Environmental Hacks (WeMakeDevs × AWS)** — **Track 02: Heat and Water**.
 
-**Live Application:** [https://ais-pre-pfxutv72qmazyb3yb4z5bg-194661539029.asia-southeast1.run.app](https://ais-pre-pfxutv72qmazyb3yb4z5bg-194661539029.asia-southeast1.run.app) · Public pages need no sign-in · Includes interactive **Guided Tour** in the top navbar.
+**Live on AWS Amplify:** [https://main.d27cssoy1swdcq.amplifyapp.com/](https://main.d27cssoy1swdcq.amplifyapp.com/) · Deployed on AWS Amplify Hosting (`amplify.yml`, stack `ushma-netra`) · Public pages need no sign-in · Includes interactive **Guided Tour** in the top navbar.
 
 | Metric | Measured / Audited in Ushma-Netra |
 |---|---|
@@ -81,6 +81,10 @@ Four engineering rules hold everywhere in Ushma-Netra:
 
 ## Architecture
 
+![Ushma-Netra architecture on AWS](docs/architecture.svg)
+
+<details><summary>Text version</summary>
+
 ```
  [ESP32-S3 Cart Sensor / Web Serial UART 115200 bps / Mobile Beacon]
          │
@@ -112,6 +116,8 @@ Four engineering rules hold everywhere in Ushma-Netra:
  [Statutory Section 133 CrPC Municipal Notice + Restorative Cooling Fund Allocation]
 ```
 
+</details>
+
 ### AWS in depth
 
 Every service is wired into the application routes and defined in our serverless deployment blueprint [`infra/template.yaml`](infra/template.yaml):
@@ -126,6 +132,7 @@ Every service is wired into the application routes and defined in our serverless
 | **Guardrails for Amazon Bedrock** | Anonymizes vendor phone numbers, Aadhaar IDs, and medical PHI (`Heart Rate`, `Blood Pressure`, `Syncope`) and blocks adversarial prompt injections (`set tax to 0`) | `AWS::Bedrock::Guardrail` (`gr-ushma-bedrock-enterprise-v2`) with `SensitiveInformationPolicyConfig` (`ANONYMIZE`) and prompt-attack filter | `infra/template.yaml` (`UshmaNetraBedrockGuardrail`), `server.ts` (`POST /api/ledger/guardrail-inspect`), `src/components/ThermalDebtLedger.tsx` |
 | **Amazon OpenSearch Serverless** | Vector k-NN search over municipal legal statutes (`Section 133 CrPC`, `NDMA Heat Action Plan §4.2`, `ASHRAE 90.1`) | `AWS::OpenSearchServerless::Collection` (`Type: VECTORSEARCH`, `ushma-municipal-statutes-rag`) returning similarity scores (`0.964`, `0.941`, `0.918`) | `infra/template.yaml` (`MunicipalCodeVectorCollection`), `server.ts` (`OPENSEARCH_MUNICIPAL_STATUTES`) |
 | **Amazon Polly & SNS / WhatsApp Gateway** | Generates audible Hindi (`hi-IN`), Tamil (`ta-IN`), and English (`en-IN`) voice warnings (`Kajal` Neural SSML) and AES-256-GCM signed WhatsApp/SMS dispatches | Neural SSML prosody generator + Web Speech/Audio fallback and rate-limited `/api/alerts/dispatch` gateway | `src/utils/pollyVoiceDispatch.ts`, `server.ts` (`POST /api/alerts/dispatch`), `src/pages/WatchlistPage.tsx` |
+| **AWS Amplify Hosting** | Serves the production WebGL + React application globally over CloudFront CDN with SPA `200` rewrite rules | Automated CI/CD build (`amplify.yml` on Node 22) live at [`https://main.d27cssoy1swdcq.amplifyapp.com/`](https://main.d27cssoy1swdcq.amplifyapp.com/) | `amplify.yml`, `public/_redirects` |
 | **AWS SAM & Least-Privilege IAM** | Defines the entire serverless stack with zero wildcard (`*`) IAM permissions | `Transform: AWS::Serverless-2016-10-31`, `EventBridgeRouterExecutionRole` scoped strictly to `!GetAtt` ARNs | `infra/template.yaml`, `tests/infra_compliance.test.ts` |
 
 ---
