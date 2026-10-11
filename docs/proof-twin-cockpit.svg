@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" width="100%" height="100%">
+  <defs>
+    <linearGradient id="twinBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#060a12"/>
+      <stop offset="50%" stop-color="#0d1627"/>
+      <stop offset="100%" stop-color="#070c18"/>
+    </linearGradient>
+    <style>
+      .cfd-stream { stroke-dasharray: 9 5; animation: streamFlow 0.75s linear infinite; }
+      .mqtt-pulse { animation: pulseGlow 1.5s ease-in-out infinite; }
+      @keyframes streamFlow { from { stroke-dashoffset: 28; } to { stroke-dashoffset: 0; } }
+      @keyframes pulseGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    </style>
+  </defs>
+
+  <rect width="1200" height="560" rx="18" fill="url(#twinBg)" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Top Navigation HUD -->
+  <rect x="18" y="18" width="1164" height="52" rx="12" fill="#0b1322" stroke="#1e293b" stroke-width="1.5"/>
+  <text x="38" y="49" fill="#ffffff" font-family="system-ui, sans-serif" font-size="16" font-weight="900">
+    PROOF OF WORK 01 • /twin — 3D STREET CANYON DIGITAL TWIN + ESP32 MQTT &amp; EVENTBRIDGE (~36ms)
+  </text>
+  <rect x="945" y="28" width="218" height="32" rx="8" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
+  <text x="1054" y="49" text-anchor="middle" fill="#6ee7b7" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">
+    ✕ SYSTEM ACTIVE: MISTING ON
+  </text>
+
+  <!-- Left Micro-Sidebar Rail -->
+  <g transform="translate(24, 90)">
+    <rect x="0" y="0" width="170" height="210" rx="14" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <text x="18" y="28" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10" font-weight="800">3D VIEWPORT LAYERS</text>
+    <rect x="14" y="42" width="142" height="42" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="85" y="68" text-anchor="middle" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">▣ MESH WIREFRAME</text>
+    <rect x="14" y="96" width="142" height="42" rx="8" fill="#451a03" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="85" y="122" text-anchor="middle" fill="#fbbf24" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">◉ FLIR THERMAL</text>
+    <rect x="14" y="150" width="142" height="42" rx="8" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+    <text x="85" y="176" text-anchor="middle" fill="#34d399" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">➤ CFD VECTORS</text>
+  </g>
+
+  <!-- Center 3D Canyon Isometric Wireframe + CFD Airflow -->
+  <g transform="translate(215, 86)">
+    <rect x="0" y="0" width="640" height="340" rx="16" fill="#080f1d" stroke="#1e3a8a" stroke-width="1.8"/>
+
+    <!-- Isometric Street Floor Grid -->
+    <polygon points="90,295 320,210 560,275 330,330" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+
+    <!-- Left Building Block (Vikas Surya Commercial Plaza) -->
+    <polygon points="85,95 235,55 235,245 85,295" fill="#111c33" stroke="#38bdf8" stroke-width="1.5"/>
+    <polygon points="235,55 295,85 295,270 235,245" fill="#0b1528" stroke="#0284c7" stroke-width="1.5"/>
+    <text x="160" y="125" text-anchor="middle" fill="#e2e8f0" font-family="ui-monospace, monospace" font-size="11" font-weight="800">VIKAS SURYA PLAZA</text>
+    <text x="160" y="143" text-anchor="middle" fill="#f59e0b" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700">64 Split + 6 VRF (638.4 kW)</text>
+
+    <!-- Right Building Block -->
+    <polygon points="420,110 545,75 545,255 420,290" fill="#111c33" stroke="#334155" stroke-width="1.5"/>
+
+    <!-- Animated 3D CFD Plume & Upward Deflection Vectors -->
+    <path d="M 275 185 C 330 140, 380 95, 450 45" fill="none" stroke="#38bdf8" stroke-width="4" class="cfd-stream"/>
+    <path d="M 275 210 C 335 165, 390 120, 465 65" fill="none" stroke="#10b981" stroke-width="3.5" class="cfd-stream"/>
+    <path d="M 275 235 C 325 235, 360 250, 385 268" fill="none" stroke="#f59e0b" stroke-width="2.5" class="cfd-stream"/>
+
+    <!-- Street Vendor Pushcart Node -->
+    <circle cx="385" cy="272" r="24" fill="#10b981" fill-opacity="0.25" stroke="#10b981" stroke-width="2"/>
+    <circle cx="385" cy="272" r="6" fill="#34d399" class="mqtt-pulse"/>
+    <text x="385" y="312" text-anchor="middle" fill="#6ee7b7" font-family="ui-monospace, monospace" font-size="11" font-weight="800">
+      ESP32 CART BEACON • 29.8°C WBGT
+    </text>
+  </g>
+
+  <!-- Right Live Telemetry Gauges -->
+  <g transform="translate(875, 86)">
+    <rect x="0" y="0" width="300" height="104" rx="12" fill="#0f172a" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="20" y="30" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="11" font-weight="700">EXHAUST INTAKE TEMP</text>
+    <text x="20" y="68" fill="#f87171" font-family="system-ui, sans-serif" font-size="34" font-weight="900">53.6°C</text>
+    <text x="20" y="88" fill="#fca5a5" font-family="ui-monospace, monospace" font-size="10.5">ASHRAE 638.4 kW Sensible Load</text>
+
+    <rect x="0" y="118" width="300" height="104" rx="12" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
+    <text x="20" y="148" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="11" font-weight="700">MITIGATED STREET WBGT</text>
+    <text x="20" y="186" fill="#34d399" font-family="system-ui, sans-serif" font-size="34" font-weight="900">29.8°C</text>
+    <text x="20" y="206" fill="#6ee7b7" font-family="ui-monospace, monospace" font-size="10.5">-7.0°C Drop via 45° Louver + Mist</text>
+
+    <rect x="0" y="236" width="300" height="104" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="20" y="266" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="11" font-weight="700">CANYON WIND VELOCITY</text>
+    <text x="20" y="304" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="34" font-weight="900">4.2 m/s</text>
+    <text x="20" y="324" fill="#7dd3fc" font-family="ui-monospace, monospace" font-size="10.5">Oke H/W = 2.15 Vortex Broken</text>
+  </g>
+
+  <!-- Bottom AWS IoT Core MQTT -> EventBridge Custom Bus Live Bar -->
+  <g transform="translate(24, 444)">
+    <rect x="0" y="0" width="1152" height="94" rx="14" fill="#0c162c" stroke="#f59e0b" stroke-width="1.8"/>
+    <text x="24" y="28" fill="#fbbf24" font-family="ui-monospace, monospace" font-size="12.5" font-weight="800">
+      ⚡ AWS IoT Core Sub-Second MQTT ──► Amazon EventBridge Custom Bus (ushma-netra-thermal-bus)
+    </text>
+    <text x="24" y="52" fill="#e2e8f0" font-family="ui-monospace, monospace" font-size="11.5">
+      Topic: ushma/delhi/canyon/telemetry  |  DetailType: "ThermalSpikeAlert"  |  EventId: eb-94f2a81c-7d3e  |  Fan-Out Latency: 36ms
+    </text>
+    <text x="24" y="74" fill="#34d399" font-family="ui-monospace, monospace" font-size="11">
+      ✓ Target 1: Watchlist Alert API (Polly Tamil/Hindi/EN Voice)   ✓ Target 2: 3D Digital Twin WebGL Plume Actuator   ✓ HMAC-SHA256 Verified
+    </text>
+    <rect x="935" y="24" width="195" height="44" rx="10" fill="#d97706"/>
+    <text x="1032" y="51" text-anchor="middle" fill="#ffffff" font-family="ui-monospace, monospace" font-size="12" font-weight="900">
+      FIRE MQTT SPIKE (&gt;50°C)
+    </text>
+  </g>
+</svg>

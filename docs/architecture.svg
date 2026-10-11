@@ -1,167 +1,348 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 800" width="100%" height="100%">
   <defs>
+    <!-- Deep Isometric Spatial Background -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0b1329"/>
-      <stop offset="50%" stop-color="#111d3b"/>
-      <stop offset="100%" stop-color="#091022"/>
+      <stop offset="0%" stop-color="#060b19"/>
+      <stop offset="50%" stop-color="#0d1730"/>
+      <stop offset="100%" stop-color="#050914"/>
     </linearGradient>
+
+    <!-- 3D Card Extrusion & Top Gradients -->
     <linearGradient id="cardGold" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#fef9e7"/>
-      <stop offset="100%" stop-color="#f7e7b4"/>
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="cardCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ecfeff"/>
+      <stop offset="100%" stop-color="#a5f3fc"/>
     </linearGradient>
     <linearGradient id="cardWhite" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
     </linearGradient>
+    <linearGradient id="laneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1d3d" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#091226" stop-opacity="0.92"/>
+    </linearGradient>
+
+    <!-- Glowing Drop Shadow for 3D Depth -->
+    <filter id="shadow3d" x="-10%" y="-10%" width="125%" height="135%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.65"/>
+    </filter>
+    <filter id="glowAmber" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="glowCyan" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Arrow Markers -->
     <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#94a3b8"/>
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
     </marker>
-    <marker id="arrowAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
       <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b"/>
     </marker>
+    <marker id="arrowEmerald" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/>
+    </marker>
+
+    <!-- Perspective Grid Pattern -->
+    <pattern id="isoGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.7" stroke-opacity="0.55"/>
+    </pattern>
+
+    <style>
+      .flow-amber {
+        stroke-dasharray: 8 6;
+        animation: dashMove 1.1s linear infinite;
+      }
+      .flow-cyan {
+        stroke-dasharray: 7 5;
+        animation: dashMove 0.9s linear infinite;
+      }
+      .flow-emerald {
+        stroke-dasharray: 9 6;
+        animation: dashMove 1.2s linear infinite;
+      }
+      .pulse-ring {
+        animation: ringPulse 2.2s ease-in-out infinite;
+      }
+      @keyframes dashMove {
+        from { stroke-dashoffset: 28; }
+        to { stroke-dashoffset: 0; }
+      }
+      @keyframes ringPulse {
+        0%, 100% { opacity: 0.35; }
+        50% { opacity: 0.95; }
+      }
+    </style>
   </defs>
 
-  <!-- Background -->
-  <rect width="1200" height="720" rx="18" fill="url(#bgGrad)"/>
+  <!-- Background Canvas + 3D Spatial Grid -->
+  <rect width="1240" height="800" rx="20" fill="url(#bgGrad)"/>
+  <rect width="1240" height="800" rx="20" fill="url(#isoGrid)"/>
 
-  <!-- Header -->
-  <text x="42" y="52" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900">
-    ऊष्मा-नेत्र • Ushma-Netra on AWS
-  </text>
-  <text x="42" y="78" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="14" font-weight="600">
-    Code flags the anomaly • 5m geofence tracks the beacon • Neptune attributes liability • Bedrock Guardrails redact PII
-  </text>
+  <!-- Top Header Banner -->
+  <g transform="translate(42, 26)">
+    <rect x="0" y="0" width="1156" height="68" rx="14" fill="#0b152c" stroke="#1e3a8a" stroke-width="1.5" filter="url(#shadow3d)"/>
+    <circle cx="28" cy="34" r="8" fill="#10b981" class="pulse-ring"/>
+    <circle cx="28" cy="34" r="4" fill="#34d399"/>
+    <text x="48" y="32" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="900" letter-spacing="0.5">
+      Ushma-Netra • Live 3D Serverless Architecture on AWS
+    </text>
+    <text x="48" y="54" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="13" font-weight="600">
+      Sub-Second MQTT (~36ms EventBridge Fan-Out)  ──►  5m Location Geofence  ──►  Neptune 3-Hop Graph  ──►  Bedrock Guardrails + RAG
+    </text>
+    <rect x="975" y="18" width="162" height="32" rx="8" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
+    <text x="1056" y="39" text-anchor="middle" fill="#6ee7b7" font-family="ui-monospace, monospace" font-size="12" font-weight="800">
+      $0.00/HR IDLE • LIVE
+    </text>
+  </g>
 
-  <!-- LANE 1: INGEST -->
-  <rect x="36" y="102" width="1128" height="175" rx="14" fill="#132042" fill-opacity="0.65" stroke="#283b6b" stroke-width="1.5"/>
-  <text x="56" y="128" fill="#f59e0b" font-family="ui-monospace, monospace" font-size="13" font-weight="800" letter-spacing="2">
-    1 • INGEST &amp; STREAMING TELEMETRY
-  </text>
-
-  <!-- Box 1.1: AWS IoT Core -->
-  <rect x="56" y="145" width="225" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="168" y="174" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">AWS IoT Core</text>
-  <text x="168" y="196" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(sub-second MQTT)</text>
-
-  <!-- Box 1.2: Kinesis Data Streams -->
-  <rect x="336" y="145" width="235" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="453" y="174" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">Kinesis Data Streams</text>
-  <text x="453" y="196" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(real-time data logs)</text>
-
-  <!-- Box 1.3: Managed Apache Flink -->
-  <rect x="626" y="145" width="240" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="746" y="174" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">Managed Apache Flink</text>
-  <text x="746" y="196" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(5-min sliding window avg)</text>
-
-  <!-- Box 1.4: DynamoDB + Streams -->
-  <rect x="920" y="145" width="224" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="1032" y="174" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">DynamoDB + Streams</text>
-  <text x="1032" y="196" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(critical anomaly trigger)</text>
-
-  <!-- Box 1.5: Open-Meteo + Landsat-9 LST -->
-  <rect x="336" y="226" width="235" height="38" rx="8" fill="url(#cardWhite)" stroke="#94a3b8" stroke-width="1.5"/>
-  <text x="453" y="250" text-anchor="middle" fill="#0f172a" font-family="ui-monospace, monospace" font-size="12" font-weight="700">Landsat-9 LST + Open-Meteo</text>
-
-  <!-- Arrows Lane 1 -->
-  <line x1="281" y1="179" x2="332" y2="179" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="571" y1="179" x2="622" y2="179" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="866" y1="179" x2="916" y2="179" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <path d="M 746 213 L 746 245 L 575 245" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- LANE 2: EVALUATE • LIABILITY -->
-  <rect x="36" y="298" width="1128" height="205" rx="14" fill="#132042" fill-opacity="0.65" stroke="#283b6b" stroke-width="1.5"/>
-  <text x="56" y="324" fill="#f59e0b" font-family="ui-monospace, monospace" font-size="13" font-weight="800" letter-spacing="2">
-    2 • EVALUATE • LIABILITY &amp; ENTERPRISE AI GOVERNANCE
+  <!-- ======================================================================= -->
+  <!-- LANE 1: SUB-SECOND IOT INGESTION & STREAMING TELEMETRY                  -->
+  <!-- ======================================================================= -->
+  <g filter="url(#shadow3d)">
+    <rect x="36" y="114" width="1168" height="190" rx="16" fill="url(#laneGrad)" stroke="#1e3a8a" stroke-width="1.8"/>
+    <!-- 3D Bottom Bevel Lip -->
+    <path d="M 46 304 L 1194 304" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.35"/>
+  </g>
+  <text x="58" y="142" fill="#f59e0b" font-family="ui-monospace, monospace" font-size="13" font-weight="800" letter-spacing="2">
+    LAYER 01 • SUB-SECOND HARDWARE INGESTION &amp; STREAMING TELEMETRY (~36MS FAN-OUT)
   </text>
 
-  <!-- Box 2.1: Location Service -->
-  <rect x="56" y="342" width="225" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="168" y="371" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">Location Service</text>
-  <text x="168" y="393" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(5m AC exhaust ring)</text>
+  <!-- 3D Box 1.1: AWS IoT Core -->
+  <g filter="url(#shadow3d)">
+    <rect x="60" y="166" width="230" height="72" rx="11" fill="#b45309"/>
+    <rect x="56" y="158" width="230" height="72" rx="11" fill="url(#cardGold)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="171" y="188" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">AWS IoT Core</text>
+    <text x="171" y="208" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">ESP32 MQTT • 115200 UART</text>
+    <text x="171" y="222" text-anchor="middle" fill="#b45309" font-family="ui-monospace, monospace" font-size="10" font-weight="800">ushma/+/canyon/telemetry</text>
+  </g>
 
-  <!-- Box 2.2: Neptune Serverless -->
-  <rect x="336" y="342" width="235" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="453" y="371" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">Neptune Serverless</text>
-  <text x="453" y="393" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(3-vertex liability graph)</text>
+  <!-- 3D Box 1.2: EventBridge Custom Bus -->
+  <g filter="url(#shadow3d)">
+    <rect x="352" y="166" width="242" height="72" rx="11" fill="#b45309"/>
+    <rect x="348" y="158" width="242" height="72" rx="11" fill="url(#cardGold)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="469" y="188" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">EventBridge Custom Bus</text>
+    <text x="469" y="208" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">ushma-netra-thermal-bus</text>
+    <text x="469" y="222" text-anchor="middle" fill="#b45309" font-family="ui-monospace, monospace" font-size="10" font-weight="800">PutEventsCommand • ~36ms</text>
+  </g>
 
-  <!-- Box 2.3: Bedrock Agents -->
-  <rect x="626" y="342" width="240" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="746" y="371" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">Bedrock Agents</text>
-  <text x="746" y="393" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(automated legal citation)</text>
+  <!-- 3D Box 1.3: Kinesis + Apache Flink -->
+  <g filter="url(#shadow3d)">
+    <rect x="654" y="166" width="242" height="72" rx="11" fill="#0e7490"/>
+    <rect x="650" y="158" width="242" height="72" rx="11" fill="url(#cardCyan)" stroke="#06b6d4" stroke-width="2"/>
+    <text x="771" y="188" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">Kinesis + Apache Flink</text>
+    <text x="771" y="208" text-anchor="middle" fill="#155e75" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">5-min sliding WBGT window</text>
+    <text x="771" y="222" text-anchor="middle" fill="#0e7490" font-family="ui-monospace, monospace" font-size="10" font-weight="800">53.6°C Exhaust Jet Check</text>
+  </g>
 
-  <!-- Box 2.4: Bedrock Guardrails -->
-  <rect x="920" y="342" width="224" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="1032" y="371" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">Bedrock Guardrails</text>
-  <text x="1032" y="393" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(PII scrub • firewall block)</text>
+  <!-- 3D Box 1.4: DynamoDB + Streams -->
+  <g filter="url(#shadow3d)">
+    <rect x="954" y="166" width="224" height="72" rx="11" fill="#b45309"/>
+    <rect x="950" y="158" width="224" height="72" rx="11" fill="url(#cardGold)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="1062" y="188" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">DynamoDB + Streams</text>
+    <text x="1062" y="208" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">NEW_AND_OLD_IMAGES</text>
+    <text x="1062" y="222" text-anchor="middle" fill="#b45309" font-family="ui-monospace, monospace" font-size="10" font-weight="800">PAY_PER_REQUEST • PITR</text>
+  </g>
 
-  <!-- Box 2.5: OpenSearch Serverless Vector -->
-  <rect x="56" y="424" width="225" height="64" rx="10" fill="url(#cardWhite)" stroke="#94a3b8" stroke-width="1.5"/>
-  <text x="168" y="452" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="14" font-weight="800">OpenSearch Serverless</text>
-  <text x="168" y="472" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(k-NN statute vectors)</text>
+  <!-- Box 1.5: Landsat-9 + Rekognition CV -->
+  <g filter="url(#shadow3d)">
+    <rect x="348" y="248" width="544" height="40" rx="9" fill="url(#cardWhite)" stroke="#64748b" stroke-width="1.5"/>
+    <text x="620" y="273" text-anchor="middle" fill="#0f172a" font-family="ui-monospace, monospace" font-size="12" font-weight="800">
+      Landsat-9 TIR Band 10 + Rekognition Façade CV (64 Split ACs + 6 VRF = 638.4 kW Rejected Heat)
+    </text>
+  </g>
 
-  <!-- Box 2.6: Statutory Matching -->
-  <rect x="336" y="424" width="235" height="64" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="453" y="452" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="14" font-weight="800">OpenSearch RAG</text>
-  <text x="453" y="472" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(Sec 133 CrPC • NDMA §4.2)</text>
+  <!-- Animated Live Arrows in Lane 1 -->
+  <path id="lane1_a1" d="M 286 194 L 344 194" fill="none" stroke="#334155" stroke-width="3"/>
+  <path d="M 286 194 L 344 194" fill="none" stroke="#f59e0b" stroke-width="3" class="flow-amber" marker-end="url(#arrowAmber)"/>
+  <circle r="4.5" fill="#fbbf24" filter="url(#glowAmber)">
+    <animateMotion dur="1.1s" repeatCount="indefinite" path="M 286 194 L 344 194"/>
+  </circle>
 
-  <!-- Box 2.7: Audit Layer -->
-  <rect x="626" y="424" width="240" height="64" rx="10" fill="url(#cardWhite)" stroke="#94a3b8" stroke-width="1.5"/>
-  <text x="746" y="452" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="14" font-weight="800">Cedar &amp; Audit Layer</text>
-  <text x="746" y="472" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(append-only HMAC ledger)</text>
+  <path id="lane1_a2" d="M 590 194 L 646 194" fill="none" stroke="#334155" stroke-width="3"/>
+  <path d="M 590 194 L 646 194" fill="none" stroke="#38bdf8" stroke-width="3" class="flow-cyan" marker-end="url(#arrow)"/>
+  <circle r="4.5" fill="#38bdf8" filter="url(#glowCyan)">
+    <animateMotion dur="1.1s" repeatCount="indefinite" path="M 590 194 L 646 194"/>
+  </circle>
 
-  <!-- Box 2.8: Cognito + SSM -->
-  <rect x="920" y="424" width="106" height="64" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="973" y="450" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="13" font-weight="800">Cognito +</text>
-  <text x="973" y="470" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11">signed link</text>
+  <path id="lane1_a3" d="M 892 194 L 946 194" fill="none" stroke="#334155" stroke-width="3"/>
+  <path d="M 892 194 L 946 194" fill="none" stroke="#f59e0b" stroke-width="3" class="flow-amber" marker-end="url(#arrowAmber)"/>
+  <circle r="4.5" fill="#fbbf24" filter="url(#glowAmber)">
+    <animateMotion dur="1.1s" repeatCount="indefinite" path="M 892 194 L 946 194"/>
+  </circle>
 
-  <rect x="1038" y="424" width="106" height="64" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="1091" y="446" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="12" font-weight="800">SSM</text>
-  <text x="1091" y="462" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="12" font-weight="800">Parameter</text>
-  <text x="1091" y="478" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11">Store</text>
-
-  <!-- Connector from DynamoDB Streams to Neptune Serverless -->
-  <path d="M 1032 213 C 1032 280, 453 275, 453 338" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowAmber)"/>
-
-  <!-- Arrows Lane 2 -->
-  <line x1="281" y1="376" x2="332" y2="376" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="571" y1="376" x2="622" y2="376" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="866" y1="376" x2="916" y2="376" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="336" y1="456" x2="285" y2="456" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- LANE 3: ALERTS • WORKBENCH -->
-  <rect x="36" y="524" width="1128" height="168" rx="14" fill="#132042" fill-opacity="0.65" stroke="#283b6b" stroke-width="1.5"/>
-  <text x="56" y="550" fill="#f59e0b" font-family="ui-monospace, monospace" font-size="13" font-weight="800" letter-spacing="2">
-    3 • ALERTS • 3D DIGITAL TWIN WORKBENCH
+  <!-- ======================================================================= -->
+  <!-- LANE 2: SPATIAL GEOFENCING, NEPTUNE 3-HOP GRAPH & BEDROCK GUARDRAILS    -->
+  <!-- ======================================================================= -->
+  <g filter="url(#shadow3d)">
+    <rect x="36" y="328" width="1168" height="232" rx="16" fill="url(#laneGrad)" stroke="#1e3a8a" stroke-width="1.8"/>
+    <path d="M 46 560 L 1194 560" stroke="#f59e0b" stroke-width="2" stroke-opacity="0.35"/>
+  </g>
+  <text x="58" y="356" fill="#f59e0b" font-family="ui-monospace, monospace" font-size="13" font-weight="800" letter-spacing="2">
+    LAYER 02 • SPATIAL GEOFENCING • NEPTUNE 3-HOP LIABILITY GRAPH &amp; BEDROCK AI FIREWALL
   </text>
 
-  <!-- Box 3.1: Amplify Hosting -->
-  <rect x="56" y="566" width="225" height="64" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="168" y="593" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">Amplify Hosting</text>
-  <text x="168" y="613" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(3D twin cockpit view)</text>
+  <!-- 3D Box 2.1: Amazon Location Service -->
+  <g filter="url(#shadow3d)">
+    <rect x="60" y="380" width="230" height="72" rx="11" fill="#0e7490"/>
+    <rect x="56" y="372" width="230" height="72" rx="11" fill="url(#cardCyan)" stroke="#06b6d4" stroke-width="2"/>
+    <text x="171" y="400" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">Amazon Location Service</text>
+    <text x="171" y="420" text-anchor="middle" fill="#155e75" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">5.0m Exhaust Geofence</text>
+    <text x="171" y="435" text-anchor="middle" fill="#0e7490" font-family="ui-monospace, monospace" font-size="10" font-weight="800">BatchEvaluateGeofences</text>
+  </g>
 
-  <!-- Box 3.2: Events -->
-  <rect x="336" y="566" width="235" height="64" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="453" y="593" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">Polly + SNS Events</text>
-  <text x="453" y="613" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(Hindi • Tamil • EN voice)</text>
+  <!-- 3D Box 2.2: Amazon Neptune Serverless -->
+  <g filter="url(#shadow3d)">
+    <rect x="352" y="380" width="242" height="72" rx="11" fill="#b45309"/>
+    <rect x="348" y="372" width="242" height="72" rx="11" fill="url(#cardGold)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="469" y="400" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">Neptune Serverless</text>
+    <text x="469" y="420" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">OpenCypher 3-Hop Graph</text>
+    <text x="469" y="435" text-anchor="middle" fill="#b45309" font-family="ui-monospace, monospace" font-size="10" font-weight="800">Cart ➔ Vent ➔ Corporation</text>
+  </g>
 
-  <!-- Box 3.3: API Gateway (WS) -->
-  <rect x="626" y="566" width="240" height="64" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="746" y="593" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">API Gateway (WS)</text>
-  <text x="746" y="613" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(sub-second UI updates)</text>
+  <!-- 3D Box 2.3: Bedrock Legal Agent -->
+  <g filter="url(#shadow3d)">
+    <rect x="654" y="380" width="242" height="72" rx="11" fill="#b45309"/>
+    <rect x="650" y="372" width="242" height="72" rx="11" fill="url(#cardGold)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="771" y="400" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">Bedrock Legal Agent</text>
+    <text x="771" y="420" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">Sec 133 CrPC Order Draft</text>
+    <text x="771" y="435" text-anchor="middle" fill="#b45309" font-family="ui-monospace, monospace" font-size="10" font-weight="800">Restorative Surcharge Math</text>
+  </g>
 
-  <!-- Box 3.4: EventBridge Custom Bus -->
-  <rect x="920" y="566" width="224" height="64" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
-  <text x="1032" y="593" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="800">EventBridge Custom Bus</text>
-  <text x="1032" y="613" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="12">(ushma-netra-thermal-bus)</text>
+  <!-- 3D Box 2.4: Bedrock Guardrails -->
+  <g filter="url(#shadow3d)">
+    <rect x="954" y="380" width="224" height="72" rx="11" fill="#047857"/>
+    <rect x="950" y="372" width="224" height="72" rx="11" fill="url(#cardGold)" stroke="#10b981" stroke-width="2.2"/>
+    <text x="1062" y="400" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">Bedrock Guardrails</text>
+    <text x="1062" y="420" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">PII &amp; PHI Redaction</text>
+    <text x="1062" y="435" text-anchor="middle" fill="#047857" font-family="ui-monospace, monospace" font-size="10" font-weight="800">Blocks Prompt Injection</text>
+  </g>
 
-  <!-- Box 3.5: WhatsApp, Slack & SMS -->
-  <rect x="56" y="640" width="225" height="40" rx="8" fill="url(#cardWhite)" stroke="#94a3b8" stroke-width="1.5"/>
-  <text x="168" y="665" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="13" font-weight="800">WhatsApp, Slack &amp; SMS</text>
+  <!-- Row 2B: OpenSearch Vector + RAG + Audit + IAM -->
+  <g filter="url(#shadow3d)">
+    <rect x="56" y="468" width="230" height="68" rx="10" fill="url(#cardWhite)" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="171" y="496" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="14" font-weight="900">OpenSearch Serverless</text>
+    <text x="171" y="516" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">k-NN Statute Vector Store</text>
 
-  <!-- Arrows Lane 3 -->
-  <line x1="453" y1="488" x2="453" y2="562" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="281" y1="598" x2="332" y2="598" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="571" y1="598" x2="622" y2="598" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="866" y1="598" x2="916" y2="598" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <path d="M 1032 630 L 1032 660 L 285 660" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowAmber)"/>
+    <rect x="348" y="468" width="242" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
+    <text x="469" y="496" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="14" font-weight="900">OpenSearch Legal RAG</text>
+    <text x="469" y="516" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">Sec 133 CrPC • NDMA §4.2</text>
+
+    <rect x="650" y="468" width="242" height="68" rx="10" fill="url(#cardWhite)" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="771" y="496" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="14" font-weight="900">HMAC-SHA256 Enclave</text>
+    <text x="771" y="516" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">ATECC608B Hardware Verify</text>
+
+    <rect x="950" y="468" width="224" height="68" rx="10" fill="url(#cardGold)" stroke="#d97706" stroke-width="2"/>
+    <text x="1062" y="496" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="14" font-weight="900">SAM Least-Privilege IAM</text>
+    <text x="1062" y="516" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">Zero Wildcards (*) Audited</text>
+  </g>
+
+  <!-- Big Curved Animated Stream: DynamoDB Streams -> Neptune Serverless -->
+  <path d="M 1062 236 C 1062 315, 469 305, 469 368" fill="none" stroke="#1e293b" stroke-width="4"/>
+  <path d="M 1062 236 C 1062 315, 469 305, 469 368" fill="none" stroke="#f59e0b" stroke-width="3" class="flow-amber" marker-end="url(#arrowAmber)"/>
+  <circle r="5.5" fill="#fbbf24" filter="url(#glowAmber)">
+    <animateMotion dur="2.2s" repeatCount="indefinite" path="M 1062 236 C 1062 315, 469 305, 469 368"/>
+  </circle>
+
+  <!-- Animated Live Arrows in Lane 2 -->
+  <path d="M 286 408 L 344 408" fill="none" stroke="#38bdf8" stroke-width="3" class="flow-cyan" marker-end="url(#arrow)"/>
+  <circle r="4.5" fill="#38bdf8" filter="url(#glowCyan)">
+    <animateMotion dur="1.0s" repeatCount="indefinite" path="M 286 408 L 344 408"/>
+  </circle>
+
+  <path d="M 590 408 L 646 408" fill="none" stroke="#f59e0b" stroke-width="3" class="flow-amber" marker-end="url(#arrowAmber)"/>
+  <circle r="4.5" fill="#fbbf24" filter="url(#glowAmber)">
+    <animateMotion dur="1.0s" repeatCount="indefinite" path="M 590 408 L 646 408"/>
+  </circle>
+
+  <path d="M 892 408 L 946 408" fill="none" stroke="#10b981" stroke-width="3" class="flow-emerald" marker-end="url(#arrowEmerald)"/>
+  <circle r="4.5" fill="#34d399" filter="url(#glowCyan)">
+    <animateMotion dur="1.0s" repeatCount="indefinite" path="M 892 408 L 946 408"/>
+  </circle>
+
+  <path d="M 286 502 L 344 502" fill="none" stroke="#38bdf8" stroke-width="2.5" class="flow-cyan" marker-end="url(#arrow)"/>
+
+  <!-- ======================================================================= -->
+  <!-- LANE 3: MULTILINGUAL VOICE ALERTS & 3D DIGITAL TWIN ACTUATION           -->
+  <!-- ======================================================================= -->
+  <g filter="url(#shadow3d)">
+    <rect x="36" y="584" width="1168" height="184" rx="16" fill="url(#laneGrad)" stroke="#1e3a8a" stroke-width="1.8"/>
+    <path d="M 46 768 L 1194 768" stroke="#10b981" stroke-width="2" stroke-opacity="0.4"/>
+  </g>
+  <text x="58" y="612" fill="#f59e0b" font-family="ui-monospace, monospace" font-size="13" font-weight="800" letter-spacing="2">
+    LAYER 03 • MULTILINGUAL ALERTS (TAMIL • HINDI • ENGLISH) &amp; 3D DIGITAL TWIN COOLING ACTUATION
+  </text>
+
+  <!-- 3D Box 3.1: AWS Amplify Hosting -->
+  <g filter="url(#shadow3d)">
+    <rect x="60" y="636" width="230" height="72" rx="11" fill="#047857"/>
+    <rect x="56" y="628" width="230" height="72" rx="11" fill="url(#cardGold)" stroke="#10b981" stroke-width="2"/>
+    <text x="171" y="656" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">AWS Amplify Hosting</text>
+    <text x="171" y="676" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">3D WebGL Digital Twin</text>
+    <text x="171" y="691" text-anchor="middle" fill="#047857" font-family="ui-monospace, monospace" font-size="10" font-weight="800">45° Louvers + 70-Bar Mist</text>
+  </g>
+
+  <!-- 3D Box 3.2: Amazon Polly + SNS -->
+  <g filter="url(#shadow3d)">
+    <rect x="352" y="636" width="242" height="72" rx="11" fill="#b45309"/>
+    <rect x="348" y="628" width="242" height="72" rx="11" fill="url(#cardGold)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="469" y="656" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">Amazon Polly + SNS</text>
+    <text x="469" y="676" text-anchor="middle" fill="#334155" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">Tamil • Hindi • EN Voice</text>
+    <text x="469" y="691" text-anchor="middle" fill="#b45309" font-family="ui-monospace, monospace" font-size="10" font-weight="800">Cart Speaker + WhatsApp</text>
+  </g>
+
+  <!-- 3D Box 3.3: API Gateway + Express -->
+  <g filter="url(#shadow3d)">
+    <rect x="654" y="636" width="242" height="72" rx="11" fill="#0e7490"/>
+    <rect x="650" y="628" width="242" height="72" rx="11" fill="url(#cardCyan)" stroke="#06b6d4" stroke-width="2"/>
+    <text x="771" y="656" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">API Gateway &amp; Express</text>
+    <text x="771" y="676" text-anchor="middle" fill="#155e75" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700">Token-Bucket Rate Limiter</text>
+    <text x="771" y="691" text-anchor="middle" fill="#0e7490" font-family="ui-monospace, monospace" font-size="10" font-weight="800">LRU Coalesced Cache</text>
+  </g>
+
+  <!-- 3D Box 3.4: Street Cooling Outcome -->
+  <g filter="url(#shadow3d)">
+    <rect x="954" y="636" width="224" height="72" rx="11" fill="#047857"/>
+    <rect x="950" y="628" width="224" height="72" rx="11" fill="url(#cardCyan)" stroke="#10b981" stroke-width="2.2"/>
+    <text x="1062" y="656" text-anchor="middle" fill="#0f172a" font-family="system-ui, sans-serif" font-size="15" font-weight="900">Street Canyon Cooled</text>
+    <text x="1062" y="676" text-anchor="middle" fill="#065f46" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">36.8°C ➔ 29.8°C WBGT</text>
+    <text x="1062" y="691" text-anchor="middle" fill="#047857" font-family="ui-monospace, monospace" font-size="10" font-weight="800">-7.0°C Wet-Bulb Relief</text>
+  </g>
+
+  <!-- Animated Connector from Layer 2 to Layer 3 -->
+  <path d="M 469 536 L 469 624" fill="none" stroke="#f59e0b" stroke-width="3" class="flow-amber" marker-end="url(#arrowAmber)"/>
+  <circle r="4.5" fill="#fbbf24" filter="url(#glowAmber)">
+    <animateMotion dur="1.1s" repeatCount="indefinite" path="M 469 536 L 469 624"/>
+  </circle>
+
+  <!-- Animated Live Arrows in Lane 3 -->
+  <path d="M 286 664 L 344 664" fill="none" stroke="#10b981" stroke-width="3" class="flow-emerald" marker-end="url(#arrowEmerald)"/>
+  <circle r="4.5" fill="#34d399" filter="url(#glowCyan)">
+    <animateMotion dur="1.1s" repeatCount="indefinite" path="M 286 664 L 344 664"/>
+  </circle>
+
+  <path d="M 590 664 L 646 664" fill="none" stroke="#38bdf8" stroke-width="3" class="flow-cyan" marker-end="url(#arrow)"/>
+  <circle r="4.5" fill="#38bdf8" filter="url(#glowCyan)">
+    <animateMotion dur="1.1s" repeatCount="indefinite" path="M 590 664 L 646 664"/>
+  </circle>
+
+  <path d="M 892 664 L 946 664" fill="none" stroke="#10b981" stroke-width="3" class="flow-emerald" marker-end="url(#arrowEmerald)"/>
+  <circle r="4.5" fill="#34d399" filter="url(#glowCyan)">
+    <animateMotion dur="1.1s" repeatCount="indefinite" path="M 892 664 L 946 664"/>
+  </circle>
+
+  <!-- Bottom Return Feedback Loop -->
+  <path d="M 1062 708 L 1062 742 L 171 742 L 171 708" fill="none" stroke="#10b981" stroke-width="2.5" class="flow-emerald" marker-end="url(#arrowEmerald)"/>
+  <circle r="4.5" fill="#34d399" filter="url(#glowCyan)">
+    <animateMotion dur="3.4s" repeatCount="indefinite" path="M 1062 708 L 1062 742 L 171 742 L 171 708"/>
+  </circle>
+  <text x="616" y="735" text-anchor="middle" fill="#6ee7b7" font-family="ui-monospace, monospace" font-size="11" font-weight="800">
+    CLOSED-LOOP AUTONOMOUS RESTITUTION • SURCHARGE FUNDS 45° LOUVERS &amp; MISTING KIOSKS (-65% TAX REBATE ON COMPLIANCE)
+  </text>
 </svg>

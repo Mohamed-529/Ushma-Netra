@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gridBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#060b16"/>
+      <stop offset="100%" stop-color="#0b1528"/>
+    </linearGradient>
+    <style>
+      .ring-pulse { animation: pulseGeo 1.6s ease-in-out infinite; }
+      @keyframes pulseGeo { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.3; } }
+    </style>
+  </defs>
+
+  <rect width="1200" height="520" rx="18" fill="url(#gridBg)" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Header -->
+  <rect x="18" y="18" width="1164" height="52" rx="12" fill="#0b1322" stroke="#1e293b" stroke-width="1.5"/>
+  <text x="38" y="49" fill="#ffffff" font-family="system-ui, sans-serif" font-size="16" font-weight="900">
+    PROOF OF WORK 03 • /grid &amp; /scanner — AMAZON LOCATION 5m GEOFENCING + AI FAÇADE CV SCANNER
+  </text>
+  <rect x="915" y="28" width="248" height="32" rx="8" fill="#450a0a" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="1039" y="49" text-anchor="middle" fill="#fca5a5" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">
+    GEOFENCE: CRITICAL_VIOLATION
+  </text>
+
+  <!-- Left Panel: /grid Amazon Location Service 5.0m Geofence Evaluator -->
+  <g transform="translate(24, 88)">
+    <rect x="0" y="0" width="564" height="408" rx="14" fill="#0b1322" stroke="#38bdf8" stroke-width="1.6"/>
+    <text x="22" y="32" fill="#38bdf8" font-family="ui-monospace, monospace" font-size="12.5" font-weight="800">
+      /grid • AMAZON LOCATION SERVICE (BatchEvaluateGeofencesCommand)
+    </text>
+
+    <!-- Spatial Radar Map View -->
+    <rect x="22" y="48" width="520" height="232" rx="12" fill="#070d19" stroke="#1e293b" stroke-width="1.5"/>
+    <!-- 5m Geofence Polygon Envelope -->
+    <circle cx="240" cy="164" r="82" fill="#ef4444" fill-opacity="0.16" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="8 5" class="ring-pulse"/>
+    <circle cx="240" cy="164" r="42" fill="#ef4444" fill-opacity="0.28" stroke="#f97316" stroke-width="1.8"/>
+    <text x="240" y="102" text-anchor="middle" fill="#fca5a5" font-family="ui-monospace, monospace" font-size="10.5" font-weight="800">
+      5.0m HVAC EXHAUST GEOFENCE (GF-VIKAS-SURYA-AC-02)
+    </text>
+
+    <!-- Vendor Cart Inside Plume (1.8m) -->
+    <circle cx="258" cy="172" r="8" fill="#fbbf24" stroke="#ffffff" stroke-width="2"/>
+    <text x="258" y="198" text-anchor="middle" fill="#fef08a" font-family="ui-monospace, monospace" font-size="11" font-weight="800">
+      Cart VN-DEL-084 (1.8m • 38.2°C WBGT)
+    </text>
+
+    <!-- Safe Zone Reference Point (14.8m) -->
+    <circle cx="465" cy="164" r="7" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+    <text x="465" y="190" text-anchor="middle" fill="#6ee7b7" font-family="ui-monospace, monospace" font-size="10.5" font-weight="800">
+      Safe Kiosk (14.8m)
+    </text>
+
+    <!-- SDK Response Telemetry -->
+    <rect x="22" y="294" width="520" height="94" rx="10" fill="#060a12" stroke="#334155" stroke-width="1.2"/>
+    <text x="36" y="318" fill="#e2e8f0" font-family="ui-monospace, monospace" font-size="11" font-weight="700">
+      Collection: UshmaNetraExhaustCollection  |  Coord: [77.1332, 28.6291]
+    </text>
+    <text x="36" y="340" fill="#f87171" font-family="ui-monospace, monospace" font-size="11" font-weight="800">
+      Status: CRITICAL_VIOLATION (1.8m &lt; 5.0m Threshold) • Action: Trigger Polly + EventBridge
+    </text>
+    <text x="36" y="364" fill="#94a3b8" font-family="ui-monospace, monospace" font-size="10.5">
+      10 Audited Corridors: Delhi NCR • Chennai (T. Nagar) • Mumbai • Bengaluru • Ahmedabad
+    </text>
+  </g>
+
+  <!-- Right Panel: /scanner AI Facade Computer Vision Scanner -->
+  <g transform="translate(612, 88)">
+    <rect x="0" y="0" width="564" height="408" rx="14" fill="#0b1322" stroke="#f59e0b" stroke-width="1.6"/>
+    <text x="22" y="32" fill="#fbbf24" font-family="ui-monospace, monospace" font-size="12.5" font-weight="800">
+      /scanner • AI FAÇADE CV CONDENSER DETECTOR (97.4% CONFIDENCE)
+    </text>
+
+    <!-- Simulated Building Facade with CV Bounding Boxes -->
+    <rect x="22" y="48" width="520" height="232" rx="12" fill="#09111f" stroke="#334155" stroke-width="1.5"/>
+
+    <!-- Grid of Detected Split AC Bounding Boxes -->
+    <g stroke="#ef4444" stroke-width="2" fill="#ef4444" fill-opacity="0.15">
+      <rect x="46" y="72" width="88" height="54" rx="4"/>
+      <rect x="150" y="72" width="88" height="54" rx="4"/>
+      <rect x="254" y="72" width="88" height="54" rx="4"/>
+      <rect x="46" y="142" width="88" height="54" rx="4"/>
+      <rect x="150" y="142" width="88" height="54" rx="4"/>
+      <rect x="254" y="142" width="88" height="54" rx="4"/>
+    </g>
+    <!-- VRF Multi-Split Commercial Bank Bounding Boxes -->
+    <g stroke="#f59e0b" stroke-width="2.2" fill="#f59e0b" fill-opacity="0.18">
+      <rect x="366" y="72" width="152" height="124" rx="6"/>
+    </g>
+
+    <text x="90" y="103" text-anchor="middle" fill="#fca5a5" font-family="ui-monospace, monospace" font-size="10" font-weight="800">SPLIT AC 98%</text>
+    <text x="194" y="103" text-anchor="middle" fill="#fca5a5" font-family="ui-monospace, monospace" font-size="10" font-weight="800">SPLIT AC 97%</text>
+    <text x="298" y="103" text-anchor="middle" fill="#fca5a5" font-family="ui-monospace, monospace" font-size="10" font-weight="800">SPLIT AC 99%</text>
+    <text x="442" y="132" text-anchor="middle" fill="#fde68a" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">6x VRF BANK (98.4%)</text>
+    <text x="442" y="152" text-anchor="middle" fill="#fbbf24" font-family="ui-monospace, monospace" font-size="10">48 TR Commercial</text>
+
+    <text x="282" y="232" text-anchor="middle" fill="#34d399" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">
+      DETECTED: 64 SPLIT ACs + 6 VRF STACKS = 144 TR COOLING CAPACITY
+    </text>
+    <text x="282" y="256" text-anchor="middle" fill="#f87171" font-family="ui-monospace, monospace" font-size="11.5" font-weight="800">
+      REJECTED SENSIBLE HEAT: 638.4 kW (≡ 319 SPACE HEATERS IN ALLEY)
+    </text>
+
+    <!-- Bottom Physics Conversion Box -->
+    <rect x="22" y="294" width="520" height="94" rx="10" fill="#060a12" stroke="#334155" stroke-width="1.2"/>
+    <text x="36" y="318" fill="#fbbf24" font-family="ui-monospace, monospace" font-size="11" font-weight="800">
+      FIRST LAW OF THERMODYNAMICS: Q_rejected = Q_cooling + W_compressor (4.4 kW / TR)
+    </text>
+    <text x="36" y="340" fill="#e2e8f0" font-family="ui-monospace, monospace" font-size="11">
+      • Street Plume Delta: +6.6°C above IMD Baseline   • Exhaust Face Velocity: 6.8 m/s
+    </text>
+    <text x="36" y="364" fill="#34d399" font-family="ui-monospace, monospace" font-size="10.5">
+      • Automatically feeds Amazon Neptune Liability Graph &amp; Section 133 CrPC Surcharge Ledger
+    </text>
+  </g>
+</svg>

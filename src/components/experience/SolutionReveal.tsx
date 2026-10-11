@@ -160,7 +160,7 @@ export const SolutionReveal: React.FC<Props> = ({ onScrollToLive }) => {
 
           <div className="pt-4 border-t border-zinc-800/40 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-xs font-mono text-zinc-400 text-left">
-              <span className="text-emerald-400 font-semibold block text-sm">USHMA-NETRA (उष्मा-नेत्रा)</span>
+              <span className="text-emerald-400 font-semibold block text-sm">USHMA-NETRA</span>
               The world’s first autonomous thermal equity and exhaust debt orchestration platform.
             </div>
 
