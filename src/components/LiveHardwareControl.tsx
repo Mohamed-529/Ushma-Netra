@@ -89,7 +89,7 @@ export const LiveHardwareControl: React.FC = () => {
   const [eventBridgeEventId, setEventBridgeEventId] = useState<string | null>(null);
   const [airpodsLang, setAirpodsLang] = useState<'ta-IN' | 'en-IN' | 'hi-IN'>('ta-IN');
   const [isSpeakingAirpods, setIsSpeakingAirpods] = useState<boolean>(false);
-  const [autoVoiceAlertEnabled, setAutoVoiceAlertEnabled] = useState<boolean>(false);
+  const [autoVoiceAlertEnabled, setAutoVoiceAlertEnabled] = useState<boolean>(true);
   const lastSpokenTimestampRef = React.useRef<number>(0);
   const [copiedSketch, setCopiedSketch] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
@@ -124,11 +124,10 @@ export const LiveHardwareControl: React.FC = () => {
       status: incomingWbgt >= 34.0 ? 'CRITICAL_SPIKE' : 'NOMINAL',
     });
 
-    // Only speak automatically if user explicitly toggled "Auto-Alert: ON"
-    // AND at least 45 seconds have passed since the last voice announcement
+    // Autonomous Trilingual Voice Dispatch: Speaks automatically when temperature crosses 34°C
     if (autoVoiceAlertEnabled && incomingWbgt >= 34.0) {
       const now = Date.now();
-      if (now - lastSpokenTimestampRef.current > 45000 && !isSpeakingAirpods) {
+      if (now - lastSpokenTimestampRef.current > 15000 && !isSpeakingAirpods) {
         lastSpokenTimestampRef.current = now;
         setIsSpeakingAirpods(true);
         void playAudibleBeaconAlert({
