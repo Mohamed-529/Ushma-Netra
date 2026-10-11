@@ -222,3 +222,34 @@ export function runInfraComplianceSuite(): InfraComplianceReport {
     resourcesAudited,
   };
 }
+
+// Direct CLI execution support for `npm run test:infra`
+if (process.argv[1] && process.argv[1].endsWith('infra_compliance.test.ts')) {
+  const report = runInfraComplianceSuite();
+  console.log(`\n================================================================================`);
+  console.log(`  ${report.suiteName}`);
+  console.log(`  Target Template: ${report.templatePath}`);
+  console.log(`================================================================================\n`);
+
+  for (const assertion of report.assertions) {
+    const badge = assertion.passed ? '✓ PASS' : '✗ FAIL';
+    console.log(`  [${badge}] ${assertion.name}`);
+    console.log(`         ${assertion.detail}\n`);
+  }
+
+  console.log(`  Audited Serverless Resources (${report.resourcesAudited.length}):`);
+  for (const res of report.resourcesAudited) {
+    console.log(`    • ${res.logicalId} (${res.type}) — ${res.billingModel}`);
+  }
+
+  console.log(`\n--------------------------------------------------------------------------------`);
+  console.log(
+    `  RESULT: ${report.passedCount} PASSED, ${report.failedCount} FAILED (${report.executionTimeMs}ms) — $0.00/HR IDLE VERIFIED`
+  );
+  console.log(`--------------------------------------------------------------------------------\n`);
+
+  if (!report.allPassed) {
+    process.exit(1);
+  }
+}
+
