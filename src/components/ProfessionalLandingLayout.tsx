@@ -10,6 +10,7 @@ import {
   Box,
   Scan,
   Scale,
+  ShieldCheck,
 } from 'lucide-react';
 import { NetraGuide } from './experience/NetraGuide';
 import { GrandFinaleFooter } from './experience/GrandFinaleFooter';
@@ -94,6 +95,12 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
       sub: 'Building heat fines & cooling fund',
       icon: Scale,
     },
+    {
+      path: '/admin',
+      label: 'Infra Compliance (/admin)',
+      sub: 'SAM zero-cost & IAM security test suite',
+      icon: ShieldCheck,
+    },
   ];
 
   const isHomePage = location.pathname === '/';
@@ -114,8 +121,8 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
             : 'opacity-0 -translate-y-2 pointer-events-none'
         } ${
           isScrolled || !isHomePage
-            ? 'bg-[#12161A]/95 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.45)]'
-            : 'bg-[#12161A]/80 backdrop-blur-md border-b border-white/5'
+            ? 'bg-[#15233E]/90 backdrop-blur-xl border-b border-sky-300/15 shadow-[0_8px_30px_rgba(10,20,40,0.45)]'
+            : 'bg-[#172542]/75 backdrop-blur-md border-b border-sky-300/10'
         }`}
       >
         <header className="w-full">
@@ -130,7 +137,7 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
               }}
               className="flex items-center gap-3.5 group cursor-pointer shrink-0"
             >
-              <div className="w-11 h-11 rounded-2xl bg-[#1E242B] group-hover:bg-[#262E37] border border-amber-500/40 flex items-center justify-center shadow-sm transition-colors shrink-0">
+              <div className="w-11 h-11 rounded-2xl bg-[#1E3256] group-hover:bg-[#253D68] border border-amber-400/50 flex items-center justify-center shadow-sm transition-colors shrink-0">
                 <svg
                   viewBox="0 0 36 36"
                   fill="none"
@@ -299,7 +306,7 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2.5 rounded-xl border border-white/10 bg-[#1E242B] hover:bg-[#262E37] text-white cursor-pointer"
+                className="md:hidden p-2.5 rounded-xl border border-sky-300/20 bg-[#1E3256] hover:bg-[#253D68] text-white cursor-pointer"
                 title="Toggle Navigation Menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -309,7 +316,7 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
 
           {/* Mobile Navigation Dropdown */}
           {mobileMenuOpen && (
-            <div className="md:hidden bg-[#181D23] border-t border-white/10 px-4 py-4 space-y-3 shadow-2xl">
+            <div className="md:hidden bg-[#172746] border-t border-sky-300/15 px-4 py-4 space-y-3 shadow-2xl">
               <div className="flex flex-col space-y-1 text-base font-semibold">
                 <Link
                   to="/"

@@ -176,13 +176,13 @@ export const GrandFinaleFooter: React.FC<Props> = ({
   ];
 
   return (
-    <footer className="relative w-full overflow-hidden font-sans border-t border-white/10 bg-[#0D1014] text-white">
+    <footer className="relative w-full overflow-hidden font-sans border-t border-sky-300/15 bg-[#12203A]/90 backdrop-blur-lg text-white">
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-12 sm:py-16 space-y-12">
         {/* Only Showcase the Interactive Particle Logo Canvas & Small CTA Div on the Home / Hero Page */}
         {isHomePage && (
           <>
             {/* Interactive Glowing Particle Brand Logo Finale */}
-            <div className="rounded-3xl bg-[#070b14] border border-slate-800 shadow-[0_24px_60px_rgba(0,0,0,0.6)] overflow-hidden relative">
+            <div className="rounded-3xl bg-[#162847]/90 border border-sky-400/20 shadow-[0_24px_60px_rgba(8,18,38,0.55)] overflow-hidden relative">
               <div
                 className="absolute inset-0 opacity-20 pointer-events-none"
                 style={{

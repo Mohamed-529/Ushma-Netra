@@ -5,7 +5,6 @@ import { StoryAct } from '../components/experience/DynamicAtmosphere';
 import { WowHero } from '../components/experience/WowHero';
 import { ScrollDrivenShowcase } from '../components/experience/ScrollDrivenShowcase';
 import { AlternatingFeatureShowcase } from '../components/experience/AlternatingFeatureShowcase';
-import { GrandFinaleFooter } from '../components/experience/GrandFinaleFooter';
 import {
   Scan,
   Radio,

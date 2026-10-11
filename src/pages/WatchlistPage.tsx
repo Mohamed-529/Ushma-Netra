@@ -21,10 +21,17 @@ import {
   Clock,
   RefreshCw,
   ArrowLeft,
-  Home
+  Home,
+  Cloud,
+  Zap,
 } from 'lucide-react';
 import { soundEngine } from '../utils/audioSynthesizer';
-import { dispatchEmergencyAlertApi } from '../services/gemini';
+import {
+  dispatchEmergencyAlertApi,
+  fetchEventBridgeBusStream,
+  publishMqttEventBridgeTelemetry,
+  EventBusEnvelopeItem,
+} from '../services/gemini';
 
 interface Props {
   buildings: BuildingAudit[];
@@ -81,6 +88,57 @@ export const WatchlistPage: React.FC<Props> = ({
     }[]
   >([]);
   const [isSending, setIsSending] = useState<boolean>(false);
+
+  // AWS IoT Core + Amazon EventBridge Custom Bus live stream on /watchlist
+  const [eventBusItems, setEventBusItems] = useState<EventBusEnvelopeItem[]>([]);
+  const [eventBusName, setEventBusName] = useState<string>('ushma-netra-thermal-bus');
+  const [mqttBroker, setMqttBroker] = useState<string>(
+    'a3k9ushmanetra-ats.iot.ap-south-1.amazonaws.com'
+  );
+  const [isTriggeringBus, setIsTriggeringBus] = useState<boolean>(false);
+
+  useEffect(() => {
+    let mounted = true;
+    void fetchEventBridgeBusStream().then((data) => {
+      if (mounted) {
+        setEventBusName(data.eventBusName);
+        setMqttBroker(data.mqttBrokerEndpoint);
+        setEventBusItems(data.events);
+      }
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleTriggerEventBridgeBurst = async () => {
+    setIsTriggeringBus(true);
+    soundEngine.playSpikeAlert();
+    const target = watchlistedBuildings[0] || buildings[0];
+    const result = await publishMqttEventBridgeTelemetry({
+      sensorId: `ESP32-${target.id.toUpperCase().slice(0, 8)}-01`,
+      buildingId: target.id,
+      exhaustTemp: +(Math.max(53.6, target.exhaustAirTempCelsius) + 1.9).toFixed(1),
+      wbgt: 38.6,
+      windVelocity: 4.4,
+      mqttTopic: `ushma/${target.id}/canyon/telemetry`,
+    });
+
+    setEventBusItems((prev) => [result.envelope, ...prev.slice(0, 9)]);
+
+    // Automatically append an automated Target 1 Watchlist WhatsApp alert from EventBridge rule
+    const autoAlert = {
+      id: `eb-wa-${result.eventId}`,
+      to: recipientNumber,
+      time: result.envelope.timestamp,
+      channel: 'WhatsApp' as const,
+      text: `⚡ [EventBridge Rule: ${result.eventId}] AWS IoT Core sensor ${result.envelope.sensorId} reported ${result.envelope.exhaustTemp}°C exhaust (${result.envelope.wbgt}°C WBGT) at ${target.name}. Relocate carts 15m away; municipal misting engaged.`,
+      status: 'Delivered' as const,
+    };
+    setDispatchedMessages((prev) => [autoAlert, ...prev]);
+    onSimulateSurge();
+    setIsTriggeringBus(false);
+  };
 
   // Watchlisted building objects
   const watchlistedBuildings = buildings.filter((b) => watchlistIds.includes(b.id));
@@ -291,6 +349,84 @@ export const WatchlistPage: React.FC<Props> = ({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Section 1B: AWS IoT Core Sub-Second MQTT + Amazon EventBridge Custom Event Bus Router */}
+      <div className="bg-[#FFFFFF] text-[#111827] rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[#a8321a] text-[11px] font-mono font-bold uppercase tracking-wider">
+              <Cloud className="w-3.5 h-3.5" />
+              <span>AWS IoT Core MQTT + Amazon EventBridge Custom Event Bus</span>
+            </div>
+            <h2 className="text-2xl font-black text-[#111827] tracking-tight">
+              Sub-Second Serverless Event Bus Router (<code className="font-mono text-lg text-[#a8321a]">{eventBusName}</code>)
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
+              Eliminates Team 2&apos;s 15-minute database polling loop. Incoming ESP32 MQTT packets on <code className="font-mono text-slate-900 font-bold">{mqttBroker}</code> trigger <code className="font-mono text-slate-900 font-bold">PutEventsCommand</code> to simultaneously dispatch Target 1 (Watchlist WhatsApp/SMS Alert API) and Target 2 (3D Digital Twin Plume WebSockets).
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => void handleTriggerEventBridgeBurst()}
+            disabled={isTriggeringBus}
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#b91c1c] via-[#a8321a] to-[#ea580c] hover:opacity-95 text-white font-mono text-xs font-extrabold uppercase tracking-wider flex items-center gap-2 shadow-lg cursor-pointer shrink-0 disabled:opacity-50"
+          >
+            <Zap className="w-4 h-4 text-amber-200" />
+            <span>
+              {isTriggeringBus
+                ? 'Publishing PutEventsCommand...'
+                : 'Inject Live MQTT Spike → EventBridge'}
+            </span>
+          </button>
+        </div>
+
+        {/* EventBridge Envelope Feed */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {eventBusItems.slice(0, 4).map((evt) => (
+            <div
+              key={evt.eventId}
+              className="p-4 rounded-2xl bg-slate-950 text-white border border-slate-800 space-y-2.5 font-mono text-xs"
+            >
+              <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                <span className="text-amber-300 font-bold flex items-center gap-1.5">
+                  <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                  <span>{evt.eventId}</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold">
+                  {evt.detailType} · {evt.latencyMs}ms
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-[11px] bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+                <div>
+                  <span className="text-slate-400 block text-[10px]">SENSOR</span>
+                  <span className="text-white font-bold">{evt.sensorId}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[10px]">EXHAUST / WBGT</span>
+                  <span className="text-rose-400 font-bold">
+                    {evt.exhaustTemp}°C / {evt.wbgt}°C
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[10px]">WIND</span>
+                  <span className="text-emerald-400 font-bold">{evt.windVelocity} m/s</span>
+                </div>
+              </div>
+
+              <div className="text-[10px] text-slate-300 space-y-1">
+                <div className="text-sky-300 truncate">
+                  Topic: {evt.mqttTopic} · Time: {evt.timestamp}
+                </div>
+                <div className="text-emerald-300 truncate">
+                  ✓ {evt.targetsDispatched.join(' | ')}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Section 2: Interactive SMS & WhatsApp Early Warning Dispatch Simulator */}

@@ -1,0 +1,140 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Ushma-Netra (Team 3) — Zero-Hourly-Cost 100% Serverless Urban Heat Equity &
+  Spatial Liability Architecture Template (AWS IoT Core, EventBridge Custom Bus,
+  Amazon Neptune Serverless, DynamoDB Streams, Amazon Location Service, Bedrock Guardrails)
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 10
+    MemorySize: 256
+    Architectures:
+      - arm64
+
+Resources:
+  # 1. Ingestion & Messaging Engine (Sub-Second Streaming)
+  UshmaNetraCustomEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: ushma-netra-thermal-bus
+
+  IoTTelemetryRoute:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      RuleName: UshmaNetraSubSecondTelemetryRule
+      TopicRulePayload:
+        Sql: "SELECT * FROM 'ushma/+/canyon/telemetry' WHERE wbgt >= 34.0 OR exhaustTemp > 50.0"
+        AwsIotSqlVersion: '2016-03-23'
+        RuleDisabled: false
+        Actions:
+          - Lambda:
+              FunctionArn: !GetAtt EventBridgeRouterFunction.Arn
+
+  # 2. Storage & Relationship Analytics (Geospatial Graph + Streams)
+  NeptuneServerlessDB:
+    Type: AWS::Neptune::DBCluster
+    Properties:
+      DBClusterIdentifier: ushma-netra-neptune-serverless
+      EngineVersion: 1.3.1.0
+      StorageEncrypted: true
+      IamAuthEnabled: true
+      BackupRetentionPeriod: 7
+      ServerlessScalingConfiguration:
+        MinCapacity: 1.0
+        MaxCapacity: 8.0
+
+  ThermalTelemetryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UshmaNetraThermalAuditTable
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      AttributeDefinitions:
+        - AttributeName: buildingId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: buildingId
+          KeyType: HASH
+
+  # 3. Spatial Context Engine (Dynamic 5m Geofencing)
+  UshmaNetraExhaustGeofenceCollection:
+    Type: AWS::Location::GeofenceCollection
+    Properties:
+      CollectionName: UshmaNetraExhaustCollection
+      Description: Dynamic 5-meter micro-climate hazard envelopes around commercial HVAC outlets
+
+  # 4. Governed GenAI & Statutory Compliance (Bedrock Guardrails + OpenSearch Serverless)
+  UshmaNetraBedrockGuardrail:
+    Type: AWS::Bedrock::Guardrail
+    Properties:
+      Name: gr-ushma-bedrock-enterprise-v2
+      BlockedInputMessaging: '[BLOCKED BY GUARDRAILS FOR AMAZON BEDROCK: Adversarial Prompt Attack Detected]'
+      BlockedOutputsMessaging: '[BLOCKED BY GUARDRAILS FOR AMAZON BEDROCK: Unsafe Statutory Output]'
+      SensitiveInformationPolicyConfig:
+        PiiEntitiesConfig:
+          - Type: PHONE
+            Action: ANONYMIZE
+          - Type: DRIVER_ID
+            Action: ANONYMIZE
+
+  MunicipalCodeVectorCollection:
+    Type: AWS::OpenSearchServerless::Collection
+    Properties:
+      Name: ushma-municipal-statutes-rag
+      Type: VECTORSEARCH
+      Description: Serverless k-NN vector store for Section 133 CrPC and NDMA Heat Action Plan bylaws
+
+  # 5. Strict Least-Privilege IAM Role (No Wildcard '*' Resource or Action)
+  EventBridgeRouterExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: UshmaNetraLeastPrivilegeExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: UshmaNetraScopedServerlessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowScopedEventBridgePutEvents
+                Effect: Allow
+                Action:
+                  - events:PutEvents
+                Resource: !GetAtt UshmaNetraCustomEventBus.Arn
+              - Sid: AllowScopedLocationGeofenceEval
+                Effect: Allow
+                Action:
+                  - geo:BatchEvaluateGeofences
+                Resource: !GetAtt UshmaNetraExhaustGeofenceCollection.Arn
+              - Sid: AllowScopedDynamoDBStreamReadWrite
+                Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt ThermalTelemetryTable.Arn
+              - Sid: AllowScopedBedrockGuardrailApply
+                Effect: Allow
+                Action:
+                  - bedrock:ApplyGuardrail
+                Resource: !GetAtt UshmaNetraBedrockGuardrail.GuardrailArn
+
+  EventBridgeRouterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ushma-netra-eventbridge-fanout
+      Handler: index.handler
+      CodeUri: ./src
+      Role: !GetAtt EventBridgeRouterExecutionRole.Arn

@@ -12,6 +12,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@aws-sdk/client-eventbridge": "^3.1149.0",
+    "@aws-sdk/client-location": "^3.1149.0",
     "@google/genai": "^2.4.0",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.1",

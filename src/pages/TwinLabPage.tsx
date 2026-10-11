@@ -34,7 +34,7 @@ export const TwinLabPage: React.FC<Props> = ({
   onSimulateSurge,
 }) => {
   return (
-    <div className="min-h-screen w-full bg-[#12161A] text-white py-10">
+    <div className="min-h-screen w-full bg-transparent text-white py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Top Navigation & Breadcrumbs Bar on #12161A Dark Canvas */}
         <div className="flex flex-wrap items-center justify-between gap-4">

@@ -9,6 +9,9 @@ interface Props {
   vendor: VendorTelemetry;
   isMitigated?: boolean;
   onMitigationToggle?: (mitigated: boolean) => void;
+  meshView?: boolean;
+  thermalOverlay?: boolean;
+  airflowVectors?: boolean;
 }
 
 // Procedural radial glow sprite for volumetric heat & mist particles
@@ -58,6 +61,9 @@ export const Thermal3DTwin: React.FC<Props> = ({
   vendor,
   isMitigated: externalIsMitigated,
   onMitigationToggle,
+  meshView = false,
+  thermalOverlay = true,
+  airflowVectors = true,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const [acLoadPct, setAcLoadPct] = useState<number>(95);
@@ -69,7 +75,7 @@ export const Thermal3DTwin: React.FC<Props> = ({
     setIsMitigated(Boolean(target));
   }, [externalIsMitigated, building.id, building.mitigationStatus]);
 
-  const [flirMode, setFlirMode] = useState<boolean>(true);
+  const [flirMode, setFlirMode] = useState<boolean>(thermalOverlay);
   const [activeProbe, setActiveProbe] = useState<'grill' | 'breathing_zone' | 'cart' | 'roof'>('breathing_zone');
   const [cameraView, setCameraView] = useState<'pedestrian' | 'side' | 'isometric'>('isometric');
 
@@ -80,6 +86,7 @@ export const Thermal3DTwin: React.FC<Props> = ({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const particleGeoRef = useRef<THREE.BufferGeometry | null>(null);
   const particleVelocitiesRef = useRef<Float32Array | null>(null);
+  const particleSystemRef = useRef<THREE.Points | null>(null);
   const mistGeoRef = useRef<THREE.BufferGeometry | null>(null);
   const mistParticlesRef = useRef<THREE.Points | null>(null);
   const deflectorMeshesRef = useRef<THREE.Mesh[]>([]);
@@ -97,18 +104,47 @@ export const Thermal3DTwin: React.FC<Props> = ({
       m.visible = isMitigated;
     });
     if (mistParticlesRef.current) {
-      mistParticlesRef.current.visible = isMitigated;
+      mistParticlesRef.current.visible = isMitigated && airflowVectors;
     }
     if (groundHeatOverlayRef.current) {
       const mat = groundHeatOverlayRef.current.material as THREE.MeshBasicMaterial;
       mat.color.setHex(isMitigated ? 0x10b981 : 0xef4444);
       mat.opacity = isMitigated ? 0.16 : 0.34;
+      groundHeatOverlayRef.current.visible = flirMode;
     }
-  }, [isMitigated]);
+  }, [isMitigated, airflowVectors, flirMode]);
+
+  useEffect(() => {
+    setFlirMode(thermalOverlay);
+  }, [thermalOverlay]);
 
   useEffect(() => {
     flirModeRef.current = flirMode;
+    if (groundHeatOverlayRef.current) {
+      groundHeatOverlayRef.current.visible = flirMode;
+    }
   }, [flirMode]);
+
+  useEffect(() => {
+    if (particleSystemRef.current) {
+      particleSystemRef.current.visible = airflowVectors;
+    }
+    if (mistParticlesRef.current) {
+      mistParticlesRef.current.visible = isMitigatedRef.current && airflowVectors;
+    }
+  }, [airflowVectors]);
+
+  useEffect(() => {
+    if (!sceneRef.current) return;
+    sceneRef.current.traverse((obj) => {
+      if (obj instanceof THREE.Mesh && obj !== groundHeatOverlayRef.current) {
+        const mat = obj.material;
+        if (mat instanceof THREE.MeshStandardMaterial) {
+          mat.wireframe = meshView;
+        }
+      }
+    });
+  }, [meshView]);
 
   useEffect(() => {
     acLoadPctRef.current = acLoadPct;

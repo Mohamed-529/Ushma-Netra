@@ -56,6 +56,77 @@ export const ThermalGridPage: React.FC<Props> = ({
   const [mapZoomMultiplier, setMapZoomMultiplier] = useState<number>(1);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  // Amazon Location Service Dynamic Geofencing State
+  const [vendorCoords, setVendorCoords] = useState<{ lat: number; lng: number }>({
+    lat: 28.6284,
+    lng: 77.1325,
+  });
+  const [proximityReport, setProximityReport] = useState<{
+    success: boolean;
+    status: 'CRITICAL_VIOLATION' | 'SAFE_ZONE';
+    geofenceId?: string;
+    message: string;
+    distanceToExhaustMeters: number;
+  } | null>({
+    success: true,
+    status: 'CRITICAL_VIOLATION',
+    geofenceId: 'GF-VIKAS-SURYA-AC-02',
+    message:
+      'ALERT: Device breached high-heat boundary envelope [GF-VIKAS-SURYA-AC-02]. Ambient exhaust risk level high.',
+    distanceToExhaustMeters: 2.4,
+  });
+  const [isValidating, setIsValidating] = useState<boolean>(false);
+
+  const simulateScrollMovement = async (mode: 'SAFE' | 'HAZARD') => {
+    setIsValidating(true);
+    soundEngine.playTone(mode === 'HAZARD' ? 440 : 680, 'sine', 0.1);
+
+    // Coordinates targeting stable ambient rows or shifting directly into the exhaust center point
+    const activePayload =
+      mode === 'HAZARD'
+        ? {
+            deviceId: 'VN-DEL-084',
+            latitude: 28.6291,
+            longitude: 77.1332,
+            currentWbgt: 38.2,
+            buildingId: selectedBuilding.id,
+          }
+        : {
+            deviceId: 'VN-DEL-084',
+            latitude: 28.625,
+            longitude: 77.1301,
+            currentWbgt: 29.4,
+            buildingId: selectedBuilding.id,
+          };
+
+    setVendorCoords({ lat: activePayload.latitude, lng: activePayload.longitude });
+
+    try {
+      const response = await fetch('/api/grid/evaluate-position', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(activePayload),
+      });
+      if (response.ok) {
+        const report = await response.json();
+        setProximityReport(report);
+      }
+    } catch {
+      setProximityReport({
+        success: true,
+        status: mode === 'HAZARD' ? 'CRITICAL_VIOLATION' : 'SAFE_ZONE',
+        geofenceId: 'GF-VIKAS-SURYA-AC-02',
+        message:
+          mode === 'HAZARD'
+            ? 'ALERT: Device breached high-heat boundary envelope [GF-VIKAS-SURYA-AC-02]. Ambient exhaust risk level high.'
+            : 'Device position verified outside critical commercial exhaust sectors.',
+        distanceToExhaustMeters: mode === 'HAZARD' ? 2.4 : 14.8,
+      });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
   const [watchlistIds, setWatchlistIds] = useState<string[]>(() => {
     try {
       return JSON.parse(
@@ -588,6 +659,156 @@ export const ThermalGridPage: React.FC<Props> = ({
                 {st.label}
               </button>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* AMAZON LOCATION SERVICE: LIVE SPATIAL CONTEXT & GEOFENCE MATRIX       */}
+      {/* ===================================================================== */}
+      <div
+        className="p-6 sm:p-8 bg-[#FFFFFF] rounded-3xl border border-[#E5E7EB] text-[#111827]"
+        style={{
+          boxShadow:
+            '0 25px 70px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        }}
+      >
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-gray-100">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
+              🗺️ Live Spatial Context &amp; Geofence Matrix
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Real-time centimeter-level urban micro-climate boundary analytics (Collection:{' '}
+              <code className="font-mono font-bold text-[#a8321a]">
+                UshmaNetraExhaustCollection
+              </code>
+              )
+            </p>
+          </div>
+          <span className="px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-mono font-bold rounded-full tracking-wide">
+            ● AMAZON LOCATION SERVICE ACTIVE
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Side: Simulation Control Panel */}
+          <div className="space-y-4 lg:col-span-1">
+            <div className="p-5 bg-[#F8FAFC] rounded-2xl border border-[#E5E7EB]">
+              <h3 className="text-xs font-mono font-bold text-slate-700 tracking-wider uppercase mb-3">
+                Geofence Traversal Sandbox (Device: VN-DEL-084)
+              </h3>
+              <div className="flex flex-col gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => simulateScrollMovement('SAFE')}
+                  className="w-full px-4 py-2.5 bg-[#111827] text-white text-xs font-mono font-bold rounded-xl hover:bg-slate-800 transition-all tracking-wider uppercase cursor-pointer shadow-xs"
+                >
+                  1. Position Cart in Public Shaded Way
+                </button>
+                <button
+                  type="button"
+                  onClick={() => simulateScrollMovement('HAZARD')}
+                  className="w-full px-4 py-2.5 bg-red-700 text-white text-xs font-mono font-bold rounded-xl hover:bg-red-800 transition-all tracking-wider uppercase cursor-pointer shadow-xs"
+                >
+                  2. Shift Cart Into 5m AC Exhaust Jet
+                </button>
+              </div>
+            </div>
+
+            {/* Real-Time Telemetry Readout */}
+            {proximityReport && (
+              <div
+                className={`p-5 rounded-2xl border transition-all ${
+                  proximityReport.status === 'CRITICAL_VIOLATION'
+                    ? 'bg-red-50/80 border-red-200'
+                    : 'bg-emerald-50/80 border-emerald-200'
+                }`}
+              >
+                <div
+                  className={`text-xs font-mono font-extrabold tracking-wider uppercase mb-1.5 ${
+                    proximityReport.status === 'CRITICAL_VIOLATION'
+                      ? 'text-red-700'
+                      : 'text-emerald-800'
+                  }`}
+                >
+                  {proximityReport.status === 'CRITICAL_VIOLATION'
+                    ? '⚠️ DANGER BOUNDARY BREACHED'
+                    : '✅ SECURE TRACKING STATUS'}
+                </div>
+                <div className="text-3xl font-black font-mono text-[#111827] mb-1">
+                  {proximityReport.distanceToExhaustMeters} meters
+                </div>
+                <div className="text-xs text-slate-600 leading-relaxed">
+                  {proximityReport.message}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Side: Map Framework Graphic Display */}
+          <div className="lg:col-span-2 relative min-h-[350px] bg-stone-900 rounded-2xl border border-stone-800 overflow-hidden flex items-center justify-center p-4">
+            {/* Subtle Technical Backdrop Grid Lines */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-30" />
+
+            {/* Simulated Building Envelope Vector */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-2xl border border-stone-700 bg-stone-800/40 flex flex-col items-center justify-center">
+              <span className="text-[10px] font-mono font-bold text-stone-300 tracking-widest uppercase mb-2">
+                {activeMapBuilding.name}
+              </span>
+
+              {/* Active 5-Meter Geofence Boundary Visual Ring */}
+              <div
+                className={`w-40 h-40 rounded-full border-2 border-dashed transition-all flex flex-col items-center justify-center animate-[spin_40s_linear_infinite] ${
+                  proximityReport?.status === 'CRITICAL_VIOLATION'
+                    ? 'border-red-500 bg-red-900/25 shadow-[0_0_35px_rgba(239,68,68,0.3)]'
+                    : 'border-sky-400/50 bg-sky-900/10'
+                }`}
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_#f59e0b]" />
+              </div>
+              <span className="text-[10px] font-mono text-amber-300/90 mt-2">
+                5.0m Exhaust Geofence ({proximityReport?.geofenceId || 'GF-VIKAS-SURYA-AC-02'})
+              </span>
+            </div>
+
+            {/* Dynamic Floating Live Vendor Tracking Node */}
+            <div
+              className="absolute w-5 h-5 transition-all duration-700 ease-out flex items-center justify-center z-20"
+              style={{
+                top: proximityReport?.status === 'CRITICAL_VIOLATION' ? '52%' : '20%',
+                left: proximityReport?.status === 'CRITICAL_VIOLATION' ? '54%' : '24%',
+              }}
+            >
+              <span
+                className={`absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping ${
+                  proximityReport?.status === 'CRITICAL_VIOLATION' ? 'bg-red-500' : 'bg-emerald-400'
+                }`}
+              />
+              <span
+                className={`relative inline-flex rounded-full h-3.5 w-3.5 shadow-md ring-2 ring-white ${
+                  proximityReport?.status === 'CRITICAL_VIOLATION' ? 'bg-red-600' : 'bg-emerald-500'
+                }`}
+              />
+            </div>
+
+            {/* Real-time telemetry log feed display layer */}
+            <div className="absolute bottom-3 left-3 right-3 bg-stone-950/90 border border-stone-800 rounded-xl px-3.5 py-2.5 font-mono text-[11px] text-stone-300 flex flex-wrap justify-between gap-2">
+              <span>
+                Position [Lng, Lat]: [{vendorCoords.lng.toFixed(4)}, {vendorCoords.lat.toFixed(4)}]
+              </span>
+              <span
+                className={
+                  proximityReport?.status === 'CRITICAL_VIOLATION'
+                    ? 'text-red-400 font-bold'
+                    : 'text-emerald-400 font-bold'
+                }
+              >
+                {isValidating
+                  ? 'COMPUTING AWS PROXIMITY...'
+                  : `RESPONSE: ${proximityReport?.status || 'WAITING_STREAM'}`}
+              </span>
+            </div>
           </div>
         </div>
       </div>

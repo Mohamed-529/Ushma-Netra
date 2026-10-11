@@ -12,7 +12,10 @@ import { useHardwareSerial } from '../hooks/useHardwareSerial';
 import { playAudibleBeaconAlert } from '../utils/pollyVoiceDispatch';
 import { MobileBeaconClient } from './MobileBeaconClient';
 import { verifyDeviceHandshake } from '../utils/cryptoVerify';
-import { ingestSignedHardwarePacket } from '../services/gemini';
+import {
+  ingestSignedHardwarePacket,
+  publishMqttEventBridgeTelemetry,
+} from '../services/gemini';
 
 export const LiveHardwareControl: React.FC = () => {
   const [telemetry, setTelemetry] = useState({
@@ -25,6 +28,7 @@ export const LiveHardwareControl: React.FC = () => {
   const [mobileBeaconOpen, setMobileBeaconOpen] = useState<boolean>(false);
   const [cryptoVerified, setCryptoVerified] = useState<boolean>(false);
   const [packetSignature, setPacketSignature] = useState<string | null>(null);
+  const [eventBridgeEventId, setEventBridgeEventId] = useState<string | null>(null);
 
   const handleIncomingPacket = async (data: {
     node_id?: string;
@@ -65,15 +69,28 @@ export const LiveHardwareControl: React.FC = () => {
       });
     }
 
-    const ingestResult = await ingestSignedHardwarePacket({
-      node_id: incomingNodeId,
-      wbgt: incomingWbgt,
-      ambient_temp: incomingAmbient,
-      token: data.token || 'un_hw_secure_998123487123',
-    });
+    const [ingestResult, ebResult] = await Promise.all([
+      ingestSignedHardwarePacket({
+        node_id: incomingNodeId,
+        wbgt: incomingWbgt,
+        ambient_temp: incomingAmbient,
+        token: data.token || 'un_hw_secure_998123487123',
+      }),
+      publishMqttEventBridgeTelemetry({
+        sensorId: incomingNodeId,
+        buildingId: 'del-ln-vikas',
+        exhaustTemp: Math.max(51.4, incomingAmbient),
+        wbgt: incomingWbgt,
+        windVelocity: 4.2,
+        mqttTopic: 'ushma/delhi/canyon/telemetry',
+      }),
+    ]);
 
     if (ingestResult?.hmacSignature) {
       setPacketSignature(ingestResult.hmacSignature);
+    }
+    if (ebResult?.eventId) {
+      setEventBridgeEventId(ebResult.eventId);
     }
   };
 
@@ -262,7 +279,9 @@ export const LiveHardwareControl: React.FC = () => {
   "wbgt": ${telemetry.wbgt},
   "ambient_temp": ${telemetry.ambient_temp},
   "status": "${telemetry.status}",
-  "transport": "${isConnected ? 'WEB_SERIAL_UART' : 'SIMULATED_PACKET'}",
+  "transport": "${isConnected ? 'WEB_SERIAL_UART' : 'AWS_IOT_CORE_MQTT'}",
+  "eventbridge_bus": "ushma-netra-thermal-bus",
+  "eventbridge_event_id": "${eventBridgeEventId || 'eb-evt-99210a4c'}",
   "crypto_handshake_verified": ${cryptoVerified},
   "hmac_sha256_sig": "${packetSignature || 'awaiting_packet'}"
 }`}

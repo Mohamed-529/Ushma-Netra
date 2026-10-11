@@ -4,7 +4,7 @@ import { ArrowRight, Wind, ShieldCheck, HeartHandshake } from 'lucide-react';
 
 export const ImpactPage: React.FC = () => {
   return (
-    <div className="min-h-screen w-full bg-[#12161A] text-white py-12 sm:py-16">
+    <div className="min-h-screen w-full bg-transparent text-white py-12 sm:py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Main Floating Impact Card (Pure White #FFFFFF on Deep Charcoal #12161A Canvas) */}
         <div className="rounded-3xl bg-[#FFFFFF] text-[#111827] overflow-hidden border border-[#E5E7EB] shadow-xl">
