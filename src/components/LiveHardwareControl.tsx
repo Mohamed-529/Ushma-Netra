@@ -1,249 +1,283 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import {
+  Usb,
+  Radio,
+  ShieldCheck,
+  AlertTriangle,
+  Zap,
+  Smartphone,
+  X,
+} from 'lucide-react';
 import { useHardwareSerial } from '../hooks/useHardwareSerial';
-import { ThermalPlumeTwin } from './ThermalPlumeTwin';
-import { ShieldAlert, ShieldCheck, Cpu, Terminal, Radio, AlertTriangle, Volume2, Sparkles, Smartphone, X } from 'lucide-react';
-import { playAudibleBeaconAlert, buildPollySSML } from '../utils/pollyVoiceDispatch';
+import { playAudibleBeaconAlert } from '../utils/pollyVoiceDispatch';
 import { MobileBeaconClient } from './MobileBeaconClient';
+import { verifyDeviceHandshake } from '../utils/cryptoVerify';
+import { ingestSignedHardwarePacket } from '../services/gemini';
 
 export const LiveHardwareControl: React.FC = () => {
   const [telemetry, setTelemetry] = useState({
-    node_id: "OFFLINE",
-    ambient_temp: 28.0,
-    wbgt: 24.5,
-    token: "NONE"
+    node_id: 'OFFLINE',
+    wbgt: 0,
+    ambient_temp: 0,
+    status: 'AWAITING_CONNECTION',
   });
-  const [isBroadcasting, setIsBroadcasting] = useState(false);
-  const [showPhoneBeaconModal, setShowPhoneBeaconModal] = useState(false);
+  const [iotStreamModalOpen, setIotStreamModalOpen] = useState<boolean>(false);
+  const [mobileBeaconOpen, setMobileBeaconOpen] = useState<boolean>(false);
+  const [cryptoVerified, setCryptoVerified] = useState<boolean>(false);
+  const [packetSignature, setPacketSignature] = useState<string | null>(null);
 
-  const { connectHardware, simulateLivePacket, isConnected, error } = useHardwareSerial((data) => {
-    setTelemetry(data);
-  });
+  const handleIncomingPacket = async (data: {
+    node_id?: string;
+    wbgt?: number;
+    ambient_temp?: number;
+    token?: string;
+  }) => {
+    const incomingNodeId = data.node_id || 'ESP32_CART_01';
+    const incomingWbgt = data.wbgt ?? 35.8;
+    const incomingAmbient = data.ambient_temp ?? 48.9;
+    const timestamp = new Date().toISOString();
 
-  // Listen to live data stream broadcast from Android Phone or companion beacon client
-  useEffect(() => {
-    const channel = new BroadcastChannel('ushma_netra_hardware_feed');
-    channel.onmessage = (event) => {
-      if (event.data) {
-        setTelemetry({
-          node_id: event.data.node_id || 'UN-DEL-084',
-          ambient_temp: event.data.ambient_temp || 44.2,
-          wbgt: event.data.wbgt || 36.8,
-          token: event.data.token || 'un_hw_secure_ecc_p256_active'
-        });
-      }
-    };
-    return () => {
-      channel.close();
-    };
-  }, []);
+    const verifiedLocal = verifyDeviceHandshake(
+      {
+        node_id: incomingNodeId,
+        wbgt: incomingWbgt,
+        ambient_temp: incomingAmbient,
+        timestamp,
+      },
+      data.token || 'un_hw_secure_998123487123'
+    );
+    setCryptoVerified(verifiedLocal);
 
-  // Determine if incoming telemetry has a valid asymmetric token structure
-  const isTokenSecure = telemetry.token.startsWith("un_hw_secure_");
-  const isCriticalHeat = telemetry.wbgt >= 36.8;
+    setTelemetry({
+      node_id: incomingNodeId,
+      wbgt: incomingWbgt,
+      ambient_temp: incomingAmbient,
+      status: incomingWbgt >= 34.0 ? 'CRITICAL_SPIKE' : 'NOMINAL',
+    });
 
-  const handleTriggerVoiceAlert = async () => {
-    setIsBroadcasting(true);
-    try {
-      await playAudibleBeaconAlert({
-        vendorName: telemetry.node_id !== 'OFFLINE' ? `Beacon ${telemetry.node_id}` : 'Chandni Chowk Vendor',
-        measuredWbgt: telemetry.wbgt,
-        nearestKioskMeters: 45,
-        exhaustTemp: telemetry.ambient_temp,
-        kioskName: 'Municipal Mist Station #03',
-        preferredLanguage: 'bilingual',
+    if (incomingWbgt >= 34.0) {
+      void playAudibleBeaconAlert({
+        vendorName: 'Street Vendor Node',
+        measuredWbgt: incomingWbgt,
+        nearestKioskMeters: 35,
+        exhaustTemp: incomingAmbient,
+        preferredLanguage: 'en-IN',
       });
-    } finally {
-      setIsBroadcasting(false);
+    }
+
+    const ingestResult = await ingestSignedHardwarePacket({
+      node_id: incomingNodeId,
+      wbgt: incomingWbgt,
+      ambient_temp: incomingAmbient,
+      token: data.token || 'un_hw_secure_998123487123',
+    });
+
+    if (ingestResult?.hmacSignature) {
+      setPacketSignature(ingestResult.hmacSignature);
     }
   };
 
+  const { isConnected, connectHardware, simulateLivePacket } =
+    useHardwareSerial(handleIncomingPacket);
+
+  const isCritical = telemetry.wbgt >= 34.0;
+
   return (
-    <div className="p-6 rounded-2xl border border-slate-800 bg-slate-950/60 backdrop-blur-md shadow-2xl space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
-            <h4 className="text-xs font-mono font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <Terminal className="h-4 w-4 text-amber-400" />
-              § Physical Edge Node Test Bench (ESP32 USB Ingestion)
-            </h4>
+    <div className="rounded-3xl bg-[#FFFFFF] text-[#111827] p-8 sm:p-10 space-y-8 border border-[#E5E7EB] shadow-xl">
+      {/* 1. UNIFIED HEADER & SINGLE CLEAN CONTROL BAR */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="text-xs font-mono font-bold text-[#a8321a] uppercase tracking-wider">
+            LIVE ESP32-S3 USB &amp; MOBILE SENSOR LINK
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Connect your physical ESP32 beacon node via Web Serial API USB line link, or run simulated live packets.
-          </p>
+          <h3 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight">
+            Plug-and-Play Hardware Telemetry
+          </h3>
         </div>
-        
-        <div className="flex flex-wrap items-center gap-2">
+
+        {/* Unified Single-Row Control Bar: Connect Serial | Simulate Packet | Mobile Mode | AWS Stream Link */}
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
+            type="button"
             onClick={connectHardware}
-            disabled={isConnected}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition-all flex items-center gap-2 shadow-sm ${
-              isConnected 
-                ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-400 cursor-default'
-                : 'bg-slate-900 border-slate-700 hover:border-amber-500 hover:text-amber-300 text-slate-300'
+            className={`px-4 py-2.5 rounded-xl font-mono text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-xs ${
+              isConnected
+                ? 'bg-emerald-700 text-white'
+                : 'bg-[#111827] hover:bg-[#1f2937] text-white'
             }`}
           >
-            {isConnected ? (
-              <>
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-                ● NODE ONLINE (115200 BAUD)
-              </>
-            ) : (
-              <>
-                <Radio className="h-3.5 w-3.5" />
-                CONNECT BEACON VIA SERIAL (USB)
-              </>
-            )}
+            <Usb className="w-3.5 h-3.5 text-amber-400 pointer-events-none" />
+            <span className="pointer-events-none">
+              {isConnected ? 'USB Connected (115200)' : 'Connect Serial'}
+            </span>
           </button>
 
           <button
-            onClick={() => setShowPhoneBeaconModal(true)}
-            className="px-3 py-1.5 rounded-lg text-xs font-mono border border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
-            title="Launch mobile phone beacon client with AirPods audio feed"
+            type="button"
+            onClick={() => simulateLivePacket()}
+            className="px-4 py-2.5 rounded-xl bg-[#a8321a] hover:bg-[#8c2713] text-white font-mono text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-xs"
           >
-            <Smartphone className="h-3.5 w-3.5" />
-            <span>PHONE BEACON CLIENT (AIRPODS)</span>
+            <Zap className="w-3.5 h-3.5 text-amber-200 pointer-events-none" />
+            <span className="pointer-events-none">Simulate Packet</span>
           </button>
 
-          {!isConnected && (
-            <button
-              onClick={() => simulateLivePacket()}
-              className="px-3 py-1.5 rounded-lg text-xs font-mono border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 transition-colors cursor-pointer"
-              title="Test serial packet stream without physical hardware plugged in"
-            >
-              SIMULATE ESP32 PACKET
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setMobileBeaconOpen((prev) => !prev)}
+            className="px-3.5 py-2.5 rounded-xl bg-[#F3F4F6] hover:bg-[#E5E7EB] border border-[#E5E7EB] text-[#111827] font-mono text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <Smartphone className="w-3.5 h-3.5 text-[#a8321a] pointer-events-none" />
+            <span className="pointer-events-none">Phone Sensor</span>
+          </button>
 
-          {isConnected && (
-            <button
-              onClick={() => simulateLivePacket({
-                node_id: 'SPOOFED_ROGUE_BEACON',
-                ambient_temp: 22.0,
-                wbgt: 21.0,
-                token: 'rogue_attacker_unsigned_payload'
-              })}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-mono border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 transition-colors"
-              title="Simulate injection of an untrusted sensor packet lacking Secrets Manager token"
-            >
-              TEST SPOOF INJECTION
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setIotStreamModalOpen(true)}
+            className="px-3 py-2 text-xs font-mono font-bold text-[#a8321a] hover:text-[#111827] underline underline-offset-4 cursor-pointer"
+          >
+            View AWS IoT Core Stream ↗
+          </button>
         </div>
       </div>
 
-      {error && (
-        <div className="text-xs font-mono text-rose-400 bg-rose-950/30 p-3 rounded-xl border border-rose-900/40 flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-          <span>ERR // {error}</span>
+      {/* 2. HIGH-IMPACT FULL-WIDTH HARDWARE STATUS BANNER */}
+      <div
+        className={`w-full rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+          isCritical
+            ? 'bg-gradient-to-r from-[#b91c1c] to-[#ea580c] text-white shadow-lg'
+            : telemetry.node_id !== 'OFFLINE'
+            ? 'bg-emerald-700 text-white'
+            : 'bg-[#F3F4F6] border border-[#E5E7EB] text-[#111827]'
+        }`}
+      >
+        <div className="flex items-center gap-3.5">
+          {isCritical ? (
+            <AlertTriangle className="w-7 h-7 text-amber-200 shrink-0 animate-bounce" />
+          ) : (
+            <ShieldCheck
+              className={`w-7 h-7 shrink-0 ${
+                telemetry.node_id !== 'OFFLINE' ? 'text-emerald-200' : 'text-[#a8321a]'
+              }`}
+            />
+          )}
+          <div>
+            <div className="text-xs font-mono font-bold uppercase tracking-wider opacity-80">
+              HARDWARE TELEMETRY STATUS · NODE {telemetry.node_id}
+            </div>
+            <div className="text-lg sm:text-xl font-black tracking-tight uppercase">
+              {isCritical
+                ? `CRITICAL ALERT: ${telemetry.wbgt.toFixed(1)}°C WET-BULB SPIKE DETECTED ON CART SENSOR`
+                : telemetry.node_id !== 'OFFLINE'
+                ? 'LIVE STREAM ACTIVE: SENSOR OPERATING IN SAFE RANGE'
+                : 'READY: PLUG IN ESP32 VIA USB OR CLICK "SIMULATE PACKET"'}
+            </div>
+          </div>
+        </div>
+
+        <span
+          className={`px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold shrink-0 self-start sm:self-center ${
+            isCritical || telemetry.node_id !== 'OFFLINE'
+              ? 'bg-black/25 text-white border border-white/20'
+              : 'bg-[#111827] text-white'
+          }`}
+        >
+          {telemetry.status}
+        </span>
+      </div>
+
+      {/* 3. CLEAN 3-CARD HARDWARE METRICS (Full-Width Layout — Overlapping 3D Picture Removed) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="p-6 rounded-2xl bg-[#F3F4F6] border border-[#E5E7EB] space-y-2 flex flex-col justify-between">
+          <div className="text-xs font-semibold text-[#111827]/70">
+            Sensor Node ID
+          </div>
+          <div className="text-2xl sm:text-3xl font-black font-mono text-[#111827] truncate">
+            {telemetry.node_id}
+          </div>
+          <div className="text-xs font-mono text-[#111827]/70">
+            Web Serial UART · 115200 bps
+          </div>
+        </div>
+
+        <div className="p-6 rounded-2xl bg-[#F3F4F6] border border-[#E5E7EB] space-y-2 flex flex-col justify-between">
+          <div className="text-xs font-semibold text-[#111827]/70">
+            Measured Wet-Bulb (WBGT)
+          </div>
+          <div
+            className={`text-3xl sm:text-4xl font-black font-mono ${
+              isCritical ? 'text-[#a8321a]' : 'text-[#111827]'
+            }`}
+          >
+            {telemetry.wbgt > 0 ? `${telemetry.wbgt.toFixed(1)}°C` : '--.-°C'}
+          </div>
+          <div className="text-xs font-mono text-[#111827]/70">
+            Threshold: 34.0°C Lethal Limit
+          </div>
+        </div>
+
+        <div className="p-6 rounded-2xl bg-[#F3F4F6] border border-[#E5E7EB] space-y-2 flex flex-col justify-between">
+          <div className="text-xs font-semibold text-[#111827]/70">
+            Exhaust Plume Air Temp
+          </div>
+          <div className="text-3xl sm:text-4xl font-black font-mono text-[#111827]">
+            {telemetry.ambient_temp > 0 ? `${telemetry.ambient_temp.toFixed(1)}°C` : '--.-°C'}
+          </div>
+          <div className="text-xs font-mono text-[#111827]/70">
+            Direct SHT31 Probe Reading
+          </div>
+        </div>
+      </div>
+
+      {/* Optional Mobile Smartphone Beacon Drawer */}
+      {mobileBeaconOpen && (
+        <div className="pt-2">
+          <MobileBeaconClient
+            onClose={() => setMobileBeaconOpen(false)}
+            onSyncTelemetry={handleIncomingPacket}
+          />
         </div>
       )}
 
-      {/* CROSS-TOOL SYNCHRONIZED STATUS STRIP */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono text-xs">
-        <div className="p-3 rounded-xl border border-slate-800 bg-slate-900/40">
-          <div className="text-slate-500 text-[10px] tracking-wider uppercase">DEVICE IDENTITY</div>
-          <div className="text-slate-200 font-bold mt-1 flex items-center gap-1.5">
-            <Cpu className="h-3.5 w-3.5 text-slate-400" />
-            {telemetry.node_id}
-          </div>
-        </div>
-        <div className="p-3 rounded-xl border border-slate-800 bg-slate-900/40">
-          <div className="text-slate-500 text-[10px] tracking-wider uppercase">AMBIENT TEMPERATURE</div>
-          <div className={`font-bold mt-1 ${telemetry.ambient_temp > 45 ? 'text-rose-400 animate-pulse' : 'text-slate-200'}`}>
-            {telemetry.ambient_temp.toFixed(1)}°C
-          </div>
-        </div>
-        <div className="p-3 rounded-xl border border-slate-800 bg-slate-900/40">
-          <div className="text-slate-500 text-[10px] tracking-wider uppercase">WBGT METRIC (ISO 7243)</div>
-          <div className={`font-bold mt-1 ${isCriticalHeat ? 'text-rose-500' : 'text-slate-200'}`}>
-            {telemetry.wbgt.toFixed(1)}°C {isCriticalHeat ? '[CRITICAL]' : ''}
-          </div>
-        </div>
-        <div className="p-3 rounded-xl border border-slate-800 bg-slate-900/40">
-          <div className="text-slate-500 text-[10px] tracking-wider uppercase">ASYMMETRIC AUTH</div>
-          <div className={`font-bold mt-1 flex items-center gap-1.5 ${isTokenSecure ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {isConnected ? (
-              isTokenSecure ? (
-                <>
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  SECURE_HANDSHAKE
-                </>
-              ) : (
-                <>
-                  <ShieldAlert className="h-3.5 w-3.5 text-rose-400" />
-                  REJECTED_SPOOF
-                </>
-              )
-            ) : (
-              'AWAITING_LINK'
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* TIER-1 ACOUSTIC DISPATCH BAR (AMAZON POLLY NEURAL) */}
-      <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-900/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono text-xs">
-        <div className="flex items-center gap-2.5">
-          <div className={`p-2 rounded-lg ${isCriticalHeat ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'}`}>
-            <Volume2 className="h-4 w-4" />
-          </div>
-          <div>
-            <div className="text-slate-200 font-bold flex items-center gap-1.5">
-              <span>Tier-1 Amazon Polly Neural Dispatch</span>
-              <span className="text-[10px] text-amber-400 font-normal">· Kajal Voice (hi-IN / en-IN)</span>
+      {/* 4. OVERLAY MODAL FOR RAW JSON TELEMETRY */}
+      {iotStreamModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+          <div className="bg-[#0b111e] border border-slate-700 rounded-3xl max-w-xl w-full p-6 space-y-4 text-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-400">
+                <Radio className="w-4 h-4 animate-pulse" />
+                <span>AWS IoT Core Serial Packet Inspector</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIotStreamModalOpen(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <div className="text-[11px] text-slate-400 mt-0.5">
-              {isCriticalHeat 
-                ? 'CRITICAL ALERT TRIGGERED: WBGT > 36.8°C. Stand-down voice loop ready.' 
-                : 'Acoustic broadcast ready for edge vendor advisories.'}
+
+            <pre className="p-4 rounded-2xl bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 overflow-x-auto leading-relaxed">
+{`{
+  "node_id": "${telemetry.node_id}",
+  "wbgt": ${telemetry.wbgt},
+  "ambient_temp": ${telemetry.ambient_temp},
+  "status": "${telemetry.status}",
+  "transport": "${isConnected ? 'WEB_SERIAL_UART' : 'SIMULATED_PACKET'}",
+  "crypto_handshake_verified": ${cryptoVerified},
+  "hmac_sha256_sig": "${packetSignature || 'awaiting_packet'}"
+}`}
+            </pre>
+
+            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-1">
+              <span>Baud Rate: 115200 bps · 8N1</span>
+              <button
+                type="button"
+                onClick={() => setIotStreamModalOpen(false)}
+                className="px-4 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-bold cursor-pointer"
+              >
+                Close Stream
+              </button>
             </div>
-          </div>
-        </div>
-
-        <button
-          onClick={handleTriggerVoiceAlert}
-          disabled={isBroadcasting}
-          className={`px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm ${
-            isCriticalHeat
-              ? 'bg-rose-500 hover:bg-rose-400 text-white shadow-rose-900/40'
-              : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-900/30'
-          } disabled:opacity-50`}
-        >
-          {isBroadcasting ? (
-            <>
-              <div className="h-2 w-2 rounded-full bg-current animate-ping" />
-              <span>Broadcasting...</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Test Polly Bilingual Call</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* THREE.JS DYNAMIC PLUME INTERFACE */}
-      <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/20">
-        <ThermalPlumeTwin 
-          alleyWidth={isCriticalHeat ? 4.0 : 6.0} 
-          acUnitsCount={isCriticalHeat ? 80 : 30} 
-          louversEngaged={!isCriticalHeat && isConnected}
-          presetName={isConnected ? `LIVE BEACON // ${telemetry.node_id}` : "SIMULATION BASELINE"}
-        />
-      </div>
-
-      {/* PHONE BEACON CLIENT MODAL (AIRPODS DEMO) */}
-      {showPhoneBeaconModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-          <div className="max-w-md w-full bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl relative">
-            <MobileBeaconClient
-              onClose={() => setShowPhoneBeaconModal(false)}
-              onSyncTelemetry={(data) => {
-                setTelemetry(data);
-              }}
-            />
           </div>
         </div>
       )}

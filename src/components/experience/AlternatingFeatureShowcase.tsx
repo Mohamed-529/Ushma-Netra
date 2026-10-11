@@ -65,8 +65,8 @@ export const AlternatingFeatureShowcase: React.FC = () => {
   ];
 
   return (
-    <section className="relative w-full py-20 sm:py-24 px-4 sm:px-8 lg:px-16 border-t border-[#d6cebe] bg-[#ebe4d8]/60">
-      <div className="max-w-7xl mx-auto space-y-20">
+    <section className="relative w-full py-20 sm:py-24 px-4 sm:px-8 lg:px-16 border-t border-white/10 bg-transparent">
+      <div className="max-w-7xl mx-auto space-y-12">
         {rows.map((row, index) => {
           const isEven = index % 2 === 1;
           const Icon = row.icon;
@@ -74,27 +74,27 @@ export const AlternatingFeatureShowcase: React.FC = () => {
           return (
             <div
               key={row.step}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
+              className="rounded-3xl bg-[#FFFFFF] border border-[#E5E7EB] shadow-xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
             >
-              {/* Text Column */}
+              {/* Text Column Inside Pure White Card */}
               <div
                 className={`lg:col-span-6 space-y-4 text-left ${
                   isEven ? 'order-1 lg:order-2' : 'order-1'
                 }`}
               >
-                <div className="text-xs font-mono text-[#a8321a] font-semibold uppercase tracking-wider">
+                <div className="text-xs font-mono text-[#a8321a] font-bold uppercase tracking-wider">
                   {row.step}
                 </div>
-                <h3 className="text-2xl sm:text-4xl font-bold text-[#0b1b2d] tracking-tight leading-tight">
+                <h3 className="text-2xl sm:text-4xl font-bold text-[#111827] tracking-tight leading-tight">
                   {row.title}
                 </h3>
-                <p className="text-sm sm:text-base text-[#1f3044] leading-relaxed max-w-xl">
+                <p className="text-sm sm:text-base text-[#111827] leading-relaxed max-w-xl">
                   {row.summary}
                 </p>
                 <div className="pt-1">
                   <Link
                     to={row.ctaPath}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0b1b2d] hover:bg-[#1a2d42] text-white text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#111827] hover:bg-[#1f2937] text-white text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 shadow-sm"
                   >
                     <span>{row.ctaLabel}</span>
                     <ArrowRight className="w-4 h-4 text-amber-300" />
@@ -108,7 +108,7 @@ export const AlternatingFeatureShowcase: React.FC = () => {
                   isEven ? 'order-2 lg:order-1' : 'order-2'
                 }`}
               >
-                <div className="relative rounded-3xl overflow-hidden border border-[#d6cebe] bg-[#0b111e] shadow-[0_18px_45px_rgba(11,27,45,0.14)]">
+                <div className="relative rounded-2xl overflow-hidden border border-[#E5E7EB] bg-[#0b111e] shadow-lg">
                   <div className="relative h-64 sm:h-72 w-full overflow-hidden">
                     <img
                       src={row.image}

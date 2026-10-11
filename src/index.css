@@ -14,50 +14,49 @@
   }
 
   body {
-    background-color: #e6dfd3;
-    color: #0b1b2d;
+    background-color: #12161A;
+    color: #F8FAFC;
     font-family: var(--font-sans);
     letter-spacing: -0.015em;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
     letter-spacing: -0.03em;
-    color: #0b1b2d;
   }
 }
 
-/* Warm Magazine Architectural Grid Background */
+/* Dark Thermal Infrared Grid Background */
 .engineering-grid-bg {
   background-image: 
-    linear-gradient(to right, rgba(11, 27, 45, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(11, 27, 45, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(249, 115, 22, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(239, 68, 68, 0.05) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
 /* Sub-grid micro alignment lines */
 .micro-alignment-grid {
   background-image: 
-    linear-gradient(to right, rgba(11, 27, 45, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(11, 27, 45, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 15px 15px;
 }
 
-/* Custom scrollbars for warm magazine canvas */
+/* Custom scrollbars for dark charcoal canvas */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #e6dfd3;
+  background: #12161A;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(184, 173, 157, 0.7);
+  background: rgba(148, 163, 184, 0.35);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(11, 27, 45, 0.35);
+  background: rgba(248, 250, 252, 0.55);
 }
 
 @keyframes pulseGlow {

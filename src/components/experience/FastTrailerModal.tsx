@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   X,
   Pause,
@@ -32,31 +32,90 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
 }) => {
   const [elapsedMs, setElapsedMs] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [runKey, setRunKey] = useState<number>(0);
 
+  // Accurate high-resolution clock refs so Restart and step jumps reset immediately
+  const elapsedRef = useRef<number>(0);
+  const lastTickTimeRef = useRef<number | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+
+  const handleRestart = useCallback((e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    soundEngine.playTone(580, 'sine', 0.12);
+    elapsedRef.current = 0;
+    lastTickTimeRef.current = performance.now();
+    setElapsedMs(0);
+    setIsPaused(false);
+    setRunKey((prev) => prev + 1);
+  }, []);
+
+  const jumpToTimeMs = useCallback((targetMs: number) => {
+    const clamped = Math.max(0, Math.min(TOTAL_DURATION_MS, targetMs));
+    elapsedRef.current = clamped;
+    lastTickTimeRef.current = performance.now();
+    setElapsedMs(clamped);
+    setIsPaused(false);
+  }, []);
+
+  // Reset timeline whenever modal opens or closes
   useEffect(() => {
     if (!isOpen) {
+      elapsedRef.current = 0;
+      lastTickTimeRef.current = null;
       setElapsedMs(0);
       setIsPaused(false);
       return;
     }
+    elapsedRef.current = 0;
+    lastTickTimeRef.current = performance.now();
+    setElapsedMs(0);
+    setIsPaused(false);
     soundEngine.playTone(540, 'sine', 0.14);
   }, [isOpen]);
 
+  // Smooth requestAnimationFrame clock loop tied to performance.now()
   useEffect(() => {
-    if (!isOpen || isPaused) return;
+    if (!isOpen || isPaused) {
+      lastTickTimeRef.current = null;
+      if (rafIdRef.current !== null) {
+        window.cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+      return;
+    }
 
-    const interval = window.setInterval(() => {
-      setElapsedMs((prev) => {
-        if (prev + 50 >= TOTAL_DURATION_MS) {
-          window.clearInterval(interval);
-          return TOTAL_DURATION_MS;
-        }
-        return prev + 50;
-      });
-    }, 50);
+    lastTickTimeRef.current = performance.now();
 
-    return () => window.clearInterval(interval);
-  }, [isOpen, isPaused]);
+    const tick = (now: number) => {
+      if (lastTickTimeRef.current === null) {
+        lastTickTimeRef.current = now;
+      }
+      const delta = Math.max(0, now - lastTickTimeRef.current);
+      lastTickTimeRef.current = now;
+
+      const nextElapsed = Math.min(TOTAL_DURATION_MS, elapsedRef.current + delta);
+      elapsedRef.current = nextElapsed;
+      setElapsedMs(nextElapsed);
+
+      if (nextElapsed < TOTAL_DURATION_MS) {
+        rafIdRef.current = window.requestAnimationFrame(tick);
+      } else {
+        rafIdRef.current = null;
+      }
+    };
+
+    rafIdRef.current = window.requestAnimationFrame(tick);
+
+    return () => {
+      if (rafIdRef.current !== null) {
+        window.cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
+  }, [isOpen, isPaused, runKey]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -66,20 +125,24 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
         e.preventDefault();
         setIsPaused((p) => !p);
       }
+      if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        handleRestart();
+      }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, handleRestart]);
 
   if (!isOpen) return null;
 
   const sec = elapsedMs / 1000;
   const remainingSec = Math.max(0, Math.ceil(30 - sec));
 
-  // Custom Ushma-Netra Editing Sequence (Distinct from JalRekha's structure):
+  // Custom Ushma-Netra Editing Sequence:
   // Scene 1 (0.0s - 4.0s): Thermal Split Contrast (21°C Indoor Comfort vs 54.2°C Sidewalk Exhaust Blast)
   // Scene 2 (4.0s - 22.0s): 5 Alternating Half-Bleed Screen Reels (~3.6s each) with angled/cropped edge-bleeding UI frames
-  // Scene 3 (22.0s - 26.2s): The 3-Pillar Closed Loop Summary (Moved near the end!)
+  // Scene 3 (22.0s - 26.2s): The 3-Pillar Closed Loop Summary (Near the end)
   // Scene 4 (26.2s - 30.0s): Live National Impact Counter + Ushma-Netra Thermal Eye Finale
   const reelDuration = (22.0 - 4.0) / 5; // 3.6s per screen reel
   const activeReelIdx = Math.min(4, Math.max(0, Math.floor((sec - 4.0) / reelDuration)));
@@ -284,7 +347,7 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
   return (
     <div className="fixed inset-0 z-[120] w-screen h-screen overflow-hidden select-none animate-in fade-in duration-200 font-sans bg-[#0b111e]">
       {/* Top Floating Control HUD */}
-      <div className="absolute top-0 inset-x-0 z-30 px-6 py-4 flex items-center justify-between gap-4">
+      <div className="absolute top-0 inset-x-0 z-50 px-6 py-4 flex items-center justify-between gap-4 pointer-events-auto">
         <div className="flex items-center gap-3 bg-[#0b1b2d]/90 backdrop-blur-md text-white px-4 py-2 rounded-full border border-amber-500/30 text-xs font-mono shadow-lg">
           <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
           <span className="font-bold tracking-wider uppercase text-amber-300">USHMA-NETRA // 30s REEL</span>
@@ -295,40 +358,66 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setIsPaused((p) => !p)}
-            className="px-3.5 py-2 rounded-full bg-[#0b1b2d]/90 hover:bg-[#162a42] text-white border border-slate-700 text-xs font-mono font-semibold flex items-center gap-1.5 cursor-pointer backdrop-blur-md transition-colors"
-          >
-            {isPaused ? <Play className="w-3.5 h-3.5 text-amber-400" /> : <Pause className="w-3.5 h-3.5 text-amber-400" />}
-            <span>{isPaused ? 'Resume' : 'Pause'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setElapsedMs(0);
-              setIsPaused(false);
+            onClick={(e) => {
+              e.stopPropagation();
+              if (elapsedMs >= TOTAL_DURATION_MS) {
+                handleRestart(e);
+              } else {
+                setIsPaused((p) => !p);
+              }
             }}
-            className="p-2 rounded-full bg-[#0b1b2d]/90 hover:bg-[#162a42] text-white border border-slate-700 cursor-pointer backdrop-blur-md transition-colors"
-            title="Replay 30s Reel"
+            className="px-3.5 py-2 rounded-full bg-[#0b1b2d]/90 hover:bg-[#162a42] active:scale-95 text-white border border-slate-700 text-xs font-mono font-semibold flex items-center gap-1.5 cursor-pointer backdrop-blur-md transition-all"
           >
-            <RotateCcw className="w-4 h-4" />
+            {isPaused || elapsedMs >= TOTAL_DURATION_MS ? (
+              <Play className="w-3.5 h-3.5 text-amber-400 pointer-events-none" />
+            ) : (
+              <Pause className="w-3.5 h-3.5 text-amber-400 pointer-events-none" />
+            )}
+            <span className="pointer-events-none">
+              {elapsedMs >= TOTAL_DURATION_MS
+                ? 'Replay'
+                : isPaused
+                ? 'Resume'
+                : 'Pause'}
+            </span>
           </button>
 
           <button
             type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-full bg-[#a8321a] hover:bg-[#8e2915] text-white text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-lg transition-colors"
+            onClick={handleRestart}
+            className="px-3.5 py-2 rounded-full bg-[#0b1b2d]/90 hover:bg-[#162a42] active:scale-95 text-white border border-amber-400/50 text-xs font-mono font-semibold flex items-center gap-1.5 cursor-pointer backdrop-blur-md transition-all"
+            title="Restart 30s Reel from beginning (00:00)"
           >
-            <X className="w-4 h-4" />
-            <span>Close</span>
+            <RotateCcw className="w-3.5 h-3.5 text-amber-400 pointer-events-none" />
+            <span className="pointer-events-none">Restart</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="px-4 py-2 rounded-full bg-[#a8321a] hover:bg-[#8e2915] active:scale-95 text-white text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-lg transition-all"
+          >
+            <X className="w-4 h-4 pointer-events-none" />
+            <span className="pointer-events-none">Close</span>
           </button>
         </div>
       </div>
 
-      {/* Bottom 30s Progress Bar */}
-      <div className="absolute bottom-0 inset-x-0 z-30 h-1.5 bg-slate-900">
+      {/* Bottom 30s Interactive Scrubbing Progress Bar */}
+      <div
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          jumpToTimeMs(ratio * TOTAL_DURATION_MS);
+        }}
+        className="absolute bottom-0 inset-x-0 z-50 h-2.5 bg-slate-900/90 cursor-pointer group"
+        title="Click anywhere to scrub timeline"
+      >
         <div
-          className="h-full bg-gradient-to-r from-amber-400 via-[#a8321a] to-emerald-400 transition-all duration-75"
+          className="h-full bg-gradient-to-r from-amber-400 via-[#a8321a] to-emerald-400 transition-none"
           style={{ width: `${(elapsedMs / TOTAL_DURATION_MS) * 100}%` }}
         />
       </div>
@@ -337,7 +426,10 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
       {/* SCENE 1 (0.0s - 4.0s): DRAMATIC THERMAL CONTRAST OPENER            */}
       {/* ================================================================= */}
       {sec < 4.0 && (
-        <div className="w-full h-full grid grid-cols-1 lg:grid-cols-12 relative overflow-hidden">
+        <div
+          key={`scene-1-${runKey}`}
+          className="w-full h-full grid grid-cols-1 lg:grid-cols-12 relative overflow-hidden"
+        >
           {/* Left Half: Chilled 21°C Corporate Tower Sanctuary */}
           <div className="lg:col-span-6 bg-[#0b1b2d] text-white flex flex-col justify-center px-8 sm:px-14 py-12 border-b lg:border-b-0 lg:border-r border-slate-800">
             <div className="max-w-md ml-auto space-y-4">
@@ -381,7 +473,10 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
       {/* SCENE 2 (4.0s - 22.0s): 5 ALTERNATING HALF-SCREEN CROPPED REELS    */}
       {/* ================================================================= */}
       {sec >= 4.0 && sec < 22.0 && (
-        <div className="w-full h-full bg-[#e6dfd3] text-[#0b1b2d] flex flex-col justify-center px-6 sm:px-14 lg:px-20 relative overflow-hidden">
+        <div
+          key={`scene-2-${runKey}-${activeReelIdx}`}
+          className="w-full h-full bg-[#e6dfd3] text-[#0b1b2d] flex flex-col justify-center px-6 sm:px-14 lg:px-20 relative overflow-hidden"
+        >
           <div className="max-w-7xl mx-auto w-full space-y-8">
             {/* Reel Step Selector Pills */}
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#d6cebe] pb-4">
@@ -399,7 +494,7 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
                   <button
                     key={r.step}
                     type="button"
-                    onClick={() => setElapsedMs((4.0 + idx * reelDuration + 0.1) * 1000)}
+                    onClick={() => jumpToTimeMs((4.0 + idx * reelDuration + 0.05) * 1000)}
                     className={`px-3 py-1 rounded-full font-mono text-xs font-bold transition-all cursor-pointer ${
                       idx === activeReelIdx
                         ? 'bg-[#a8321a] text-white shadow-sm'
@@ -465,7 +560,10 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
       {/* SCENE 3 (22.0s - 26.2s): 3-PILLAR CLOSED LOOP SUMMARY NEAR THE END */}
       {/* ================================================================= */}
       {sec >= 22.0 && sec < 26.2 && (
-        <div className="w-full h-full bg-[#efe8dc] text-[#0b1b2d] flex flex-col justify-center px-8 sm:px-16 lg:px-24">
+        <div
+          key={`scene-3-${runKey}`}
+          className="w-full h-full bg-[#efe8dc] text-[#0b1b2d] flex flex-col justify-center px-8 sm:px-16 lg:px-24"
+        >
           <div className="max-w-6xl mx-auto w-full space-y-10">
             <div className="space-y-2">
               <div className="text-xs font-mono font-bold text-[#a8321a] uppercase tracking-widest">
@@ -515,7 +613,10 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
       {/* SCENE 4 (26.2s - 30.0s): NATIONAL COUNTER + USHMA-NETRA FINALE     */}
       {/* ================================================================= */}
       {sec >= 26.2 && (
-        <div className="w-full h-full bg-[#070b14] text-white flex items-center justify-center px-8 relative overflow-hidden">
+        <div
+          key={`scene-4-${runKey}`}
+          className="w-full h-full bg-[#070b14] text-white flex items-center justify-center px-8 relative overflow-hidden"
+        >
           {/* Subtle Thermal Grid Backdrop */}
           <div
             className="absolute inset-0 opacity-20 pointer-events-none"
@@ -552,6 +653,18 @@ export const FastTrailerModal: React.FC<FastTrailerModalProps> = ({
               <p className="text-sm text-slate-300 font-mono">
                 10 Monitored Street Canyons · Delhi NCR, Mumbai, Bengaluru &amp; Ahmedabad
               </p>
+
+              {/* Prominent Replay Button when Reel Finishes */}
+              <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                <button
+                  type="button"
+                  onClick={handleRestart}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-mono text-xs font-bold shadow-lg cursor-pointer transition-all"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 pointer-events-none" />
+                  <span className="pointer-events-none">Watch 30s Reel Again</span>
+                </button>
+              </div>
             </div>
 
             {/* Ushma-Netra Brand Lockup */}

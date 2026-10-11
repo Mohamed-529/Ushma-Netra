@@ -12,7 +12,9 @@ import { WatchlistPage } from './pages/WatchlistPage';
 import { LedgerPage } from './pages/LedgerPage';
 import { TwinLabPage } from './pages/TwinLabPage';
 import { ScannerPage } from './pages/ScannerPage';
+import { ImpactPage } from './pages/ImpactPage';
 import { soundEngine } from './utils/audioSynthesizer';
+import { recordBuildingMitigation } from './services/gemini';
 import { Flame, AlertTriangle, ShieldCheck, X } from 'lucide-react';
 
 // Scroll-to-top handler on route change
@@ -121,11 +123,13 @@ function AppContent() {
       detail: `${selectedBuilding.name} deployed verified thermal diversion. Street heat delta reduced by 4.2°C; surcharge discounted.`,
     };
     setLogs((prev) => [newLog, ...prev]);
+
+    void recordBuildingMitigation(buildingId, intervention);
   };
 
   return (
-    <div className="relative min-h-screen bg-[#e6dfd3] text-[#0b1b2d] font-sans selection:bg-amber-900/20 selection:text-[#0b1b2d] antialiased overflow-x-hidden">
-      {/* Dynamic Background with unified warm magazine canvas & ambient mesh */}
+    <div className="relative min-h-screen bg-[#12161A] text-white font-sans selection:bg-amber-500/30 selection:text-white antialiased overflow-x-clip">
+      {/* Dynamic Background with unified #12161A dark charcoal canvas & ambient mesh */}
       <DynamicAtmosphere
         activeAct={activeAct}
         isSurgeActive={surgeModalOpen}
@@ -309,6 +313,9 @@ function AppContent() {
               />
             }
           />
+
+          {/* Simple Feel-Good Impact Page */}
+          <Route path="/impact" element={<ImpactPage />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

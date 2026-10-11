@@ -1,8 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { Wind, Flame, ShieldCheck, Sliders, MapPin, RefreshCw, Cpu } from 'lucide-react';
-import { verifyDeviceHandshake } from '../utils/cryptoVerify';
+import { Flame, ShieldCheck, Sliders, RotateCcw, ArrowRight, ArrowUpRight } from 'lucide-react';
 
 interface TwinProps {
   alleyWidth?: number; // 4m to 8m
@@ -10,6 +9,25 @@ interface TwinProps {
   louversEngaged?: boolean; // Active toggle
   presetName?: string; // Synced to Canyon Presets
   onLouversChange?: (engaged: boolean) => void;
+}
+
+function createSoftParticleSprite(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 64;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    const grad = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    grad.addColorStop(0.4, 'rgba(255, 255, 255, 0.75)');
+    grad.addColorStop(0.75, 'rgba(255, 255, 255, 0.2)');
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 64);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
 }
 
 export const ThermalPlumeTwin: React.FC<TwinProps> = ({
@@ -23,8 +41,6 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
   const [alleyWidth, setAlleyWidth] = useState<number>(initialAlleyWidth);
   const [acUnitsCount, setAcUnitsCount] = useState<number>(initialAcUnits);
   const [louversEngaged, setLouversEngaged] = useState<boolean>(initialLouvers);
-  const [activePreset, setActivePreset] = useState<string>(presetName);
-  const [hardwareVerified, setHardwareVerified] = useState<boolean>(true);
 
   // Sync external prop changes
   useEffect(() => {
@@ -32,345 +48,580 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
   }, [initialLouvers]);
 
   useEffect(() => {
-    if (presetName) setActivePreset(presetName);
-  }, [presetName]);
+    if (initialAlleyWidth !== undefined) setAlleyWidth(initialAlleyWidth);
+  }, [initialAlleyWidth]);
 
-  // Three.js object references for smooth reactive mutations without rebuilding WebGL context
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  useEffect(() => {
+    if (initialAcUnits !== undefined) setAcUnitsCount(initialAcUnits);
+  }, [initialAcUnits]);
+
+  // Refs for live reactive updates inside the Three.js animation loop
+  const louversRef = useRef<boolean>(louversEngaged);
+  const alleyWidthRef = useRef<number>(alleyWidth);
+  const acUnitsRef = useRef<number>(acUnitsCount);
+
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const buildingMeshOppositeRef = useRef<THREE.Mesh | null>(null);
-  const acUnitsGroupRef = useRef<THREE.Group | null>(null);
+  const controlsRef = useRef<OrbitControls | null>(null);
+  const vendorCartGroupRef = useRef<THREE.Group | null>(null);
+  const oppositeWallGroupRef = useRef<THREE.Group | null>(null);
   const louversGroupRef = useRef<THREE.Group | null>(null);
-  const particleGeoRef = useRef<THREE.BufferGeometry | null>(null);
-  const particleVelocitiesRef = useRef<Float32Array | null>(null);
-  const animFrameRef = useRef<number | null>(null);
+  const redArrowGroupRef = useRef<THREE.Group | null>(null);
+  const greenArrowGroupRef = useRef<THREE.Group | null>(null);
+  const dangerFloorMeshRef = useRef<THREE.Mesh | null>(null);
+  const mistParticlesRef = useRef<THREE.Points | null>(null);
+  const acFanRotorsRef = useRef<THREE.Group[]>([]);
 
-  // Location preset visual parameters
-  const presets: Record<string, {
-    canyonWidth: number;
-    ambientTemp: number;
-    atmosphereColor: number;
-    fogDensity: number;
-    plumeHue: 'severe_crimson' | 'amber_dust' | 'dense_thermal';
-    description: string;
-  }> = {
-    'Chandni Chowk': {
-      canyonWidth: 4.8,
-      ambientTemp: 44.2,
-      atmosphereColor: 0x1a0f0a,
-      fogDensity: 0.028,
-      plumeHue: 'severe_crimson',
-      description: 'Dense historical commercial canyon; extreme thermal trapping, pedestrian alley width < 5m.',
-    },
-    'Indiranagar 100ft': {
-      canyonWidth: 7.4,
-      ambientTemp: 37.8,
-      atmosphereColor: 0x091419,
-      fogDensity: 0.020,
-      plumeHue: 'dense_thermal',
-      description: 'Mixed retail corridor; high rooftop VRF density discharging directly into walkway.',
-    },
-    'Connaught Place Inner': {
-      canyonWidth: 8.0,
-      ambientTemp: 45.1,
-      atmosphereColor: 0x1f140d,
-      fogDensity: 0.024,
-      plumeHue: 'severe_crimson',
-      description: 'Neoclassical colonnade facade; severe ground-level reverberation into vendor zones.',
-    },
-  };
-
-  const currentPresetData = presets[activePreset] || presets['Chandni Chowk'];
-
-  // Handle Preset Switching
-  const applyPreset = (name: string) => {
-    setActivePreset(name);
-    const p = presets[name];
-    if (p) {
-      setAlleyWidth(p.canyonWidth);
-      if (sceneRef.current) {
-        sceneRef.current.background = new THREE.Color(p.atmosphereColor);
-        if (sceneRef.current.fog) {
-          (sceneRef.current.fog as THREE.FogExp2).color = new THREE.Color(p.atmosphereColor);
-          (sceneRef.current.fog as THREE.FogExp2).density = p.fogDensity;
-        }
-      }
+  useEffect(() => {
+    louversRef.current = louversEngaged;
+    if (louversGroupRef.current) {
+      louversGroupRef.current.visible = louversEngaged;
     }
-  };
+    if (redArrowGroupRef.current) {
+      redArrowGroupRef.current.visible = !louversEngaged;
+    }
+    if (greenArrowGroupRef.current) {
+      greenArrowGroupRef.current.visible = louversEngaged;
+    }
+    if (mistParticlesRef.current) {
+      mistParticlesRef.current.visible = louversEngaged;
+    }
+    if (dangerFloorMeshRef.current) {
+      const mat = dangerFloorMeshRef.current.material as THREE.MeshBasicMaterial;
+      mat.color.setHex(louversEngaged ? 0x10b981 : 0xef4444);
+      mat.opacity = louversEngaged ? 0.22 : 0.38;
+    }
+  }, [louversEngaged]);
 
-  // Setup WebGL Scene with strict lifecycle cleanup and .dispose() discipline
+  useEffect(() => {
+    alleyWidthRef.current = alleyWidth;
+    // Map 4.0m..8.0m to scene X coordinate for the Vendor Cart & Right Building
+    const cartX = -1.2 + alleyWidth * 0.72;
+    if (vendorCartGroupRef.current) {
+      vendorCartGroupRef.current.position.x = cartX;
+    }
+    if (oppositeWallGroupRef.current) {
+      oppositeWallGroupRef.current.position.x = cartX + 3.4;
+    }
+  }, [alleyWidth]);
+
+  useEffect(() => {
+    acUnitsRef.current = acUnitsCount;
+  }, [acUnitsCount]);
+
+  // Setup crystal-clear Side-View Cross-Section 3D Scene
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
 
-    const width = container.clientWidth || 800;
-    const height = container.clientHeight || 500;
+    const width = container.clientWidth || 860;
+    const height = container.clientHeight || 480;
 
-    // 1. Scene & Atmosphere Continuity
+    // 1. Bright, high-contrast blueprint slate scene (No muddy dark brown fog)
     const scene = new THREE.Scene();
-    sceneRef.current = scene;
-    scene.background = new THREE.Color(currentPresetData.atmosphereColor);
-    scene.fog = new THREE.FogExp2(currentPresetData.atmosphereColor, currentPresetData.fogDensity);
+    scene.background = new THREE.Color(0x0b1528);
+    scene.fog = new THREE.FogExp2(0x0b1528, 0.012);
 
-    // 2. Camera Setup
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+    // 2. Clean Side-Profile / Slightly Angled Cross-Section Camera so Left->Right flow is obvious in 2 seconds
+    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 120);
     cameraRef.current = camera;
-    camera.position.set(13, 9, 14);
-    camera.lookAt(0, 2.5, 0);
+    camera.position.set(0.5, 5.2, 16.2);
 
-    // 3. Renderer with shadow maps and antialiasing
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    rendererRef.current = renderer;
+    // 3. Renderer
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false,
+      powerPreference: 'high-performance',
+    });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.22;
 
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 2.5, 0);
+    controlsRef.current = controls;
+    controls.target.set(0.2, 3.1, 0);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.maxPolarAngle = Math.PI / 2 - 0.03;
-    controls.minDistance = 4;
-    controls.maxDistance = 36;
+    controls.minDistance = 6;
+    controls.maxDistance = 30;
     controls.update();
 
-    // 4. Lighting System
-    const ambientLight = new THREE.AmbientLight(0xffeedd, 0.65);
-    scene.add(ambientLight);
+    // 4. Crisp Studio Lighting
+    const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x1e293b, 1.15);
+    scene.add(hemiLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfff5e6, 1.3);
-    sunLight.position.set(12, 18, 8);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 1024;
-    sunLight.shadow.mapSize.height = 1024;
-    scene.add(sunLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    dirLight.position.set(10, 20, 14);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    scene.add(dirLight);
 
-    const heatGlowLight = new THREE.PointLight(0xff3300, 2.8, 14);
-    heatGlowLight.position.set(-3.8, 2.5, 0);
-    scene.add(heatGlowLight);
+    // 5. Street Roadway + High-Visibility Blueprint Grid
+    const roadGeo = new THREE.PlaneGeometry(32, 16);
+    const roadMat = new THREE.MeshStandardMaterial({
+      color: 0x172236,
+      roughness: 0.85,
+    });
+    const road = new THREE.Mesh(roadGeo, roadMat);
+    road.rotation.x = -Math.PI / 2;
+    road.receiveShadow = true;
+    scene.add(road);
 
-    // 5. Environment Mesh Construction
-    // Road & Sidewalk
-    const roadGeo = new THREE.PlaneGeometry(36, 24);
-    const roadMat = new THREE.MeshStandardMaterial({ color: 0x141824, roughness: 0.9 });
-    const roadMesh = new THREE.Mesh(roadGeo, roadMat);
-    roadMesh.rotation.x = -Math.PI / 2;
-    roadMesh.receiveShadow = true;
-    scene.add(roadMesh);
+    const gridHelper = new THREE.GridHelper(28, 28, 0x334155, 0x1e293b);
+    gridHelper.position.y = 0.01;
+    scene.add(gridHelper);
 
-    // Source Commercial Building Facade (Left Wall with Condensers)
-    const bldgGeo = new THREE.BoxGeometry(6, 14, 18);
-    const bldgMat = new THREE.MeshStandardMaterial({ color: 0x222a38, roughness: 0.8, metalness: 0.1 });
-    const sourceBuilding = new THREE.Mesh(bldgGeo, bldgMat);
-    sourceBuilding.position.set(-6, 7, 0);
-    sourceBuilding.castShadow = true;
-    sourceBuilding.receiveShadow = true;
-    scene.add(sourceBuilding);
+    // Colored Street Floor Zone (Red when hot blast hits street, Green when cooled)
+    const floorZoneGeo = new THREE.PlaneGeometry(8.5, 6.5);
+    const floorZoneMat = new THREE.MeshBasicMaterial({
+      color: louversRef.current ? 0x10b981 : 0xef4444,
+      transparent: true,
+      opacity: louversRef.current ? 0.22 : 0.38,
+      side: THREE.DoubleSide,
+    });
+    const floorZone = new THREE.Mesh(floorZoneGeo, floorZoneMat);
+    floorZone.rotation.x = -Math.PI / 2;
+    floorZone.position.set(0.4, 0.03, 0);
+    scene.add(floorZone);
+    dangerFloorMeshRef.current = floorZone;
 
-    // Opposite Canyon Building (Right Wall - position updates reactively based on alleyWidth)
-    const oppBldgGeo = new THREE.BoxGeometry(6, 14, 18);
-    const oppBldgMat = new THREE.MeshStandardMaterial({ color: 0x1f2430, roughness: 0.85 });
-    const oppBuilding = new THREE.Mesh(oppBldgGeo, oppBldgMat);
-    oppBuilding.position.set(alleyWidth + 3, 7, 0);
-    oppBuilding.receiveShadow = true;
-    oppBuilding.castShadow = true;
-    scene.add(oppBuilding);
-    buildingMeshOppositeRef.current = oppBuilding;
+    // 6. LEFT SIDE: Commercial Tower with Glowing Windows & AC Condenser Wall
+    const leftTowerGroup = new THREE.Group();
+    const towerBody = new THREE.Mesh(
+      new THREE.BoxGeometry(5.5, 11.5, 8.5),
+      new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5, metalness: 0.2 })
+    );
+    towerBody.position.set(-6.8, 5.75, 0);
+    towerBody.castShadow = true;
+    towerBody.receiveShadow = true;
+    leftTowerGroup.add(towerBody);
 
-    // AC Condenser Units Bank
-    const acGroup = new THREE.Group();
-    acUnitsGroupRef.current = acGroup;
-    scene.add(acGroup);
+    // Roof cap
+    const roofCap = new THREE.Mesh(
+      new THREE.BoxGeometry(5.8, 0.35, 8.8),
+      new THREE.MeshStandardMaterial({ color: 0x475569 })
+    );
+    roofCap.position.set(-6.8, 11.6, 0);
+    leftTowerGroup.add(roofCap);
+
+    // Glowing office windows on left building
+    for (let floor = 1; floor <= 3; floor++) {
+      for (let z = -2.8; z <= 2.8; z += 1.85) {
+        const win = new THREE.Mesh(
+          new THREE.BoxGeometry(0.12, 1.4, 1.2),
+          new THREE.MeshStandardMaterial({
+            color: 0x38bdf8,
+            emissive: 0x0284c7,
+            emissiveIntensity: 0.45,
+          })
+        );
+        win.position.set(-4.02, floor * 2.6 + 1.2, z);
+        leftTowerGroup.add(win);
+      }
+    }
+
+    // Outdoor AC Condenser Units with Spinning Fans (Mounted on Right Face of Left Tower)
+    const acFanRotors: THREE.Group[] = [];
+    const casingMat = new THREE.MeshStandardMaterial({
+      color: 0xe2e8f0,
+      metalness: 0.35,
+      roughness: 0.35,
+    });
+    const fanHousingMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+    const hotGrillMat = new THREE.MeshBasicMaterial({ color: 0xf97316 });
 
     const louversGroup = new THREE.Group();
+    louversGroup.visible = louversRef.current;
     louversGroupRef.current = louversGroup;
+
+    const louverMat = new THREE.MeshStandardMaterial({
+      color: 0x10b981,
+      emissive: 0x059669,
+      emissiveIntensity: 0.45,
+      roughness: 0.2,
+    });
+
+    for (let row = 0; row < 3; row++) {
+      for (let col = -2.4; col <= 2.4; col += 1.6) {
+        const yPos = 1.6 + row * 1.35;
+        const unit = new THREE.Group();
+        unit.position.set(-3.65, yPos, col);
+
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.85, 1.15), casingMat);
+        box.castShadow = true;
+        unit.add(box);
+
+        const fanRing = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.3, 0.3, 0.08, 20),
+          fanHousingMat
+        );
+        fanRing.rotation.z = Math.PI / 2;
+        fanRing.position.set(0.32, 0, 0);
+        unit.add(fanRing);
+
+        const rotor = new THREE.Group();
+        rotor.position.set(0.36, 0, 0);
+        for (let b = 0; b < 3; b++) {
+          const blade = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.24, 0.08), hotGrillMat);
+          blade.rotation.x = (b * Math.PI * 2) / 3;
+          rotor.add(blade);
+        }
+        unit.add(rotor);
+        acFanRotors.push(rotor);
+
+        // Bright Green 45° Upward Louver Hood
+        const hood = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.1, 1.15), louverMat);
+        hood.position.set(-3.2, yPos + 0.35, col);
+        hood.rotation.z = Math.PI / 4; // 45° upward tilt
+        louversGroup.add(hood);
+
+        leftTowerGroup.add(unit);
+      }
+    }
+    acFanRotorsRef.current = acFanRotors;
+    scene.add(leftTowerGroup);
     scene.add(louversGroup);
 
-    // Rebuild condenser meshes helper
-    const buildCondensers = (count: number) => {
-      while (acGroup.children.length > 0) {
-        const obj = acGroup.children[0] as THREE.Mesh;
-        if (obj.geometry) obj.geometry.dispose();
-        acGroup.remove(obj);
-      }
-      while (louversGroup.children.length > 0) {
-        const obj = louversGroup.children[0] as THREE.Mesh;
-        if (obj.geometry) obj.geometry.dispose();
-        louversGroup.remove(obj);
-      }
+    // 7. RIGHT SIDE: Street Vendor Pushcart, Orange Umbrella, Vendor Figure & Cooling Mist Arch
+    const initialCartX = -1.2 + alleyWidthRef.current * 0.72;
+    const vendorGroup = new THREE.Group();
+    vendorGroup.position.set(initialCartX, 0, 0);
+    vendorCartGroupRef.current = vendorGroup;
 
-      const rows = 4;
-      const cols = Math.max(3, Math.ceil(count / rows));
-      const condenserGeo = new THREE.BoxGeometry(0.7, 0.9, 0.9);
-      const condenserMat = new THREE.MeshStandardMaterial({ color: 0x5a6578, metalness: 0.6, roughness: 0.4 });
-      const grillMat = new THREE.MeshStandardMaterial({ color: 0x181c24, roughness: 0.3 });
+    // Sidewalk Curb under Cart
+    const curb = new THREE.Mesh(
+      new THREE.BoxGeometry(3.4, 0.24, 8.5),
+      new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 })
+    );
+    curb.position.set(0.4, 0.12, 0);
+    vendorGroup.add(curb);
 
-      const louverGeo = new THREE.BoxGeometry(0.8, 0.1, 1.0);
-      const louverMat = new THREE.MeshStandardMaterial({ color: 0x10b981, metalness: 0.5, roughness: 0.2 });
+    // Wooden Vendor Cart Body
+    const cartBody = new THREE.Mesh(
+      new THREE.BoxGeometry(1.75, 0.9, 2.2),
+      new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.65 })
+    );
+    cartBody.position.set(0, 0.78, 0);
+    cartBody.castShadow = true;
+    vendorGroup.add(cartBody);
 
-      let placed = 0;
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          if (placed >= count) break;
-          const y = 1.6 + r * 1.3;
-          const z = (c - cols / 2) * 1.3;
+    // Cart Countertop
+    const cartTop = new THREE.Mesh(
+      new THREE.BoxGeometry(1.88, 0.08, 2.3),
+      new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.5, roughness: 0.3 })
+    );
+    cartTop.position.set(0, 1.26, 0);
+    vendorGroup.add(cartTop);
 
-          const unitMesh = new THREE.Mesh(condenserGeo, condenserMat);
-          unitMesh.position.set(-3.3, y, z);
-          unitMesh.castShadow = true;
-          acGroup.add(unitMesh);
+    // Cart Wheels
+    const wheelGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.1, 20);
+    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a });
+    [
+      [-0.65, 0.36, 0.85],
+      [0.65, 0.36, 0.85],
+      [-0.65, 0.36, -0.85],
+      [0.65, 0.36, -0.85],
+    ].forEach(([wx, wy, wz]) => {
+      const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+      wheel.rotation.x = Math.PI / 2;
+      wheel.position.set(wx, wy, wz);
+      vendorGroup.add(wheel);
+    });
 
-          // Fan grill detail
-          const grillMesh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.75, 0.75), grillMat);
-          grillMesh.position.set(-2.92, y, z);
-          acGroup.add(grillMesh);
+    // Bright Market Umbrella over Cart
+    const pole = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.05, 0.05, 2.1, 12),
+      new THREE.MeshStandardMaterial({ color: 0xe2e8f0 })
+    );
+    pole.position.set(0, 2.25, 0);
+    vendorGroup.add(pole);
 
-          // Mitigation Louver Plate
-          const lMesh = new THREE.Mesh(louverGeo, louverMat);
-          lMesh.position.set(-2.8, y + 0.35, z);
-          lMesh.rotation.z = Math.PI / 4; // 45-degree skyward tilt
-          lMesh.visible = louversEngaged;
-          louversGroup.add(lMesh);
+    const umbrella = new THREE.Mesh(
+      new THREE.ConeGeometry(1.95, 0.75, 12),
+      new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.45 })
+    );
+    umbrella.position.set(0, 3.35, 0);
+    umbrella.castShadow = true;
+    vendorGroup.add(umbrella);
 
-          placed++;
-        }
-      }
-    };
-    buildCondensers(acUnitsCount);
+    // Street Vendor Human Figure standing beside Cart
+    const humanTorso = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.26, 0.22, 1.15, 16),
+      new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.5 })
+    );
+    humanTorso.position.set(0, 1.05, 1.55);
+    vendorGroup.add(humanTorso);
 
-    // Street Vendor Cart in the Canyon
-    const cartGroup = new THREE.Group();
-    const cartBaseGeo = new THREE.BoxGeometry(1.4, 0.9, 2.2);
-    const cartBaseMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.8 });
-    const cartBase = new THREE.Mesh(cartBaseGeo, cartBaseMat);
-    cartBase.position.set(alleyWidth * 0.55, 0.45, 0);
-    cartBase.castShadow = true;
-    cartGroup.add(cartBase);
+    const humanHead = new THREE.Mesh(
+      new THREE.SphereGeometry(0.24, 16, 16),
+      new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.5 })
+    );
+    humanHead.position.set(0, 1.85, 1.55);
+    vendorGroup.add(humanHead);
 
-    // Cart Canopy (Vendor Protection Zone)
-    const canopyGeo = new THREE.ConeGeometry(1.6, 0.6, 4);
-    const canopyMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.5 });
-    const canopy = new THREE.Mesh(canopyGeo, canopyMat);
-    canopy.position.set(alleyWidth * 0.55, 2.3, 0);
-    canopy.rotation.y = Math.PI / 4;
-    cartGroup.add(canopy);
+    // Glowing ESP32 Sensor Beacon on Cart Corner
+    const beaconSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.18, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0x10b981 })
+    );
+    beaconSphere.position.set(-0.82, 1.48, 0.95);
+    vendorGroup.add(beaconSphere);
 
-    // Micro-Beacon IoT Node with blinking thermal indicator
-    const beaconGeo = new THREE.SphereGeometry(0.12, 16, 16);
-    const beaconMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
-    const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-    beacon.position.set(alleyWidth * 0.55 - 0.4, 1.1, 0.6);
-    cartGroup.add(beacon);
+    // Blue Cooling Mist Arch Frame in front of Cart
+    const archMat = new THREE.MeshStandardMaterial({
+      color: 0x38bdf8,
+      emissive: 0x0284c7,
+      emissiveIntensity: 0.35,
+    });
+    const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 3.6, 12), archMat);
+    postL.position.set(-1.25, 1.8, -1.35);
+    vendorGroup.add(postL);
+    const postR = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 3.6, 12), archMat);
+    postR.position.set(-1.25, 1.8, 1.85);
+    vendorGroup.add(postR);
+    const topBar = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 3.3, 12), archMat);
+    topBar.rotation.x = Math.PI / 2;
+    topBar.position.set(-1.25, 3.6, 0.25);
+    vendorGroup.add(topBar);
 
-    scene.add(cartGroup);
+    scene.add(vendorGroup);
 
-    // 6. Thermal Exhaust Plume Particle Simulation
-    const particleCount = 1400;
+    // Low Opposite Shop Wall behind Vendor Sidewalk (Kept low so camera is NEVER blocked)
+    const oppWallGroup = new THREE.Group();
+    oppWallGroup.position.set(initialCartX + 3.4, 0, 0);
+    oppositeWallGroupRef.current = oppWallGroup;
+    const oppWall = new THREE.Mesh(
+      new THREE.BoxGeometry(2.2, 5.2, 8.5),
+      new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 })
+    );
+    oppWall.position.set(0, 2.6, 0);
+    oppWallGroup.add(oppWall);
+    scene.add(oppWallGroup);
+
+    // 8. ULTRA-CLEAR 3D DIRECTIONAL ARROWS (Understandable in < 2 Seconds)
+    // A) RED HORIZONTAL BLAST ARROWS (AC Wall -> Straight into Vendor Cart)
+    const redArrowGroup = new THREE.Group();
+    redArrowGroup.visible = !louversRef.current;
+    redArrowGroupRef.current = redArrowGroup;
+
+    const redArrowMat = new THREE.MeshBasicMaterial({
+      color: 0xff3b1f,
+      transparent: true,
+      opacity: 0.9,
+    });
+
+    for (const zOffset of [-1.2, 0, 1.2]) {
+      const arrowWrapper = new THREE.Group();
+      arrowWrapper.position.set(-2.5, 2.4, zOffset);
+
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.6, 12), redArrowMat);
+      shaft.rotation.z = -Math.PI / 2;
+      shaft.position.set(1.8, 0, 0);
+      arrowWrapper.add(shaft);
+
+      const head = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.65, 16), redArrowMat);
+      head.rotation.z = -Math.PI / 2;
+      head.position.set(3.8, 0, 0);
+      arrowWrapper.add(head);
+
+      redArrowGroup.add(arrowWrapper);
+    }
+    scene.add(redArrowGroup);
+
+    // B) GREEN 45° UPWARD DEFLECTION ARROWS (AC Wall -> Safely Up to Sky above Roof)
+    const greenArrowGroup = new THREE.Group();
+    greenArrowGroup.visible = louversRef.current;
+    greenArrowGroupRef.current = greenArrowGroup;
+
+    const greenArrowMat = new THREE.MeshBasicMaterial({
+      color: 0x10b981,
+      transparent: true,
+      opacity: 0.92,
+    });
+
+    for (const zOffset of [-1.2, 0, 1.2]) {
+      const upArrowWrapper = new THREE.Group();
+      upArrowWrapper.position.set(-2.9, 3.2, zOffset);
+      upArrowWrapper.rotation.z = Math.PI / 4; // 45° upward angle
+
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4.4, 12), greenArrowMat);
+      shaft.rotation.z = -Math.PI / 2;
+      shaft.position.set(2.2, 0, 0);
+      upArrowWrapper.add(shaft);
+
+      const head = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.65, 16), greenArrowMat);
+      head.rotation.z = -Math.PI / 2;
+      head.position.set(4.6, 0, 0);
+      upArrowWrapper.add(head);
+
+      greenArrowGroup.add(upArrowWrapper);
+    }
+    scene.add(greenArrowGroup);
+
+    // 9. Soft Glowing Heat Stream Particles
+    const spriteTex = createSoftParticleSprite();
+    const particleCount = 650;
     const particleGeo = new THREE.BufferGeometry();
-    particleGeoRef.current = particleGeo;
-
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
-    particleVelocitiesRef.current = velocities;
 
     const resetParticle = (i: number) => {
-      positions[i * 3] = -2.9; // Spawns directly at condenser fans
-      positions[i * 3 + 1] = 1.5 + Math.random() * 4.5; // Fan height
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+      positions[i * 3] = -3.1;
+      positions[i * 3 + 1] = 1.4 + Math.random() * 2.9;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 5.2;
 
-      if (louversEngaged) {
-        // Skyward dispersion (deflected at 50 degrees upwards)
-        velocities[i * 3] = 0.03 + Math.random() * 0.04;
-        velocities[i * 3 + 1] = 0.08 + Math.random() * 0.07; // High vertical lift
-        velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+      const isUpward = louversRef.current;
+      const speedScale = 0.7 + (acUnitsRef.current / 100) * 0.65;
 
-        // Cools down into cyan/green as heat vents safely into boundary layer
-        colors[i * 3] = 0.1;
-        colors[i * 3 + 1] = 0.85;
-        colors[i * 3 + 2] = 0.75;
+      if (isUpward) {
+        velocities[i * 3] = (0.045 + Math.random() * 0.03) * speedScale;
+        velocities[i * 3 + 1] = (0.065 + Math.random() * 0.045) * speedScale; // 45°+ upward sky lift
+        velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.012;
+
+        colors[i * 3] = 0.08;
+        colors[i * 3 + 1] = 0.92;
+        colors[i * 3 + 2] = 0.68;
       } else {
-        // Horizontal street-level jet blasting pedestrian/vendor breathing zone
-        velocities[i * 3] = 0.10 + Math.random() * 0.06;
-        velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.015; // Trapped at head level
-        velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.025;
+        velocities[i * 3] = (0.095 + Math.random() * 0.045) * speedScale;
+        velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.012; // Straight horizontal street blast
+        velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.015;
 
-        // Incandescent thermal false-color (FLIR white-hot -> searing red-amber)
         colors[i * 3] = 1.0;
-        colors[i * 3 + 1] = 0.28;
-        colors[i * 3 + 2] = 0.08;
+        colors[i * 3 + 1] = 0.32;
+        colors[i * 3 + 2] = 0.06;
       }
     };
 
     for (let i = 0; i < particleCount; i++) {
       resetParticle(i);
-      positions[i * 3] += Math.random() * 6.0; // Distribute initially
+      positions[i * 3] += Math.random() * 5.5;
+      if (louversRef.current) {
+        positions[i * 3 + 1] += Math.random() * 3.5;
+      }
     }
 
     particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const particleMat = new THREE.PointsMaterial({
-      size: 0.32,
+      size: 0.52,
+      map: spriteTex,
       vertexColors: true,
       transparent: true,
-      opacity: 0.78,
+      opacity: 0.85,
+      depthWrite: false,
       blending: THREE.AdditiveBlending,
     });
 
-    const particleSystem = new THREE.Points(particleGeo, particleMat);
-    scene.add(particleSystem);
+    const particlePoints = new THREE.Points(particleGeo, particleMat);
+    scene.add(particlePoints);
 
-    // 7. Animation Loop with Beacon Pulsing
-    let clock = new THREE.Clock();
+    // 10. Cool Blue Mist Spray Curtain around Vendor Cart when Louvers/Cooling ON
+    const mistCount = 220;
+    const mistGeo = new THREE.BufferGeometry();
+    const mistPositions = new Float32Array(mistCount * 3);
+    for (let i = 0; i < mistCount; i++) {
+      mistPositions[i * 3] = initialCartX - 1.2 + (Math.random() - 0.5) * 0.6;
+      mistPositions[i * 3 + 1] = 0.5 + Math.random() * 3.0;
+      mistPositions[i * 3 + 2] = (Math.random() - 0.5) * 2.6;
+    }
+    mistGeo.setAttribute('position', new THREE.BufferAttribute(mistPositions, 3));
+    const mistMat = new THREE.PointsMaterial({
+      size: 0.42,
+      map: spriteTex,
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.65,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    const mistSystem = new THREE.Points(mistGeo, mistMat);
+    mistSystem.visible = louversRef.current;
+    scene.add(mistSystem);
+    mistParticlesRef.current = mistSystem;
+
+    // 11. Animation Loop
+    let animId: number;
+    const clock = new THREE.Clock();
+
     const animate = () => {
-      animFrameRef.current = requestAnimationFrame(animate);
+      animId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
 
-      // Beacon status pulse
-      if (beaconMat) {
-        const pulse = (Math.sin(elapsed * 5) + 1) * 0.5;
-        beaconMat.color.setHex(hardwareVerified ? 0x10b981 : 0xef4444);
-        beacon.scale.setScalar(1 + pulse * 0.25);
+      // Spin AC fans
+      const fanSpeed = 0.16 + (acUnitsRef.current / 100) * 0.2;
+      acFanRotorsRef.current.forEach((r) => {
+        r.rotation.x += fanSpeed;
+      });
+
+      // Subtle animated pulse on 3D arrows so eye immediately tracks flow direction
+      const arrowOffset = (elapsed * 1.4) % 0.6;
+      if (redArrowGroupRef.current && !louversRef.current) {
+        redArrowGroupRef.current.position.x = arrowOffset;
+      }
+      if (greenArrowGroupRef.current && louversRef.current) {
+        greenArrowGroupRef.current.position.x = arrowOffset * 0.6;
+        greenArrowGroupRef.current.position.y = arrowOffset * 0.6;
       }
 
-      // Heat light flicker
-      heatGlowLight.intensity = louversEngaged ? 0.8 : 2.5 + Math.sin(elapsed * 3) * 0.4;
+      // Beacon status color
+      (beaconSphere.material as THREE.MeshBasicMaterial).color.setHex(
+        louversRef.current ? 0x10b981 : 0xef4444
+      );
+      beaconSphere.scale.setScalar(1 + Math.sin(elapsed * 6) * 0.22);
 
-      // Update particle stream
-      if (particleGeoRef.current && particleVelocitiesRef.current) {
-        const posAttr = particleGeoRef.current.attributes.position as THREE.BufferAttribute;
-        const colAttr = particleGeoRef.current.attributes.color as THREE.BufferAttribute;
-        const pos = posAttr.array as Float32Array;
-        const col = colAttr.array as Float32Array;
-        const vel = particleVelocitiesRef.current;
+      // Update thermal stream particles
+      const posAttr = particleGeo.attributes.position as THREE.BufferAttribute;
+      const colAttr = particleGeo.attributes.color as THREE.BufferAttribute;
+      const pos = posAttr.array as Float32Array;
+      const col = colAttr.array as Float32Array;
+      const isUpward = louversRef.current;
+      const targetCartX = -1.2 + alleyWidthRef.current * 0.72;
 
-        for (let i = 0; i < particleCount; i++) {
-          pos[i * 3] += vel[i * 3];
-          pos[i * 3 + 1] += vel[i * 3 + 1];
-          pos[i * 3 + 2] += vel[i * 3 + 2];
+      for (let i = 0; i < particleCount; i++) {
+        pos[i * 3] += velocities[i * 3];
+        pos[i * 3 + 1] += velocities[i * 3 + 1];
+        pos[i * 3 + 2] += velocities[i * 3 + 2];
 
-          const dist = pos[i * 3] - -2.9;
-
-          if (louversEngaged) {
-            // Rapid vertical dissipation
-            if (pos[i * 3 + 1] > 10.0 || pos[i * 3] > alleyWidth + 1.0) {
-              resetParticle(i);
-            }
-          } else {
-            // Horizontal impact against opposite canyon wall
-            if (pos[i * 3] > alleyWidth || dist > 9.0) {
-              resetParticle(i);
-            }
+        if (isUpward) {
+          col[i * 3] = 0.08;
+          col[i * 3 + 1] = 0.92;
+          col[i * 3 + 2] = 0.68;
+          if (pos[i * 3 + 1] > 9.8 || pos[i * 3] > targetCartX + 1.5) {
+            resetParticle(i);
+          }
+        } else {
+          col[i * 3] = 1.0;
+          col[i * 3 + 1] = Math.max(0.12, 0.55 - (pos[i * 3] + 3.1) * 0.07);
+          col[i * 3 + 2] = 0.05;
+          if (pos[i * 3] > targetCartX + 0.6) {
+            resetParticle(i);
           }
         }
-        posAttr.needsUpdate = true;
-        colAttr.needsUpdate = true;
+      }
+      posAttr.needsUpdate = true;
+      colAttr.needsUpdate = true;
+
+      // Update cool mist curtain
+      if (isUpward) {
+        const mAttr = mistGeo.attributes.position as THREE.BufferAttribute;
+        const mPos = mAttr.array as Float32Array;
+        for (let i = 0; i < mistCount; i++) {
+          mPos[i * 3] = targetCartX - 1.2 + Math.sin(elapsed * 2 + i) * 0.15;
+          mPos[i * 3 + 1] -= 0.03;
+          if (mPos[i * 3 + 1] < 0.35) {
+            mPos[i * 3 + 1] = 3.5;
+          }
+        }
+        mAttr.needsUpdate = true;
       }
 
       controls.update();
@@ -378,9 +629,8 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
     };
     animate();
 
-    // 8. Resize Handler
     const handleResize = () => {
-      if (!container || !camera || !renderer) return;
+      if (!container) return;
       const w = container.clientWidth;
       const h = container.clientHeight;
       camera.aspect = w / h;
@@ -389,25 +639,13 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
     };
     window.addEventListener('resize', handleResize);
 
-    // 9. Thorough Memory & WebGL Cache Cleanup (.dispose() discipline)
     return () => {
       window.removeEventListener('resize', handleResize);
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
-      }
-
-      // Recursively traverse scene to dispose geometries, materials, and textures
+      cancelAnimationFrame(animId);
+      controls.dispose();
+      spriteTex.dispose();
       scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh) {
-          if (obj.geometry) obj.geometry.dispose();
-          if (obj.material) {
-            if (Array.isArray(obj.material)) {
-              obj.material.forEach((m) => m.dispose());
-            } else {
-              obj.material.dispose();
-            }
-          }
-        } else if (obj instanceof THREE.Points) {
+        if (obj instanceof THREE.Mesh || obj instanceof THREE.Points) {
           if (obj.geometry) obj.geometry.dispose();
           if (obj.material) {
             if (Array.isArray(obj.material)) {
@@ -418,31 +656,12 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
           }
         }
       });
-
       renderer.dispose();
       if (renderer.domElement && renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
       }
-      sceneRef.current = null;
-      rendererRef.current = null;
     };
   }, []);
-
-  // Reactive updates to Alley Width without recreating WebGL context
-  useEffect(() => {
-    if (buildingMeshOppositeRef.current) {
-      buildingMeshOppositeRef.current.position.set(alleyWidth + 3, 7, 0);
-    }
-  }, [alleyWidth]);
-
-  // Reactive updates to Louvers toggle
-  useEffect(() => {
-    if (louversGroupRef.current) {
-      louversGroupRef.current.children.forEach((child) => {
-        child.visible = louversEngaged;
-      });
-    }
-  }, [louversEngaged]);
 
   const toggleLouvers = () => {
     const next = !louversEngaged;
@@ -450,184 +669,121 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
     if (onLouversChange) onLouversChange(next);
   };
 
-  // Keyboard shortcut listener for spacebar toggle (Game-grade drill experience)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
-      if (e.code === 'Space') {
-        e.preventDefault();
-        toggleLouvers();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [louversEngaged]);
-
-  // Verify hardware crypto handshake on demand
-  const handleVerifyHardware = () => {
-    const mockPayload = {
-      node_id: 'BEACON-DELHI-W84-V01',
-      wbgt: 38.6,
-      ambient_temp: currentPresetData.ambientTemp,
-      timestamp: new Date().toISOString(),
-    };
-    const isValid = verifyDeviceHandshake(mockPayload, 'un_hw_secure_ecc_p256_09x84b2e1');
-    setHardwareVerified(isValid);
+  const resetCameraView = () => {
+    if (!cameraRef.current || !controlsRef.current) return;
+    cameraRef.current.position.set(0.5, 5.2, 16.2);
+    controlsRef.current.target.set(0.2, 3.1, 0);
+    controlsRef.current.update();
   };
 
+  // Dynamic Vendor Cart Temperature based on AC Count, Alley Width & Louvers
+  const vendorCartTemp = louversEngaged
+    ? (30.2).toFixed(1)
+    : (38.5 + (acUnitsCount / 100) * 6.2 + (8 - alleyWidth) * 0.8).toFixed(1);
+
   return (
-    <div className="relative w-full h-full min-h-[580px] bg-[#08080a] flex flex-col overflow-hidden rounded-2xl border border-zinc-800/40 shadow-2xl">
-      {/* 3D WebGL Canvas Mount Container */}
-      <div ref={mountRef} className="absolute inset-0 w-full h-full" />
+    <div className="w-full space-y-4">
+      {/* 2-Second Instant Comprehension 3D Cross-Section Viewport */}
+      <div className="relative w-full h-[460px] sm:h-[520px] bg-[#0b1528] rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl">
+        {/* WebGL Canvas */}
+        <div
+          ref={mountRef}
+          className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+        />
 
-      {/* Tactical Objective HUD (Top-Left) */}
-      <div className="absolute top-16 left-4 z-20 bg-[#0c0d12]/85 backdrop-blur-md rounded-xl border border-zinc-800/40 p-3 shadow-xl font-mono text-[10px] space-y-1.5 max-w-xs pointer-events-auto">
-        <div className="flex items-center justify-between border-b border-zinc-800/40 pb-1">
-          <div className="flex items-center gap-1.5 text-amber-400 font-semibold tracking-wider">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
-            <span>DRILL // THERMAL DEFENSE</span>
-          </div>
-          <span className="text-[9px] text-zinc-500 font-semibold">LIVE CFD</span>
-        </div>
-        <p className="text-zinc-300 text-[11px] font-sans font-light leading-tight">
-          {louversEngaged
-            ? '✅ Skyward louvers engaged! Exhaust heat deflected vertically into upper atmosphere.'
-            : '⚠️ 53.6°C exhaust jet hitting pedestrian street corridor. Rameshwar Pal in extreme thermal danger!'}
-        </p>
-        <div className="flex items-center gap-2 pt-0.5 text-[9px] text-zinc-400">
-          <span className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-amber-300 font-semibold">SPACE</span>
-          <span>TOGGLE LOUVERS</span>
-          <span className="text-zinc-600">·</span>
-          <span className="text-zinc-500">DRAG TO ORBIT</span>
-        </div>
-      </div>
-
-      {/* Tactical 2D Radar Minimap (Top-Right) */}
-      <div className="absolute top-16 right-4 z-20 w-44 bg-[#0c0d12]/85 backdrop-blur-md rounded-xl border border-zinc-800/40 p-2.5 shadow-xl font-mono text-[10px] space-y-2 pointer-events-auto">
-        <div className="flex items-center justify-between border-b border-zinc-800/40 pb-1 text-zinc-400">
-          <div className="flex items-center gap-1.5 font-semibold text-zinc-200 tracking-wider">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-            <span>RADAR // SECTOR</span>
-          </div>
-          <span className="text-[9px] text-zinc-500">{alleyWidth.toFixed(1)}m WIDE</span>
-        </div>
-        
-        {/* Vector Top-Down Schematic */}
-        <div className="relative h-20 w-full bg-black/80 rounded-lg border border-zinc-800/60 overflow-hidden flex items-center justify-between px-2">
-          {/* Left Building Facade / AC Units */}
-          <div className="w-2.5 h-full bg-red-950/80 border-r-2 border-red-500 flex flex-col justify-around py-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-red-400 mx-auto" />
-            <div className="w-1.5 h-1.5 rounded-full bg-red-400 mx-auto" />
-            <div className="w-1.5 h-1.5 rounded-full bg-red-400 mx-auto" />
-          </div>
-
-          {/* Heat Plume Trajectory */}
-          <div className="flex-1 h-full relative overflow-hidden flex items-center">
-            <div 
-              className={`absolute inset-y-1 transition-all duration-500 ${
-                louversEngaged 
-                  ? 'w-6 bg-gradient-to-t from-emerald-500/40 to-sky-400/60 rounded-t-lg'
-                  : 'w-full bg-gradient-to-r from-red-600/60 via-amber-500/40 to-transparent'
-              }`}
-              style={{ left: '4px' }}
-            />
-            {/* Vendor Pin */}
-            <div 
-              className="absolute z-10 flex flex-col items-center"
-              style={{ left: '60%' }}
-            >
-              <div className={`h-2.5 w-2.5 rounded-full border ${louversEngaged ? 'bg-emerald-400 border-white' : 'bg-amber-400 border-red-500 animate-pulse'}`} />
-              <span className="text-[7px] text-zinc-300 font-bold whitespace-nowrap mt-0.5">VENDOR</span>
-            </div>
-
-            {/* Mist Refuge Kiosk */}
-            <div 
-              className="absolute top-1 right-1.5 z-10 flex items-center gap-0.5 text-sky-400 text-[7px]"
-            >
-              <span className="h-1 w-1 rounded-full bg-sky-400" />
-              <span>MIST #3</span>
-            </div>
-          </div>
-
-          {/* Right Building Facade */}
-          <div className="w-2.5 h-full bg-zinc-900 border-l-2 border-zinc-700" />
-        </div>
-
-        {/* Legend & Plume Status */}
-        <div className="flex items-center justify-between text-[9px] pt-0.5 text-zinc-400">
-          <div className="flex items-center gap-1">
-            <span className={`h-1.5 w-1.5 rounded-full ${louversEngaged ? 'bg-emerald-400' : 'bg-red-500'}`} />
-            <span>{louversEngaged ? 'SKYWARD DEFLECTION' : '54°C TRAPPED JET'}</span>
-          </div>
-          <span className="text-zinc-500 font-bold">[SPACE]</span>
-        </div>
-      </div>
-
-      {/* Top Floating Telemetry & Preset Ribbon */}
-      <div className="relative z-10 p-4 pointer-events-none flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2 pointer-events-auto">
-          {/* Location Presets Selector */}
-          <div className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-            <MapPin className="w-3.5 h-3.5 text-amber-400" />
-            <span className="font-semibold text-slate-300">Canyon Archetype:</span>
-            {Object.keys(presets).map((name) => (
-              <button
-                key={name}
-                onClick={() => applyPreset(name)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                  activePreset === name
-                    ? 'bg-amber-500 text-slate-950 shadow-sm'
-                    : 'text-slate-400 hover:text-white bg-slate-800/60'
-                }`}
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-
-          {/* Cryptographic Handshake Status */}
+        {/* TOP-CENTER: Bold 1-Second Visual Story Banner */}
+        <div className="absolute top-3.5 left-3.5 right-3.5 z-10 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
           <div
-            onClick={handleVerifyHardware}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs cursor-pointer backdrop-blur-md transition-all ${
-              hardwareVerified
-                ? 'bg-emerald-950/60 border-emerald-800/80 text-emerald-400'
-                : 'bg-red-950/60 border-red-800/80 text-red-400'
+            className={`px-4 py-2 rounded-xl font-mono text-xs sm:text-sm font-black tracking-wide flex items-center gap-2.5 shadow-lg border backdrop-blur-md ${
+              louversEngaged
+                ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/80'
+                : 'bg-rose-950/90 text-rose-100 border-rose-500/80'
             }`}
-            title="Click to re-verify AWS Secrets Manager ECC-P256 token"
           >
-            <Cpu className="w-3.5 h-3.5" />
-            <span className="font-mono text-[11px]">
-              {hardwareVerified ? 'IoT Beacon: Authenticated (P-256)' : 'IoT Beacon: Token Tampered'}
-            </span>
+            <span
+              className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                louversEngaged ? 'bg-emerald-400' : 'bg-rose-500 animate-ping'
+              }`}
+            />
+            {louversEngaged ? (
+              <span className="flex items-center gap-1.5">
+                <span>SAFE: 45° Louvers Send Heat UP to Sky</span>
+                <ArrowUpRight className="w-4 h-4 text-emerald-400 shrink-0" />
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5">
+                <span>DANGER: AC Heat Blasts Straight at Vendor Cart</span>
+                <ArrowRight className="w-4 h-4 text-rose-400 shrink-0" />
+              </span>
+            )}
           </div>
+
+          <button
+            type="button"
+            onClick={resetCameraView}
+            className="pointer-events-auto px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-md"
+          >
+            <RotateCcw className="w-3.5 h-3.5 pointer-events-none" />
+            <span className="pointer-events-none">Reset View</span>
+          </button>
         </div>
 
-        {/* Real-Time Canyon Status Metrics */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <div className="bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-800 text-right">
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Canyon Aspect Ratio (H/W)</div>
-            <div className="text-sm font-mono font-bold text-amber-400 tabular-nums">
-              {(14 / alleyWidth).toFixed(2)}:1
+        {/* CLEAR 3-POINT DIAGRAM CALLOUTS (Left Building -> Middle Airflow -> Right Vendor Cart) */}
+        <div className="absolute bottom-3.5 left-3.5 right-3.5 z-10 grid grid-cols-3 gap-2 sm:gap-3 pointer-events-none">
+          {/* 1. LEFT: Building AC Wall */}
+          <div className="bg-slate-950/85 backdrop-blur-md border border-slate-700/80 rounded-xl p-2.5 sm:p-3 text-left">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold">
+              1. Left: Tower AC Wall
+            </div>
+            <div className="text-xs sm:text-sm font-black text-white mt-0.5">
+              {acUnitsCount} Outdoor ACs (53.6°C)
             </div>
           </div>
 
-          <div className="bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-800 text-right">
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Breathing-Zone Plume Temp</div>
-            <div className={`text-sm font-mono font-bold tabular-nums ${louversEngaged ? 'text-emerald-400' : 'text-red-400'}`}>
-              {louversEngaged ? `${(currentPresetData.ambientTemp + 0.9).toFixed(1)}°C (Skyward)` : `${(currentPresetData.ambientTemp + 6.8).toFixed(1)}°C (Trapped)`}
+          {/* 2. CENTER: Street Canyon Path */}
+          <div
+            className={`backdrop-blur-md border rounded-xl p-2.5 sm:p-3 text-center ${
+              louversEngaged
+                ? 'bg-emerald-950/85 border-emerald-500/70'
+                : 'bg-rose-950/85 border-rose-500/70'
+            }`}
+          >
+            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-200 font-bold">
+              2. Middle: {alleyWidth.toFixed(1)}m Street
+            </div>
+            <div
+              className={`text-xs sm:text-sm font-black mt-0.5 ${
+                louversEngaged ? 'text-emerald-300' : 'text-rose-300'
+              }`}
+            >
+              {louversEngaged ? '↗ Heat Sent Up to Roof' : '→ Hot Air Hits Street'}
+            </div>
+          </div>
+
+          {/* 3. RIGHT: Street Vendor Cart */}
+          <div className="bg-slate-950/85 backdrop-blur-md border border-slate-700/80 rounded-xl p-2.5 sm:p-3 text-right">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-sky-400 font-bold">
+              3. Right: Vendor Cart
+            </div>
+            <div
+              className={`text-xs sm:text-sm font-black mt-0.5 ${
+                louversEngaged ? 'text-emerald-400' : 'text-rose-400'
+              }`}
+            >
+              Cart Temp: {vendorCartTemp}°C {louversEngaged ? '(Safe)' : '(Hot)'}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Interactive Spatial Controls Panel */}
-      <div className="mt-auto relative z-10 p-4 pointer-events-auto bg-[#0c0d12]/85 backdrop-blur-md border-t border-zinc-800/40 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+      {/* External Control Strip Outside the 3D Canvas */}
+      <div className="p-4 rounded-2xl bg-[#0f172a] border border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
         {/* Alley Width Slider */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-zinc-400 flex items-center gap-1.5">
+            <span className="text-slate-300 font-semibold flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5 text-sky-400" />
-              Alley Width (Canyon Geometry)
+              Street Width
             </span>
             <span className="text-sky-400 font-bold">{alleyWidth.toFixed(1)}m</span>
           </div>
@@ -638,20 +794,16 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
             step="0.2"
             value={alleyWidth}
             onChange={(e) => setAlleyWidth(parseFloat(e.target.value))}
-            className="w-full h-1.5 bg-zinc-900 rounded-lg appearance-none cursor-pointer accent-sky-400 border border-zinc-800/60"
+            className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-sky-400"
           />
-          <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
-            <span>4.0m (Trapped Chasm)</span>
-            <span>8.0m (Open Boulevard)</span>
-          </div>
         </div>
 
         {/* AC Units Count Slider */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-zinc-400 flex items-center gap-1.5">
+            <span className="text-slate-300 font-semibold flex items-center gap-1.5">
               <Flame className="w-3.5 h-3.5 text-amber-400" />
-              Condenser Density (Split & VRF)
+              Outdoor AC Units
             </span>
             <span className="text-amber-400 font-bold">{acUnitsCount} units</span>
           </div>
@@ -662,37 +814,32 @@ export const ThermalPlumeTwin: React.FC<TwinProps> = ({
             step="2"
             value={acUnitsCount}
             onChange={(e) => setAcUnitsCount(parseInt(e.target.value))}
-            className="w-full h-1.5 bg-zinc-900 rounded-lg appearance-none cursor-pointer accent-amber-400 border border-zinc-800/60"
+            className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-amber-400"
           />
-          <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
-            <span>10 units (85 kW heat)</span>
-            <span>100 units (850 kW blast)</span>
-          </div>
         </div>
 
         {/* Louver Mitigation Toggle */}
-        <div className="flex items-center justify-end">
-          <button
-            onClick={toggleLouvers}
-            className={`w-full py-2.5 px-4 rounded-xl font-mono font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md ${
-              louversEngaged
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40'
-                : 'bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white border border-amber-500/40'
-            }`}
-          >
-            {louversEngaged ? (
-              <>
-                <ShieldCheck className="w-4 h-4" />
-                <span>Restorative Skyward Louvers ENGAGED</span>
-              </>
-            ) : (
-              <>
-                <Flame className="w-4 h-4 fill-current animate-pulse" />
-                <span>Engage Section 133 Skyward Louvers</span>
-              </>
-            )}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={toggleLouvers}
+          className={`w-full py-2.5 px-4 rounded-xl font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            louversEngaged
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+              : 'bg-[#a8321a] hover:bg-[#8e2915] text-white'
+          }`}
+        >
+          {louversEngaged ? (
+            <>
+              <ShieldCheck className="w-4 h-4 pointer-events-none" />
+              <span className="pointer-events-none">45° Skyward Louvers ON (Safe)</span>
+            </>
+          ) : (
+            <>
+              <Flame className="w-4 h-4 fill-current pointer-events-none" />
+              <span className="pointer-events-none">Turn ON 45° Skyward Louvers</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

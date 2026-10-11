@@ -87,12 +87,12 @@ export const MethodologyPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      {/* Top Navigation & Breadcrumbs Bar */}
+      {/* Top Navigation & Breadcrumbs Bar on #12161A Dark Canvas */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-2">
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F3F4F6] text-[#111827] border border-[#E5E7EB] shadow-md text-xs font-mono font-bold transition-colors"
             title="Return to Home Overview"
           >
             <Home className="w-3.5 h-3.5 text-[#a8321a]" />
@@ -100,36 +100,36 @@ export const MethodologyPage: React.FC = () => {
           </Link>
         </div>
 
-        <nav className="flex items-center gap-2 text-xs font-mono text-[#0b1b2d]/70">
-          <Link to="/" className="hover:text-[#a8321a] transition-colors">
+        <nav className="flex items-center gap-2 text-xs font-mono text-slate-300">
+          <Link to="/" className="text-white hover:text-amber-400 transition-colors">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-[#0b1b2d]/40" />
-          <span className="text-[#a8321a] font-bold">Scientific Methodology</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-amber-400 font-bold">Scientific Methodology</span>
         </nav>
       </div>
 
       {/* Hero Headline */}
-      <div className="space-y-3 pb-6 border-b border-[#d6cebe]">
+      <div className="space-y-3 pb-6 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+          <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-400/15 text-amber-300 border border-amber-400/30">
             Peer-Reviewed Thermodynamics
           </span>
-          <span className="text-[#0b1b2d]/40 text-xs font-mono">·</span>
-          <span className="text-[#0b1b2d]/80 text-xs font-mono font-semibold">
+          <span className="text-slate-500 text-xs font-mono">·</span>
+          <span className="text-slate-300 text-xs font-mono font-semibold">
             Urban Canopy Micro-Climate Modeling
           </span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0b1b2d]">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
           Scientific Formulation &amp; Data Methodology
         </h1>
-        <p className="text-sm text-[#1f3044] max-w-3xl leading-relaxed">
+        <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
           Grounding thermal equity in the first principles of refrigeration thermodynamics, atmospheric boundary layer physics, wet bulb globe temperatures, and statutory civic environmental law.
         </p>
       </div>
 
       {/* Interactive Live Thermodynamic Calculator */}
-      <div className="bg-[#efe8dc] rounded-2xl border border-[#d6cebe] p-6 sm:p-8 space-y-8 shadow-sm">
+      <div className="bg-[#FFFFFF] rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 space-y-8 shadow-xl text-[#111827]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#d6cebe]">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-[#a8321a] mb-1 font-bold">

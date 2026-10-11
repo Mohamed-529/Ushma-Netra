@@ -45,19 +45,19 @@ export const ScrollDrivenShowcase: React.FC<ScrollDrivenShowcaseProps> = () => {
   ];
 
   return (
-    <section id="how_it_works_summary" className="relative w-full py-20 sm:py-28 px-4 sm:px-8 lg:px-16 border-t border-[#d6cebe]">
+    <section id="how_it_works_summary" className="relative w-full py-20 sm:py-28 px-4 sm:px-8 lg:px-16 border-t border-white/10">
       {/* Persistent Sticky Floating "30s Fast Tour" Trailer Button */}
       <div className="fixed bottom-6 left-6 z-40">
         <button
           type="button"
           onClick={() => setTrailerOpen(true)}
-          className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#0b1b2d]/95 hover:bg-[#162a42] text-white border border-slate-700/80 shadow-[0_10px_30px_rgba(11,27,45,0.28)] backdrop-blur-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 group"
+          className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#FFFFFF] hover:bg-[#F3F4F6] text-[#111827] border border-[#E5E7EB] shadow-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 group"
           title="Watch full-screen 30-second platform trailer"
         >
           <span className="w-6 h-6 rounded-full bg-[#a8321a] text-white flex items-center justify-center group-hover:scale-105 transition-transform">
             <Play className="w-3 h-3 fill-current ml-0.5" />
           </span>
-          <span className="font-semibold tracking-tight pr-1">30s Fast Tour</span>
+          <span className="font-bold tracking-tight pr-1">30s Fast Tour</span>
         </button>
       </div>
 
@@ -73,35 +73,35 @@ export const ScrollDrivenShowcase: React.FC<ScrollDrivenShowcaseProps> = () => {
           {/* LEFT SIDE: Short, Crisp, Simple English Summary of All 4 Core Capabilities */}
           <div className="lg:col-span-6 space-y-6 text-left">
             <div className="space-y-2">
-              <div className="text-xs font-mono text-[#a8321a] font-semibold uppercase tracking-wider">
+              <div className="text-xs font-mono text-amber-400 font-semibold uppercase tracking-wider">
                 How Ushma-Netra Works in 4 Steps
               </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-[#0b1b2d] tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
                 Stop commercial AC heat from cooking street workers.
               </h2>
-              <p className="text-sm sm:text-base text-[#1f3044] leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
                 We track waste heat from big buildings and turn it into instant street cooling.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {corePillars.map((item) => {
                 const Icon = item.icon;
                 return (
                   <div
                     key={item.num}
-                    className="p-4 rounded-2xl bg-[#efe8dc] border border-[#d6cebe] space-y-1.5"
+                    className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E5E7EB] shadow-xl space-y-1.5"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-mono font-bold text-[#a8321a]">
                         {item.num}
                       </span>
-                      <Icon className="w-4 h-4 text-[#0b1b2d]" />
+                      <Icon className="w-4 h-4 text-[#111827]" />
                     </div>
-                    <h3 className="text-sm font-bold text-[#0b1b2d] leading-snug">
+                    <h3 className="text-sm font-bold text-[#111827] leading-snug">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-[#1f3044] leading-relaxed">
+                    <p className="text-xs text-[#111827]/80 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -112,17 +112,17 @@ export const ScrollDrivenShowcase: React.FC<ScrollDrivenShowcaseProps> = () => {
             <div className="pt-1">
               <Link
                 to="/twin"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0b1b2d] hover:bg-[#1a2f47] text-white text-sm font-semibold transition-all cursor-pointer shadow-md"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-[#F3F4F6] text-[#111827] text-sm font-bold transition-all cursor-pointer shadow-xl"
               >
                 <span>See Live 3D Street View</span>
-                <ArrowRight className="w-4 h-4 text-amber-300" />
+                <ArrowRight className="w-4 h-4 text-[#a8321a]" />
               </Link>
             </div>
           </div>
 
           {/* RIGHT SIDE: Clean Related Visual Picture with Key Thermal Overlay */}
           <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden border-2 border-[#d6cebe] bg-[#0b111e] shadow-[0_24px_60px_rgba(11,27,45,0.18)]">
+            <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-[#0b111e] shadow-2xl">
               {/* High-Contrast Street Canyon Thermal Visual */}
               <div className="relative h-[380px] sm:h-[430px] w-full overflow-hidden">
                 <img

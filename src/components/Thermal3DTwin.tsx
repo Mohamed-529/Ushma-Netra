@@ -705,170 +705,166 @@ export const Thermal3DTwin: React.FC<Props> = ({
   };
 
   return (
-    <div className="relative w-full h-full min-h-[600px] bg-[#09111e] flex flex-col overflow-hidden rounded-xl border border-slate-800">
-      {/* 3D WebGL Canvas with Interactive OrbitControls */}
-      <div ref={mountRef} className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing" />
+    <div className="w-full space-y-3">
+      {/* Unobstructed 3D WebGL Viewport (Only minimal floating pills on corners) */}
+      <div className="relative w-full h-[540px] sm:h-[600px] bg-[#09111e] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+        {/* 3D WebGL Canvas with Interactive OrbitControls */}
+        <div
+          ref={mountRef}
+          className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+        />
 
-      {/* Top Floating Telemetry HUD */}
-      <div className="relative z-10 p-4 pointer-events-none flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-lg border border-slate-700/80 text-xs pointer-events-auto">
-          <span className="font-bold text-white">3D Micro-Canyon Digital Twin</span>
-          <span className="text-slate-500">·</span>
-          <span className="text-slate-300 font-medium">{building.name}</span>
-          <span className="text-slate-500">·</span>
-          <span className="text-amber-400 font-mono font-bold">Drag to Rotate · Scroll to Zoom</span>
+        {/* Minimal Top-Left Camera Angle Switcher */}
+        <div className="absolute top-3.5 left-3.5 z-10 flex flex-wrap items-center gap-1.5 bg-slate-950/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-800">
+          <button
+            type="button"
+            onClick={() => setPresetCamera('isometric')}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+              cameraView === 'isometric'
+                ? 'bg-amber-400 text-slate-950'
+                : 'text-slate-200 hover:text-white'
+            }`}
+          >
+            Street View
+          </button>
+          <button
+            type="button"
+            onClick={() => setPresetCamera('pedestrian')}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+              cameraView === 'pedestrian'
+                ? 'bg-amber-400 text-slate-950'
+                : 'text-slate-200 hover:text-white'
+            }`}
+          >
+            Vendor View
+          </button>
+          <button
+            type="button"
+            onClick={() => setPresetCamera('side')}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+              cameraView === 'side'
+                ? 'bg-amber-400 text-slate-950'
+                : 'text-slate-200 hover:text-white'
+            }`}
+          >
+            Side View
+          </button>
+          <button
+            type="button"
+            onClick={() => setPresetCamera('isometric')}
+            className="p-1.5 rounded-lg text-slate-300 hover:text-white cursor-pointer"
+            title="Reset 3D Camera"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
         </div>
 
-        {/* Real-time Thermal Metrics Strip */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/80 text-right">
-            <div className="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">AC Exhaust Temp</div>
-            <div className="text-sm font-mono font-bold text-rose-400 tabular-nums">
-              {effectiveExhaustTemp}°C
-            </div>
-          </div>
-
-          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/80 text-right">
-            <div className="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Street Heat Delta</div>
-            <div className={`text-sm font-mono font-bold tabular-nums ${isMitigated ? 'text-emerald-400' : 'text-amber-400'}`}>
-              {effectiveStreetDelta}
-            </div>
-          </div>
-
-          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/80 text-right">
-            <div className="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Vendor WBGT</div>
-            <div className="text-sm font-mono font-bold text-amber-300 tabular-nums">
-              {isMitigated ? '30.2°C' : `${vendor.wetBulbGlobeTempCelsius}°C`}
-            </div>
-          </div>
+        {/* Minimal Top-Right Live Heat Pill */}
+        <div className="absolute top-3.5 right-3.5 z-10 flex items-center gap-2 bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 font-mono text-xs">
+          <span className="text-slate-400">Street Temp:</span>
+          <span
+            className={`font-black text-sm ${
+              isMitigated ? 'text-emerald-400' : 'text-rose-400'
+            }`}
+          >
+            {isMitigated ? '33.5°C (Cooled)' : `${currentPlumeTemp}°C (Hot)`}
+          </span>
         </div>
       </div>
 
-      {/* Bottom Floating Interactive Controls Drawer */}
-      <div className="mt-auto relative z-10 p-4 pointer-events-auto">
-        <div className="bg-slate-900/95 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-          {/* Camera View Switcher */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs text-slate-300 font-semibold mr-1 flex items-center gap-1">
-              <Eye className="w-3.5 h-3.5 text-amber-400" /> View:
-            </span>
-            <button
-              onClick={() => setPresetCamera('isometric')}
-              className={`px-2.5 py-1 text-xs font-bold rounded transition-colors cursor-pointer ${cameraView === 'isometric' ? 'bg-amber-400 text-slate-950' : 'text-slate-200 hover:text-white bg-slate-800'}`}
-            >
-              Canyon Overview
-            </button>
-            <button
-              onClick={() => setPresetCamera('pedestrian')}
-              className={`px-2.5 py-1 text-xs font-bold rounded transition-colors cursor-pointer ${cameraView === 'pedestrian' ? 'bg-amber-400 text-slate-950' : 'text-slate-200 hover:text-white bg-slate-800'}`}
-            >
-              Vendor Head Height
-            </button>
-            <button
-              onClick={() => setPresetCamera('side')}
-              className={`px-2.5 py-1 text-xs font-bold rounded transition-colors cursor-pointer ${cameraView === 'side' ? 'bg-amber-400 text-slate-950' : 'text-slate-200 hover:text-white bg-slate-800'}`}
-            >
-              Cross-Section
-            </button>
-            <button
-              onClick={() => setPresetCamera('isometric')}
-              className="p-1.5 rounded bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
-              title="Reset 3D Camera"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-          </div>
+      {/* External Controls & Simple Temperature Probes Bar (Outside the 3D Canvas so 3D is never hidden) */}
+      <div className="bg-[#0f172a] p-4 rounded-2xl border border-slate-800 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 text-xs">
+        {/* Left: Thermal Camera Mode + AC Heat Load Slider */}
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setFlirMode(!flirMode)}
+            className={`px-3.5 py-2 font-bold rounded-xl border transition-all cursor-pointer ${
+              flirMode
+                ? 'bg-rose-950 text-rose-200 border-rose-500'
+                : 'bg-slate-800 text-slate-200 border-slate-700 hover:text-white'
+            }`}
+          >
+            {flirMode ? 'Thermal Camera: ON' : 'Thermal Camera: OFF'}
+          </button>
 
-          {/* View Mode: FLIR False-Color vs Standard 3D */}
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setFlirMode(!flirMode)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
-                flirMode
-                  ? 'bg-rose-950/90 text-rose-200 border-rose-600 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
-                  : 'bg-slate-800 text-slate-200 border-slate-700 hover:text-white'
-              }`}
-            >
-              {flirMode ? '🌡️ FLIR Thermal IR Active' : '📷 Standard 3D View'}
-            </button>
-          </div>
-
-          {/* AC Capacity Slider */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs text-slate-200 font-semibold">
-              <Flame className="w-3.5 h-3.5 text-rose-400" />
-              <span>Chiller Load:</span>
-              <span className="font-mono text-rose-300 font-bold tabular-nums">{acLoadPct}%</span>
-            </div>
+          <div className="flex items-center gap-2.5 bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-800">
+            <Flame className="w-3.5 h-3.5 text-rose-400" />
+            <span className="text-slate-300 font-semibold">AC Power:</span>
+            <span className="font-mono text-amber-300 font-bold w-9">{acLoadPct}%</span>
             <input
               type="range"
               min="20"
               max="100"
               value={acLoadPct}
               onChange={(e) => setAcLoadPct(Number(e.target.value))}
-              className="w-28 accent-amber-400 cursor-pointer"
+              className="w-24 accent-amber-400 cursor-pointer"
             />
           </div>
-
-          {/* Restorative Mitigation Trigger */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleMitigation}
-              className={`px-4 py-2 text-xs font-bold rounded-lg flex items-center gap-2 transition-all cursor-pointer ${
-                isMitigated
-                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/40'
-                  : 'bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white'
-              }`}
-            >
-              {isMitigated ? (
-                <>
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>45° Louvers + Mist Active (Plume Diverted)</span>
-                </>
-              ) : (
-                <>
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>Deploy 45° Louvers &amp; Sidewalk Mist</span>
-                </>
-              )}
-            </button>
-          </div>
         </div>
 
-        {/* Interactive Micro-Thermal Probe Crosshairs Bar */}
-        <div className="mt-2.5 p-2.5 bg-slate-950/95 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-          <div className="flex flex-wrap items-center gap-2 text-slate-300">
-            <span className="text-[10px] uppercase text-amber-400 font-bold">Temperature Probes:</span>
-            <button
-              onClick={() => setActiveProbe('grill')}
-              className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${activeProbe === 'grill' ? 'bg-red-900/80 text-red-200 border border-red-700' : 'text-slate-300 hover:text-white'}`}
-            >
-              Exhaust Grill: <strong className="text-rose-400">{effectiveExhaustTemp}°C</strong>
-            </button>
-            <button
-              onClick={() => setActiveProbe('breathing_zone')}
-              className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${activeProbe === 'breathing_zone' ? 'bg-amber-900/80 text-amber-200 border border-amber-700' : 'text-slate-300 hover:text-white'}`}
-            >
-              Breathing Height: <strong className="text-amber-300">{isMitigated ? '33.5°C' : `${currentPlumeTemp}°C`}</strong>
-            </button>
-            <button
-              onClick={() => setActiveProbe('cart')}
-              className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${activeProbe === 'cart' ? 'bg-purple-900/80 text-purple-200 border border-purple-700' : 'text-slate-300 hover:text-white'}`}
-            >
-              Vendor Cart: <strong className="text-purple-300">{isMitigated ? '30.2°C' : `${vendor.wetBulbGlobeTempCelsius}°C`}</strong>
-            </button>
-            <button
-              onClick={() => setActiveProbe('roof')}
-              className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${activeProbe === 'roof' ? 'bg-emerald-900/80 text-emerald-200 border border-emerald-700' : 'text-slate-300 hover:text-white'}`}
-            >
-              Roof Discharge: <strong className="text-emerald-300">34.0°C</strong>
-            </button>
-          </div>
-
-          <div className="text-[11px] text-slate-300">
-            {flirMode ? '🔴 FLIR False-Color: White/Red = 54°C · Emerald/Cyan = Mitigated' : '🟢 45° Louvers + 70-bar Mist Arch'}
-          </div>
+        {/* Center: 3 Simple Spot Temperatures */}
+        <div className="flex flex-wrap items-center gap-2 font-mono">
+          <button
+            type="button"
+            onClick={() => setActiveProbe('grill')}
+            className={`px-3 py-1.5 rounded-xl border transition-colors cursor-pointer ${
+              activeProbe === 'grill'
+                ? 'bg-rose-950/80 text-rose-200 border-rose-600'
+                : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
+            }`}
+          >
+            AC Vent: <strong className="text-rose-400">{effectiveExhaustTemp}°C</strong>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveProbe('cart')}
+            className={`px-3 py-1.5 rounded-xl border transition-colors cursor-pointer ${
+              activeProbe === 'cart'
+                ? 'bg-amber-950/80 text-amber-200 border-amber-600'
+                : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
+            }`}
+          >
+            Vendor Cart:{' '}
+            <strong className="text-amber-300">
+              {isMitigated ? '30.2°C' : `${vendor.wetBulbGlobeTempCelsius}°C`}
+            </strong>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveProbe('roof')}
+            className={`px-3 py-1.5 rounded-xl border transition-colors cursor-pointer ${
+              activeProbe === 'roof'
+                ? 'bg-emerald-950/80 text-emerald-200 border-emerald-600'
+                : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
+            }`}
+          >
+            Roof Air: <strong className="text-emerald-400">34.0°C</strong>
+          </button>
         </div>
+
+        {/* Right: Single Primary Cooling Toggle */}
+        <button
+          type="button"
+          onClick={toggleMitigation}
+          className={`px-4 py-2 font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 ${
+            isMitigated
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+              : 'bg-[#a8321a] hover:bg-[#8e2915] text-white'
+          }`}
+        >
+          {isMitigated ? (
+            <>
+              <ShieldCheck className="w-4 h-4" />
+              <span>Cooling Mist + 45° Louvers ON</span>
+            </>
+          ) : (
+            <>
+              <AlertTriangle className="w-4 h-4" />
+              <span>Turn ON 45° Louvers &amp; Mist</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

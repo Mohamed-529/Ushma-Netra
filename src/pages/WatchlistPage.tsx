@@ -24,6 +24,7 @@ import {
   Home
 } from 'lucide-react';
 import { soundEngine } from '../utils/audioSynthesizer';
+import { dispatchEmergencyAlertApi } from '../services/gemini';
 
 interface Props {
   buildings: BuildingAudit[];
@@ -84,52 +85,67 @@ export const WatchlistPage: React.FC<Props> = ({
   // Watchlisted building objects
   const watchlistedBuildings = buildings.filter((b) => watchlistIds.includes(b.id));
 
-  // Handle Dispatch
-  const handleDispatchNotification = () => {
+  // Handle Dispatch via Hardened Backend Endpoint
+  const handleDispatchNotification = async () => {
     setIsSending(true);
     soundEngine.playSpikeAlert();
 
-    setTimeout(() => {
-      let text = '';
-      if (selectedLanguage === 'hi') {
-        text =
-          selectedAlertTier === 'tier1'
-            ? '🚨 [उष्मा-नेत्र आपातकालीन चेतावनी] आपके बाज़ार में AC निकास से WBGT 36.8°C पार हो गया है। जानलेवा लू का खतरा। तुरंत अपनी रेहड़ी 15 मीटर दूर ले जाएं और नगर निगम हाइड्रेशन कियोस्क से ओआरएस लें।'
-            : '⚠️ [उष्मा-नेत्र चेतावनी] दोपहर 2 से 4 बजे के बीच AC का गर्म निकास चरम पर रहेगा। छायादार क्षेत्र में रहें।';
-      } else if (selectedLanguage === 'ta') {
-        text =
-          selectedAlertTier === 'tier1'
-            ? '🚨 [உஷ்மா-நேத்ரா அவசர எச்சரிக்கை] ஏசி வெளியேற்றும் வெப்பம் 36.8°C WBGT அளவைத் தாண்டியது. ஆபத்தான வெப்ப அலை எச்சரிக்கை! உடனடியாக வண்டியை 15 மீ தள்ளி வைக்கவும், நகராட்சி நீர் மையத்தை அணுகவும்.'
-            : '⚠️ [உஷ்மா-நேத்ரா எச்சரிக்கை] வணிக வளாக ஏசி வெப்பம் அதிகரித்துள்ளது. நிழல் பகுதியில் பாதுகாப்பாக இருக்கவும்.';
-      } else {
-        text =
-          selectedAlertTier === 'tier1'
-            ? '🚨 [Ushma-Netra URGENT ALERT] Commercial AC exhaust blast breached lethal WBGT 36.8°C threshold in your alley. Relocate carts 15m away; municipal evaporative mist kiosks engaged.'
-            : '⚠️ [Ushma-Netra ADVISORY] Moderate thermal debt surge detected. Please hydrate frequently and use designated cool shelters.';
+    try {
+      const apiResult = await dispatchEmergencyAlertApi({
+        recipientNumber,
+        recipientPersona,
+        language: selectedLanguage,
+        tier: selectedAlertTier,
+      });
+
+      if (apiResult) {
+        setDispatchedMessages((prev) => [apiResult, ...prev]);
+        setIsSending(false);
+        return;
       }
+    } catch {
+      // Fallback to local generation if offline
+    }
 
-      const newMsg = {
-        id: `msg-${Date.now()}`,
-        to: recipientNumber,
-        time: new Date().toLocaleTimeString(),
-        channel: 'WhatsApp' as const,
-        text,
-        status: 'Delivered' as const,
-      };
+    let text = '';
+    if (selectedLanguage === 'hi') {
+      text =
+        selectedAlertTier === 'tier1'
+          ? '🚨 [उष्मा-नेत्र आपातकालीन चेतावनी] आपके बाज़ार में AC निकास से WBGT 36.8°C पार हो गया है। जानलेवा लू का खतरा। तुरंत अपनी रेहड़ी 15 मीटर दूर ले जाएं और नगर निगम हाइड्रेशन कियोस्क से ओआरएस लें।'
+          : '⚠️ [उष्मा-नेत्र चेतावनी] दोपहर 2 से 4 बजे के बीच AC का गर्म निकास चरम पर रहेगा। छायादार क्षेत्र में रहें।';
+    } else if (selectedLanguage === 'ta') {
+      text =
+        selectedAlertTier === 'tier1'
+          ? '🚨 [உஷ்மா-நேத்ரா அவசர எச்சரிக்கை] ஏசி வெளியேற்றும் வெப்பம் 36.8°C WBGT அளவைத் தாண்டியது. ஆபத்தான வெப்ப அலை எச்சரிக்கை! உடனடியாக வண்டியை 15 மீ தள்ளி வைக்கவும், நகராட்சி நீர் மையத்தை அணுகவும்.'
+          : '⚠️ [உஷ்மா-நேத்ரா எச்சரிக்கை] வணிக வளாக ஏசி வெப்பம் அதிகரித்துள்ளது. நிழல் பகுதியில் பாதுகாப்பாக இருக்கவும்.';
+    } else {
+      text =
+        selectedAlertTier === 'tier1'
+          ? '🚨 [Ushma-Netra URGENT ALERT] Commercial AC exhaust blast breached lethal WBGT 36.8°C threshold in your alley. Relocate carts 15m away; municipal evaporative mist kiosks engaged.'
+          : '⚠️ [Ushma-Netra ADVISORY] Moderate thermal debt surge detected. Please hydrate frequently and use designated cool shelters.';
+    }
 
-      setDispatchedMessages((prev) => [newMsg, ...prev]);
-      setIsSending(false);
-    }, 800);
+    const newMsg = {
+      id: `msg-${Date.now()}`,
+      to: recipientNumber,
+      time: new Date().toLocaleTimeString(),
+      channel: 'WhatsApp' as const,
+      text,
+      status: 'Delivered' as const,
+    };
+
+    setDispatchedMessages((prev) => [newMsg, ...prev]);
+    setIsSending(false);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      {/* Top Navigation & Breadcrumbs Bar */}
+      {/* Top Navigation & Breadcrumbs Bar on #12161A Dark Canvas */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-2">
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F3F4F6] text-[#111827] border border-[#E5E7EB] shadow-md text-xs font-mono font-bold transition-colors"
             title="Return to Home Overview"
           >
             <Home className="w-3.5 h-3.5 text-[#a8321a]" />
@@ -137,30 +153,30 @@ export const WatchlistPage: React.FC<Props> = ({
           </Link>
         </div>
 
-        <nav className="flex items-center gap-2 text-xs font-mono text-[#0b1b2d]/70">
-          <Link to="/" className="hover:text-[#a8321a] transition-colors">
+        <nav className="flex items-center gap-2 text-xs font-mono text-slate-300">
+          <Link to="/" className="text-white hover:text-amber-400 transition-colors">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-[#0b1b2d]/40" />
-          <span className="text-[#a8321a] font-bold">Heat Surge Watchlist &amp; Alert Center</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-amber-400 font-bold">Heat Surge Watchlist &amp; Alert Center</span>
         </nav>
       </div>
 
       {/* Hero Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#d6cebe]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-100 text-rose-900 border border-rose-300 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
+            <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-500/15 text-rose-300 border border-rose-500/30 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
               <span>Real-Time Alert Feed</span>
             </span>
-            <span className="text-[#0b1b2d]/40 text-xs font-mono">·</span>
-            <span className="text-[#0b1b2d]/80 text-xs font-mono font-semibold">Early Warning System</span>
+            <span className="text-slate-500 text-xs font-mono">·</span>
+            <span className="text-slate-300 text-xs font-mono font-semibold">Early Warning System</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0b1b2d]">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
             Heat Surge Watchlist &amp; Alert Center
           </h1>
-          <p className="text-sm text-[#1f3044] max-w-2xl leading-relaxed">
+          <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
             Monitor flagged high-vulnerability urban micro-canyons, simulate multi-lingual WhatsApp/SMS emergency dispatches to street vendors, and inspect autonomous SCADA mitigation logs.
           </p>
         </div>
@@ -168,9 +184,9 @@ export const WatchlistPage: React.FC<Props> = ({
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={onSimulateSurge}
-            className="px-4 py-2.5 rounded-xl bg-red-100 hover:bg-red-200 border border-red-300 text-red-900 text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+            className="px-4 py-2.5 rounded-xl bg-[#a8321a] hover:bg-[#8c2713] border border-[#a8321a] text-white text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg"
           >
-            <Flame className="w-4 h-4 text-red-700 animate-pulse" />
+            <Flame className="w-4 h-4 text-amber-200 animate-pulse" />
             <span>Simulate City-Wide Surge</span>
           </button>
         </div>
@@ -180,11 +196,11 @@ export const WatchlistPage: React.FC<Props> = ({
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-xl font-bold text-[#0b1b2d] flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#a8321a]" />
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-400" />
               <span>My Monitored Hotspot Watchlist ({watchlistedBuildings.length})</span>
             </h2>
-            <p className="text-xs text-[#1f3044]">
+            <p className="text-xs text-slate-300">
               Zones currently pinned for sub-second lethal temperature threshold alerts.
             </p>
           </div>
@@ -192,13 +208,13 @@ export const WatchlistPage: React.FC<Props> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={addAllCritical}
-              className="text-xs font-mono text-[#a8321a] hover:underline font-bold cursor-pointer"
+              className="text-xs font-mono text-amber-400 hover:underline font-bold cursor-pointer"
             >
               + Add All Critical Hotspots
             </button>
             <Link
               to="/grid"
-              className="text-xs font-mono text-[#0b1b2d] hover:text-[#a8321a] px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] border border-[#d6cebe] transition-colors font-bold"
+              className="text-xs font-mono text-[#111827] hover:bg-[#F3F4F6] px-3.5 py-1.5 rounded-xl bg-[#FFFFFF] border border-[#E5E7EB] transition-colors font-bold shadow-sm"
             >
               Browse Registry
             </Link>

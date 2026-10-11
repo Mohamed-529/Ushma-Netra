@@ -1,32 +1,27 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { BuildingAudit, VendorTelemetry } from '../types';
 import {
   Search,
-  Filter,
   MapPin,
   Flame,
   AlertTriangle,
   ShieldCheck,
   Download,
-  ExternalLink,
   ChevronRight,
-  TrendingUp,
   Activity,
-  Layers,
-  Thermometer,
-  Wind,
   FileSpreadsheet,
   CheckCircle2,
-  SlidersHorizontal,
   X,
   Sparkles,
   ArrowRight,
-  Eye,
-  Radio,
-  FileText,
   ArrowLeft,
-  Home
+  Home,
+  Compass,
+  Navigation,
+  Crosshair,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import { soundEngine } from '../utils/audioSynthesizer';
 
@@ -43,7 +38,6 @@ export const ThermalGridPage: React.FC<Props> = ({
   selectedBuilding,
   onSelectBuilding,
   onApplyMitigation,
-  vendors,
 }) => {
   const { zoneId } = useParams<{ zoneId?: string }>();
   const navigate = useNavigate();
@@ -52,11 +46,21 @@ export const ThermalGridPage: React.FC<Props> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState<string>('All');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'table' | 'map'>('grid');
-  const [minHeatDebt, setMinHeatDebt] = useState<number>(0);
+  const [viewMode, setViewMode] = useState<'scrolly' | 'table' | 'map'>('scrolly');
+  const [minHeatDebt] = useState<number>(0);
+
+  // Scrollytelling Active Building State (driven by IntersectionObserver + manual click)
+  const [activeScrollBuildingId, setActiveScrollBuildingId] = useState<string>(
+    buildings[0]?.id || 'del-ln-vikas'
+  );
+  const [mapZoomMultiplier, setMapZoomMultiplier] = useState<number>(1);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
   const [watchlistIds, setWatchlistIds] = useState<string[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem('ushma_watchlist') || '["del-ln-vikas", "del-np-devika"]');
+      return JSON.parse(
+        localStorage.getItem('ushma_watchlist') || '["del-ln-vikas", "del-np-devika"]'
+      );
     } catch {
       return ['del-ln-vikas', 'del-np-devika'];
     }
@@ -66,7 +70,9 @@ export const ThermalGridPage: React.FC<Props> = ({
   const toggleWatchlist = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setWatchlistIds((prev) => {
-      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      const next = prev.includes(id)
+        ? prev.filter((item) => item !== id)
+        : [...prev, id];
       localStorage.setItem('ushma_watchlist', JSON.stringify(next));
       return next;
     });
@@ -99,11 +105,148 @@ export const ThermalGridPage: React.FC<Props> = ({
     });
   }, [buildings, searchQuery, selectedCity, selectedStatus, minHeatDebt]);
 
+  // Keep activeScrollBuildingId valid when filters change
+  useEffect(() => {
+    if (
+      filteredBuildings.length > 0 &&
+      !filteredBuildings.some((b) => b.id === activeScrollBuildingId)
+    ) {
+      setActiveScrollBuildingId(filteredBuildings[0].id);
+    }
+  }, [filteredBuildings, activeScrollBuildingId]);
+
+  // Performance-friendly IntersectionObserver to track which building card is in the center viewport threshold
+  useEffect(() => {
+    if (viewMode !== 'scrolly' || filteredBuildings.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Pick the card with the highest intersection ratio inside the center band
+        let bestEntry: IntersectionObserverEntry | null = null;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+              bestEntry = entry;
+            }
+          }
+        }
+        if (bestEntry) {
+          const buildingId = (bestEntry.target as HTMLElement).dataset.buildingId;
+          if (buildingId) {
+            setActiveScrollBuildingId(buildingId);
+          }
+        }
+      },
+      {
+        // Trigger when a card crosses the middle 30% band of the viewport
+        root: null,
+        rootMargin: '-32% 0px -32% 0px',
+        threshold: [0.15, 0.35, 0.6, 0.85],
+      }
+    );
+
+    filteredBuildings.forEach((b) => {
+      const el = cardRefs.current[b.id];
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [filteredBuildings, viewMode]);
+
+  // Safely sync activeScrollBuildingId with parent selectedBuilding inside an effect
+  useEffect(() => {
+    const found = filteredBuildings.find((b) => b.id === activeScrollBuildingId);
+    if (found && found.id !== selectedBuilding.id) {
+      onSelectBuilding(found);
+    }
+  }, [activeScrollBuildingId, filteredBuildings, selectedBuilding.id, onSelectBuilding]);
+
+  const activeMapBuilding = useMemo(() => {
+    return (
+      filteredBuildings.find((b) => b.id === activeScrollBuildingId) ||
+      filteredBuildings[0] ||
+      selectedBuilding
+    );
+  }, [filteredBuildings, activeScrollBuildingId, selectedBuilding]);
+
+  // Normalize building coordinates onto a 1000x700 spatial SVG coordinate plane with smooth local neighborhood offsets
+  const spatialNodes = useMemo(() => {
+    return filteredBuildings.map((b, idx) => {
+      // Create deterministic, well-spaced urban coordinates so every building has a clear micro-canyon footprint
+      const angle = idx * 1.18 + 0.4;
+      const ringRadius = 110 + (idx % 4) * 58;
+      const x = Math.round(500 + Math.cos(angle) * ringRadius * 1.25);
+      const y = Math.round(350 + Math.sin(angle) * ringRadius * 0.82);
+      return {
+        building: b,
+        x: Math.max(140, Math.min(860, x)),
+        y: Math.max(120, Math.min(580, y)),
+      };
+    });
+  }, [filteredBuildings]);
+
+  const activeSpatialNode = useMemo(() => {
+    return (
+      spatialNodes.find((n) => n.building.id === activeMapBuilding?.id) ||
+      spatialNodes[0] || {
+        building: selectedBuilding,
+        x: 500,
+        y: 350,
+      }
+    );
+  }, [spatialNodes, activeMapBuilding, selectedBuilding]);
+
+  // Smoothly scroll to a specific building card when a map marker is clicked
+  const scrollToBuildingCard = (building: BuildingAudit) => {
+    soundEngine.playTone(520, 'sine', 0.08);
+    setActiveScrollBuildingId(building.id);
+    onSelectBuilding(building);
+    const el = cardRefs.current[building.id];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   // Cities list
   const cities = ['All', 'Delhi NCR', 'Mumbai', 'Bengaluru', 'Ahmedabad'];
 
+  const [exportStatusMessage, setExportStatusMessage] = useState<string | null>(null);
+
+  // Trigger reliable file download inside sandboxed iframe + show visual confirmation
+  const triggerFileDownload = (content: string, filename: string, mimeType: string, label: string) => {
+    soundEngine.playTone(620, 'sine', 0.1);
+    try {
+      const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.setTimeout(() => {
+        if (document.body.contains(a)) {
+          document.body.removeChild(a);
+        }
+        URL.revokeObjectURL(url);
+      }, 250);
+      setExportStatusMessage(`Downloaded ${label} (${filteredBuildings.length} zones)`);
+      window.setTimeout(() => setExportStatusMessage(null), 3200);
+    } catch {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(content);
+      }
+      setExportStatusMessage(`Copied ${label} data to clipboard (${filteredBuildings.length} zones)`);
+      window.setTimeout(() => setExportStatusMessage(null), 3200);
+    }
+  };
+
   // Export GeoJSON
-  const handleExportGeoJSON = () => {
+  const handleExportGeoJSON = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     const geojson = {
       type: 'FeatureCollection',
       metadata: {
@@ -126,7 +269,9 @@ export const ThermalGridPage: React.FC<Props> = ({
           thermalDebtScore: b.thermalDebtScore,
           streetPlumeTempCelsius: b.streetPlumeTempCelsius,
           ambientBaselineTempCelsius: b.ambientBaselineTempCelsius,
-          temperatureDeltaCelsius: (b.streetPlumeTempCelsius - b.ambientBaselineTempCelsius).toFixed(1),
+          temperatureDeltaCelsius: (
+            b.streetPlumeTempCelsius - b.ambientBaselineTempCelsius
+          ).toFixed(1),
           rejectedHeatKw: b.rejectedHeatKw,
           coolingTonnageTR: b.totalCoolingTonnageTR,
           monthlyExhaustTaxInr: b.monthlyExhaustTaxInr,
@@ -136,17 +281,20 @@ export const ThermalGridPage: React.FC<Props> = ({
       })),
     };
 
-    const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ushma-netra-thermal-grid-${Date.now()}.geojson`;
-    a.click();
-    URL.revokeObjectURL(url);
+    triggerFileDownload(
+      JSON.stringify(geojson, null, 2),
+      `ushma-netra-thermal-grid-${Date.now()}.geojson`,
+      'application/geo+json',
+      'GeoJSON'
+    );
   };
 
   // Export CSV
-  const handleExportCSV = () => {
+  const handleExportCSV = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     const headers = [
       'ID',
       'Name',
@@ -180,16 +328,15 @@ export const ThermalGridPage: React.FC<Props> = ({
     ]);
 
     const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ushma-netra-thermal-nodes-${Date.now()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    triggerFileDownload(
+      csvContent,
+      `ushma-netra-thermal-nodes-${Date.now()}.csv`,
+      'text/csv',
+      'CSV'
+    );
   };
 
-  // Open detail
+  // Open detail drawer
   const handleOpenDetail = (b: BuildingAudit) => {
     onSelectBuilding(b);
     navigate(`/grid/${b.id}`);
@@ -199,14 +346,21 @@ export const ThermalGridPage: React.FC<Props> = ({
     navigate('/grid');
   };
 
+  // Compute dynamic camera transform & heat radius ring for the active building
+  const zoomScale = (1.75 + (activeMapBuilding.thermalDebtScore - 70) * 0.012) * mapZoomMultiplier;
+  const heatRadiusPx = Math.max(58, Math.round(activeMapBuilding.thermalDebtScore * 1.18));
+  const activeDelta = (
+    activeMapBuilding.streetPlumeTempCelsius - activeMapBuilding.ambientBaselineTempCelsius
+  ).toFixed(1);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Top Navigation & Breadcrumbs Bar */}
+      {/* Top Navigation & Breadcrumbs Bar on #12161A Dark Canvas */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-2">
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F3F4F6] text-[#111827] border border-[#E5E7EB] shadow-md text-xs font-mono font-bold transition-colors"
             title="Return to Home Overview"
           >
             <Home className="w-3.5 h-3.5 text-[#a8321a]" />
@@ -214,85 +368,97 @@ export const ThermalGridPage: React.FC<Props> = ({
           </Link>
         </div>
 
-        <nav className="flex items-center gap-2 text-xs font-mono text-[#0b1b2d]/70">
-          <Link to="/" className="hover:text-[#a8321a] transition-colors font-medium">
+        <nav className="flex items-center gap-2 text-xs font-mono text-slate-300">
+          <Link to="/" className="text-white hover:text-amber-400 transition-colors font-medium">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-[#0b1b2d]/40" />
-          <span className="text-[#a8321a] font-bold">Thermal Grid Registry</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-amber-400 font-bold">Thermal Grid Registry</span>
           {activeDetailBuilding && (
             <>
-              <ChevronRight className="w-3.5 h-3.5 text-[#0b1b2d]/40" />
-              <span className="text-[#0b1b2d] font-bold truncate">{activeDetailBuilding.name}</span>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-white font-bold truncate">
+                {activeDetailBuilding.name}
+              </span>
             </>
           )}
         </nav>
       </div>
 
       {/* Hero Headline & Key Statistics */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#d6cebe]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+            <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-400/15 text-amber-300 border border-amber-400/30">
               National Registry
             </span>
-            <span className="text-[#0b1b2d]/40 font-bold">·</span>
-            <span className="text-xs font-mono text-[#0b1b2d]/70">
-              Urban Street Canyon Heat Island Ingestion
-            </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0b1b2d]">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
             Thermal Grid &amp; Exhaust Zone Registry
           </h1>
-          <p className="text-sm text-[#1f3044] max-w-2xl leading-relaxed">
-            Continuously tracking commercial HVAC outdoor condenser clusters dumping 45°C–56°C exhaust heat into narrow pedestrian right-of-ways across Indian metro urban canopies.
-          </p>
         </div>
 
-        {/* Global Summary Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#efe8dc] p-4 rounded-2xl border border-[#d6cebe] shrink-0 shadow-sm">
+        {/* Global Summary Stats in Pure White #FFFFFF Floating Card */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#FFFFFF] p-4 rounded-2xl border border-[#E5E7EB] shrink-0 shadow-xl text-[#111827]">
           <div>
-            <div className="text-[10px] font-mono text-[#0b1b2d]/60 uppercase font-semibold">Monitored Nodes</div>
-            <div className="text-lg font-black font-mono text-[#0b1b2d]">{buildings.length}</div>
+            <div className="text-[10px] font-mono text-[#111827]/60 uppercase font-semibold">
+              Monitored Nodes
+            </div>
+            <div className="text-lg font-black font-mono text-[#111827]">
+              {buildings.length}
+            </div>
           </div>
           <div>
-            <div className="text-[10px] font-mono text-[#0b1b2d]/60 uppercase font-semibold">Total Rejection</div>
+            <div className="text-[10px] font-mono text-[#111827]/60 uppercase font-semibold">
+              Total Rejection
+            </div>
             <div className="text-lg font-black font-mono text-[#a8321a]">
               {(buildings.reduce((sum, b) => sum + b.rejectedHeatKw, 0) / 1000).toFixed(2)} MW
             </div>
           </div>
           <div>
-            <div className="text-[10px] font-mono text-[#0b1b2d]/60 uppercase font-semibold">Vulnerable Vendors</div>
+            <div className="text-[10px] font-mono text-[#111827]/60 uppercase font-semibold">
+              Vulnerable Vendors
+            </div>
             <div className="text-lg font-black font-mono text-[#9e2a14]">
-              {buildings.reduce((sum, b) => sum + b.adjacentVulnerablePopulation.vendorsCount, 0)}
+              {buildings.reduce(
+                (sum, b) => sum + b.adjacentVulnerablePopulation.vendorsCount,
+                0
+              )}
             </div>
           </div>
           <div>
-            <div className="text-[10px] font-mono text-[#0b1b2d]/60 uppercase font-semibold">Monthly Tax</div>
+            <div className="text-[10px] font-mono text-[#111827]/60 uppercase font-semibold">
+              Monthly Tax
+            </div>
             <div className="text-lg font-black font-mono text-[#047857]">
-              ₹{(buildings.reduce((sum, b) => sum + b.monthlyExhaustTaxInr, 0) / 100000).toFixed(1)}L
+              ₹
+              {(
+                buildings.reduce((sum, b) => sum + b.monthlyExhaustTaxInr, 0) / 100000
+              ).toFixed(1)}
+              L
             </div>
           </div>
         </div>
       </div>
 
-      {/* Control Bar: Search, Filters & Export Buttons */}
-      <div className="space-y-4 bg-[#efe8dc] p-5 rounded-2xl border border-[#d6cebe] shadow-sm">
+      {/* Control Bar: Search, Filters & Export Buttons inside Pure White #FFFFFF Card */}
+      <div className="space-y-4 bg-[#FFFFFF] p-5 rounded-2xl border border-[#E5E7EB] shadow-xl text-[#111827]">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#0b1b2d]/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#111827]/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by building name, market, street or ward (e.g. Nehru Place, Laxmi Nagar)..."
+              placeholder="Search by building name, market, street or ward (e.g. Vikas Surya, Devika Tower, Statesman House)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#f5efe6] border border-[#d6cebe] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#0b1b2d] placeholder-[#0b1b2d]/50 focus:outline-none focus:border-[#0b1b2d] transition-colors font-sans"
+              className="w-full bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#111827] placeholder-[#111827]/50 focus:outline-none focus:border-[#111827] transition-colors font-sans"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#0b1b2d]/50 hover:text-[#0b1b2d]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#111827]/50 hover:text-[#111827]"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -300,74 +466,98 @@ export const ThermalGridPage: React.FC<Props> = ({
           </div>
 
           {/* View Mode Toggle + Export Buttons */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             {/* View Mode Switcher */}
-            <div className="flex items-center p-1 bg-[#dfd7c9] rounded-xl border border-[#d6cebe] text-xs font-mono">
+            <div className="flex items-center p-1 bg-[#F3F4F6] rounded-xl border border-[#E5E7EB] text-xs font-mono">
               <button
-                onClick={() => setViewMode('grid')}
+                type="button"
+                onClick={() => setViewMode('scrolly')}
                 className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-[#0b1b2d] text-white font-bold shadow-sm'
-                    : 'text-[#0b1b2d]/70 hover:text-[#0b1b2d]'
+                  viewMode === 'scrolly'
+                    ? 'bg-[#111827] text-white font-bold shadow-sm'
+                    : 'text-[#111827]/70 hover:text-[#111827]'
                 }`}
               >
-                Cards
+                Split Scrollytelling
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('table')}
                 className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                   viewMode === 'table'
-                    ? 'bg-[#0b1b2d] text-white font-bold shadow-sm'
-                    : 'text-[#0b1b2d]/70 hover:text-[#0b1b2d]'
+                    ? 'bg-[#111827] text-white font-bold shadow-sm'
+                    : 'text-[#111827]/70 hover:text-[#111827]'
                 }`}
               >
                 Table
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('map')}
                 className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                   viewMode === 'map'
-                    ? 'bg-[#0b1b2d] text-white font-bold shadow-sm'
-                    : 'text-[#0b1b2d]/70 hover:text-[#0b1b2d]'
+                    ? 'bg-[#111827] text-white font-bold shadow-sm'
+                    : 'text-[#111827]/70 hover:text-[#111827]'
                 }`}
               >
-                Spatial Map
+                Overview Grid
               </button>
             </div>
 
             {/* Export Buttons */}
             <button
+              type="button"
               onClick={handleExportGeoJSON}
-              className="px-3 py-2 rounded-xl bg-[#f5efe6] hover:bg-[#e4dcce] border border-[#d6cebe] text-[#0b1b2d] text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+              className="px-3.5 py-2 rounded-xl bg-[#111827] hover:bg-[#1f2937] active:scale-95 text-white text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
               title="Download open GeoJSON format"
             >
-              <Download className="w-3.5 h-3.5 text-[#a8321a]" />
-              <span>GeoJSON</span>
+              <Download className="w-3.5 h-3.5 text-amber-400 pointer-events-none" />
+              <span className="pointer-events-none">GeoJSON</span>
             </button>
             <button
+              type="button"
               onClick={handleExportCSV}
-              className="px-3 py-2 rounded-xl bg-[#f5efe6] hover:bg-[#e4dcce] border border-[#d6cebe] text-[#0b1b2d] text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+              className="px-3.5 py-2 rounded-xl bg-[#047857] hover:bg-[#065f46] active:scale-95 text-white text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
               title="Download CSV audit data"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-[#047857]" />
-              <span>CSV</span>
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-200 pointer-events-none" />
+              <span className="pointer-events-none">CSV</span>
             </button>
           </div>
         </div>
 
+        {/* Visual Export Confirmation Banner */}
+        {exportStatusMessage && (
+          <div className="px-3.5 py-2 rounded-xl bg-emerald-950 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>{exportStatusMessage}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setExportStatusMessage(null)}
+              className="text-emerald-300/70 hover:text-white cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Filter Pills: City & Status */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#d6cebe] text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#E5E7EB] text-xs">
           {/* City Selector */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[#0b1b2d]/70 font-mono text-[11px] mr-1.5 font-bold">City:</span>
+            <span className="text-[#111827]/70 font-mono text-[11px] mr-1.5 font-bold">
+              City:
+            </span>
             {cities.map((city) => (
               <button
                 key={city}
                 onClick={() => setSelectedCity(city)}
                 className={`px-2.5 py-1 rounded-lg font-mono text-xs transition-colors cursor-pointer ${
                   selectedCity === city
-                    ? 'bg-[#0b1b2d] text-white font-bold shadow-sm'
-                    : 'bg-[#f5efe6] border border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
+                    ? 'bg-[#111827] text-white font-bold shadow-sm'
+                    : 'bg-[#F3F4F6] border border-[#E5E7EB] text-[#111827] hover:bg-[#E5E7EB]'
                 }`}
               >
                 {city}
@@ -377,7 +567,9 @@ export const ThermalGridPage: React.FC<Props> = ({
 
           {/* Status Selector */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[#0b1b2d]/70 font-mono text-[11px] mr-1.5 font-bold">Mitigation:</span>
+            <span className="text-[#111827]/70 font-mono text-[11px] mr-1.5 font-bold">
+              Mitigation:
+            </span>
             {[
               { id: 'all', label: 'All Statuses' },
               { id: 'unmitigated', label: 'Unmitigated (Critical)' },
@@ -389,8 +581,8 @@ export const ThermalGridPage: React.FC<Props> = ({
                 onClick={() => setSelectedStatus(st.id)}
                 className={`px-2.5 py-1 rounded-lg font-mono text-xs transition-colors cursor-pointer ${
                   selectedStatus === st.id
-                    ? 'bg-[#0b1b2d] text-white font-bold shadow-sm'
-                    : 'bg-[#f5efe6] border border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
+                    ? 'bg-[#111827] text-white font-bold shadow-sm'
+                    : 'bg-[#F3F4F6] border border-[#E5E7EB] text-[#111827] hover:bg-[#E5E7EB]'
                 }`}
               >
                 {st.label}
@@ -400,61 +592,381 @@ export const ThermalGridPage: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Main Listing Viewport */}
-      {viewMode === 'grid' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredBuildings.map((building) => {
-            const tempDelta = (
-              building.streetPlumeTempCelsius - building.ambientBaselineTempCelsius
-            ).toFixed(1);
-            const isWatchlisted = watchlistIds.includes(building.id);
-            const isCritical = building.thermalDebtScore >= 85;
+      {/* ===================================================================== */}
+      {/* SPLIT-SCREEN SCROLLYTELLING INTERFACE (Left Sticky Map + Right Stream) */}
+      {/* ===================================================================== */}
+      {viewMode === 'scrolly' && (
+        <div className="relative flex flex-col lg:flex-row gap-6 lg:gap-8 items-start min-h-screen">
+          {/* LEFT COLUMN: Full-Viewport Sticky Spatial Thermal Map Window */}
+          <div className="w-full lg:w-[58%] xl:w-[60%] lg:sticky lg:top-[88px] h-[540px] lg:h-[calc(100vh-104px)] rounded-3xl overflow-hidden border-2 border-[#0b1b2d]/25 bg-[#08101d] shadow-[0_24px_60px_rgba(11,27,45,0.24)] flex flex-col justify-between relative shrink-0">
+            {/* Compact Top Spatial HUD Bar (Does not hide the spatial map) */}
+            <div className="relative z-20 px-4 py-3 bg-[#08101d]/90 border-b border-slate-800/80 backdrop-blur-md flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
+                  <Compass className="w-4 h-4 animate-pulse" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-amber-300 font-bold">
+                      LIVE SPATIAL LOCK · {activeMapBuilding.city}
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono text-[10px] font-bold">
+                      Debt {activeMapBuilding.thermalDebtScore}/100
+                    </span>
+                  </div>
+                  <h2 className="text-sm sm:text-base font-bold text-white truncate">
+                    {activeMapBuilding.name}
+                  </h2>
+                </div>
+              </div>
 
-            return (
-              <div
-                key={building.id}
-                onClick={() => handleOpenDetail(building)}
-                className="group relative bg-[#efe8dc] hover:bg-[#f5efe6] rounded-2xl border border-[#d6cebe] hover:border-[#b8ad9d] p-5 transition-all cursor-pointer shadow-[0_4px_16px_rgba(11,27,45,0.04)] hover:shadow-[0_8px_24px_rgba(11,27,45,0.08)] flex flex-col justify-between"
+              {/* Coordinates + Zoom Controls */}
+              <div className="flex items-center gap-2 font-mono text-xs shrink-0">
+                <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0f1b2e] border border-slate-700 text-sky-300 text-[11px]">
+                  <Crosshair className="w-3.5 h-3.5 text-amber-400" />
+                  <span>
+                    {activeMapBuilding.coordinates?.lat.toFixed(4)}°N,{' '}
+                    {activeMapBuilding.coordinates?.lng.toFixed(4)}°E
+                  </span>
+                </div>
+
+                <div className="flex items-center rounded-lg bg-[#0f1b2e] border border-slate-700 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMapZoomMultiplier((z) =>
+                        Math.min(1.8, Number((z + 0.2).toFixed(2)))
+                      )
+                    }
+                    className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 cursor-pointer"
+                    title="Zoom In"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMapZoomMultiplier((z) =>
+                        Math.max(0.7, Number((z - 0.2).toFixed(2)))
+                      )
+                    }
+                    className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 cursor-pointer border-l border-slate-700"
+                    title="Zoom Out"
+                  >
+                    <ZoomOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Full-Bleed Unobstructed Vector Spatial Map Viewport */}
+            <div className="relative flex-1 w-full h-full overflow-hidden">
+              <svg
+                viewBox="0 0 1000 700"
+                className="w-full h-full select-none"
+                preserveAspectRatio="xMidYMid slice"
               >
-                {/* Card Top: Badges & Watchlist Button */}
-                <div>
-                  <div className="flex items-start justify-between gap-3 mb-3">
+                <defs>
+                  {/* Radial Heat Island Gradient Scaled by Thermal Debt */}
+                  <radialGradient id="activeHeatIslandGradient" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#ef4444" stopOpacity="0.68" />
+                    <stop offset="45%" stopColor="#f97316" stopOpacity="0.34" />
+                    <stop offset="78%" stopColor="#f59e0b" stopOpacity="0.14" />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+                  </radialGradient>
+
+                  <radialGradient id="secondaryHeatGradient" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.32" />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+                  </radialGradient>
+
+                  <pattern
+                    id="urbanCanyonGrid"
+                    width="50"
+                    height="50"
+                    patternUnits="userSpaceOnUse"
+                  >
+                    <path
+                      d="M 50 0 L 0 0 0 50"
+                      fill="none"
+                      stroke="rgba(148, 163, 184, 0.13)"
+                      strokeWidth="1"
+                    />
+                  </pattern>
+                </defs>
+
+                {/* Smoothly Animated Camera Group that Flies & Zooms to Active Building Coordinates */}
+                <g
+                  style={{
+                    transform: `translate(500px, 350px) scale(${zoomScale.toFixed(
+                      3
+                    )}) translate(${-activeSpatialNode.x}px, ${-activeSpatialNode.y}px)`,
+                    transition: 'transform 850ms cubic-bezier(0.22, 1, 0.36, 1)',
+                  }}
+                >
+                  {/* Base Coordinate Grid */}
+                  <rect x="-500" y="-500" width="2000" height="2000" fill="#08101d" />
+                  <rect
+                    x="-500"
+                    y="-500"
+                    width="2000"
+                    height="2000"
+                    fill="url(#urbanCanyonGrid)"
+                  />
+
+                  {/* Stylized Urban Arterial Roads & Street Canyons */}
+                  <g stroke="rgba(56, 189, 248, 0.15)" strokeWidth="2.5" fill="none">
+                    <path d="M 50 180 L 950 520" />
+                    <path d="M 120 580 L 890 130" />
+                    <path d="M 500 20 L 500 680" strokeDasharray="6 6" />
+                    <path d="M 60 350 L 940 350" strokeDasharray="6 6" />
+                    <circle cx="500" cy="350" r="240" stroke="rgba(148,163,184,0.12)" />
+                    <circle cx="500" cy="350" r="390" stroke="rgba(148,163,184,0.08)" />
+                  </g>
+
+                  {/* Surrounding Urban Building Footprints */}
+                  {spatialNodes.map((node, idx) => {
+                    const isCurrent = node.building.id === activeMapBuilding.id;
+                    const b = node.building;
+                    const nodeHeatRadius = Math.max(
+                      44,
+                      Math.round(b.thermalDebtScore * 1.15)
+                    );
+
+                    return (
+                      <g
+                        key={b.id}
+                        onClick={() => scrollToBuildingCard(b)}
+                        className="cursor-pointer"
+                      >
+                        {/* Secondary Heat Aura for Non-Active Nodes */}
+                        {!isCurrent && (
+                          <circle
+                            cx={node.x}
+                            cy={node.y}
+                            r={nodeHeatRadius * 0.65}
+                            fill="url(#secondaryHeatGradient)"
+                          />
+                        )}
+
+                        {/* ACTIVE BUILDING: Dynamic Thermal Heat Island Radius Ring Scaled by Thermal Debt Score */}
+                        {isCurrent && (
+                          <>
+                            <circle
+                              cx={node.x}
+                              cy={node.y}
+                              r={heatRadiusPx * 1.35}
+                              fill="url(#activeHeatIslandGradient)"
+                            />
+                            {/* Outer Dashed Thermal Debt Boundary Ring */}
+                            <circle
+                              cx={node.x}
+                              cy={node.y}
+                              r={heatRadiusPx}
+                              fill="none"
+                              stroke="#ef4444"
+                              strokeWidth="1.8"
+                              strokeDasharray="6 4"
+                            />
+                            {/* Inner Micro-Canyon Plume Ring */}
+                            <circle
+                              cx={node.x}
+                              cy={node.y}
+                              r={heatRadiusPx * 0.58}
+                              fill="rgba(239, 68, 68, 0.16)"
+                              stroke="#f59e0b"
+                              strokeWidth="1.4"
+                            />
+                            {/* Radius Label Tag on Ring */}
+                            <g
+                              transform={`translate(${node.x + heatRadiusPx * 0.68}, ${
+                                node.y - heatRadiusPx * 0.68
+                              })`}
+                            >
+                              <rect
+                                x="-4"
+                                y="-12"
+                                width="124"
+                                height="20"
+                                rx="5"
+                                fill="#0b1b2d"
+                                stroke="#f59e0b"
+                                strokeWidth="1"
+                              />
+                              <text
+                                x="4"
+                                y="1"
+                                fill="#fde68a"
+                                fontSize="8.5"
+                                fontFamily="monospace"
+                                fontWeight="bold"
+                              >
+                                {b.canyonWidthMeters}m Canyon · +{activeDelta}°C
+                              </text>
+                            </g>
+                          </>
+                        )}
+
+                        {/* Architectural Commercial Block Footprint */}
+                        <rect
+                          x={node.x - (isCurrent ? 16 : 11)}
+                          y={node.y - (isCurrent ? 16 : 11)}
+                          width={isCurrent ? 32 : 22}
+                          height={isCurrent ? 32 : 22}
+                          rx="4"
+                          fill={isCurrent ? '#ef4444' : '#1e293b'}
+                          stroke={isCurrent ? '#fde68a' : '#64748b'}
+                          strokeWidth={isCurrent ? '2.2' : '1.2'}
+                        />
+
+                        {/* Node Index & Plume Temperature Label */}
+                        <text
+                          x={node.x}
+                          y={node.y + 3}
+                          textAnchor="middle"
+                          fill="#ffffff"
+                          fontSize={isCurrent ? '9.5' : '8'}
+                          fontFamily="monospace"
+                          fontWeight="bold"
+                        >
+                          {String(idx + 1).padStart(2, '0')}
+                        </text>
+
+                        <text
+                          x={node.x}
+                          y={node.y + (isCurrent ? 30 : 22)}
+                          textAnchor="middle"
+                          fill={isCurrent ? '#fde68a' : '#cbd5e1'}
+                          fontSize={isCurrent ? '9.5' : '7.5'}
+                          fontFamily="monospace"
+                          fontWeight="bold"
+                        >
+                          {b.streetPlumeTempCelsius}°C
+                        </text>
+                      </g>
+                    );
+                  })}
+                </g>
+              </svg>
+            </div>
+
+            {/* Compact Single-Line Bottom Bar (Zero Map Obstruction) */}
+            <div className="relative z-20 px-4 py-2.5 bg-[#0b1b2d]/95 border-t border-slate-800 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-white">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="flex items-center gap-1.5 text-amber-300 font-bold">
+                  <Navigation className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{activeMapBuilding.location}</span>
+                </span>
+                <span className="text-slate-600">|</span>
+                <span className="text-rose-400 font-bold">
+                  Plume {activeMapBuilding.streetPlumeTempCelsius}°C (+{activeDelta}°C)
+                </span>
+                <span className="text-slate-600 hidden sm:inline">|</span>
+                <span className="text-emerald-400 font-bold hidden sm:inline">
+                  {activeMapBuilding.adjacentVulnerablePopulation.vendorsCount} Vendors Exposed
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleOpenDetail(activeMapBuilding)}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-mono text-xs font-bold transition-colors cursor-pointer shrink-0"
+              >
+                <span>Inspect Dossier</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Single Vertical Scrolling Stream of Building Registry Cards */}
+          <div className="w-full lg:w-[42%] xl:w-[40%] space-y-6 pb-[32vh]">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs font-mono uppercase tracking-wider font-bold text-[#a8321a]">
+                Scrolling Building Stream ({filteredBuildings.length} Zones)
+              </span>
+              <span className="text-xs font-mono text-[#0b1b2d]/60">
+                Scroll to fly map →
+              </span>
+            </div>
+
+            {filteredBuildings.map((building, index) => {
+              const tempDelta = (
+                building.streetPlumeTempCelsius - building.ambientBaselineTempCelsius
+              ).toFixed(1);
+              const isWatchlisted = watchlistIds.includes(building.id);
+              const isActiveCard = building.id === activeMapBuilding.id;
+
+              return (
+                <div
+                  key={building.id}
+                  data-building-id={building.id}
+                  ref={(el) => {
+                    cardRefs.current[building.id] = el;
+                  }}
+                  onClick={() => {
+                    setActiveScrollBuildingId(building.id);
+                    onSelectBuilding(building);
+                  }}
+                  className={`group relative rounded-3xl p-6 transition-all duration-300 cursor-pointer ${
+                    isActiveCard
+                      ? 'bg-[#fbf7f0] border-2 border-[#a8321a] ring-4 ring-[#a8321a]/15 shadow-[0_20px_50px_rgba(168,50,26,0.16)] -translate-y-0.5'
+                      : 'bg-[#efe8dc]/90 hover:bg-[#f5efe6] border border-[#d6cebe] opacity-85 hover:opacity-100'
+                  }`}
+                >
+                  {/* Card Top: Node Index, Active Radar Lock Badge & Watchlist Button */}
+                  <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono uppercase tracking-widest text-[#0b1b2d]/60 font-bold">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${
+                            isActiveCard
+                              ? 'bg-[#a8321a] text-white'
+                              : 'bg-[#dfd7c9] text-[#0b1b2d]/70'
+                          }`}
+                        >
+                          NODE #{String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="text-[11px] font-mono uppercase tracking-wider text-[#0b1b2d]/70 font-bold">
                           {building.city}
                         </span>
                         <span className="text-[#0b1b2d]/30 font-bold">·</span>
-                        <span className="text-[10px] font-mono text-[#0b1b2d]/70 font-semibold">
-                          {building.district || building.location}
+                        <span className="text-[11px] font-mono text-[#0b1b2d]/70">
+                          {building.coordinates?.lat.toFixed(4)}°N,{' '}
+                          {building.coordinates?.lng.toFixed(4)}°E
                         </span>
                       </div>
-                      <h3 className="text-base font-bold text-[#0b1b2d] group-hover:text-[#a8321a] transition-colors leading-tight">
+                      <h3 className="text-xl font-black text-[#0b1b2d] group-hover:text-[#a8321a] transition-colors leading-snug pt-0.5">
                         {building.name}
                       </h3>
+                      <p className="text-xs font-mono text-[#1f3044] flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-[#a8321a]" />
+                        <span>
+                          {building.location} · {building.district}
+                        </span>
+                      </p>
                     </div>
 
                     <button
                       onClick={(e) => toggleWatchlist(building.id, e)}
-                      className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+                      className={`p-2 rounded-xl border transition-all cursor-pointer shrink-0 ${
                         isWatchlisted
                           ? 'bg-amber-100 border-amber-300 text-amber-900'
                           : 'bg-[#f5efe6] border-[#d6cebe] text-[#0b1b2d]/50 hover:text-[#0b1b2d]'
                       }`}
                       title={isWatchlisted ? 'Remove from Watchlist' : 'Add to Watchlist'}
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <Sparkles className="w-4 h-4" />
                     </button>
                   </div>
 
-                  {/* Temperature Anomaly Visual Tag */}
-                  <div className="my-3.5 p-3 rounded-xl bg-[#f5efe6] border border-[#d6cebe] flex items-center justify-between">
+                  {/* Primary Plume Temperature & Thermal Debt Score Highlight */}
+                  <div className="my-4 p-4 rounded-2xl bg-[#f5efe6] border border-[#d6cebe] grid grid-cols-2 gap-4">
                     <div>
                       <div className="text-[10px] font-mono text-[#0b1b2d]/60 uppercase font-semibold">
                         Street Plume Temp
                       </div>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-xl font-black font-mono text-[#a8321a]">
+                      <div className="flex items-baseline gap-1.5 mt-0.5">
+                        <span className="text-2xl font-black font-mono text-[#a8321a]">
                           {building.streetPlumeTempCelsius}°C
                         </span>
                         <span className="text-xs font-mono text-[#9e2a14] font-bold">
@@ -465,53 +977,48 @@ export const ThermalGridPage: React.FC<Props> = ({
 
                     <div className="text-right">
                       <div className="text-[10px] font-mono text-[#0b1b2d]/60 uppercase font-semibold">
-                        Thermal Debt
+                        Thermal Debt Score
                       </div>
-                      <div
-                        className={`text-xl font-black font-mono ${
-                          isCritical ? 'text-[#9e2a14]' : 'text-[#a8321a]'
-                        }`}
-                      >
+                      <div className="text-2xl font-black font-mono text-[#0b1b2d] mt-0.5">
                         {building.thermalDebtScore}
-                        <span className="text-xs text-[#0b1b2d]/40 font-normal">/100</span>
+                        <span className="text-xs text-[#0b1b2d]/50 font-normal">/100</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Technical Spec Matrix */}
-                  <div className="space-y-2 text-xs font-mono text-[#1f3044] border-t border-[#d6cebe]/60 pt-3">
-                    <div className="flex justify-between">
-                      <span className="text-[#0b1b2d]/60 font-semibold">Outdoor Units:</span>
-                      <span className="text-[#0b1b2d] font-bold">
-                        {building.detectedOutdoorUnits.splitUnits} Splits / {building.detectedOutdoorUnits.vrfUnits} VRFs
+                  {/* Concise 4-Point Telemetry Grid */}
+                  <div className="grid grid-cols-2 gap-2.5 text-xs font-mono text-[#1f3044] pt-1">
+                    <div className="p-2.5 rounded-xl bg-[#efe8dc]/70 border border-[#d6cebe]/80 flex justify-between">
+                      <span className="text-[#0b1b2d]/60">AC Units:</span>
+                      <span className="font-bold text-[#0b1b2d]">
+                        {building.detectedOutdoorUnits.splitUnits} Split /{' '}
+                        {building.detectedOutdoorUnits.vrfUnits} VRF
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#0b1b2d]/60 font-semibold">Rejected Heat:</span>
-                      <span className="text-[#0b1b2d] font-bold">
-                        {building.rejectedHeatKw} kW ({building.totalCoolingTonnageTR} TR)
+                    <div className="p-2.5 rounded-xl bg-[#efe8dc]/70 border border-[#d6cebe]/80 flex justify-between">
+                      <span className="text-[#0b1b2d]/60">Heat Load:</span>
+                      <span className="font-bold text-[#0b1b2d]">
+                        {building.rejectedHeatKw} kW
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#0b1b2d]/60 font-semibold">Exposed Vendors:</span>
-                      <span className="text-[#9e2a14] font-bold">
+                    <div className="p-2.5 rounded-xl bg-[#efe8dc]/70 border border-[#d6cebe]/80 flex justify-between">
+                      <span className="text-[#0b1b2d]/60">Vendors:</span>
+                      <span className="font-bold text-[#9e2a14]">
                         {building.adjacentVulnerablePopulation.vendorsCount} workers
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#0b1b2d]/60 font-semibold">Canyon Aspect:</span>
-                      <span className="text-[#0b1b2d] font-bold">
-                        {building.canyonWidthMeters}m narrow alley
+                    <div className="p-2.5 rounded-xl bg-[#efe8dc]/70 border border-[#d6cebe]/80 flex justify-between">
+                      <span className="text-[#0b1b2d]/60">Alley Width:</span>
+                      <span className="font-bold text-[#0b1b2d]">
+                        {building.canyonWidthMeters}m canyon
                       </span>
                     </div>
                   </div>
-                </div>
 
-                {/* Card Footer: Status & Deep Dive Link */}
-                <div className="mt-4 pt-3 border-t border-[#d6cebe]/60 flex items-center justify-between">
-                  <div>
+                  {/* Card Footer: Mitigation Status + Deep Dive Audit Action */}
+                  <div className="mt-5 pt-3.5 border-t border-[#d6cebe] flex items-center justify-between gap-3">
                     <span
-                      className={`inline-flex items-center gap-1 text-[11px] font-mono font-bold px-2 py-0.5 rounded ${
+                      className={`inline-flex items-center gap-1.5 text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg ${
                         building.mitigationStatus === 'compliant'
                           ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                           : building.mitigationStatus === 'under_review'
@@ -520,26 +1027,37 @@ export const ThermalGridPage: React.FC<Props> = ({
                       }`}
                     >
                       {building.mitigationStatus === 'compliant' && (
-                        <CheckCircle2 className="w-3 h-3" />
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                       )}
                       {building.mitigationStatus === 'under_review' && (
-                        <Activity className="w-3 h-3" />
+                        <Activity className="w-3.5 h-3.5" />
                       )}
                       {building.mitigationStatus === 'unmitigated' && (
-                        <AlertTriangle className="w-3 h-3" />
+                        <AlertTriangle className="w-3.5 h-3.5" />
                       )}
-                      <span className="capitalize">{building.mitigationStatus.replace('_', ' ')}</span>
+                      <span className="capitalize">
+                        {building.mitigationStatus.replace('_', ' ')}
+                      </span>
                     </span>
-                  </div>
 
-                  <span className="text-xs font-mono text-[#a8321a] group-hover:translate-x-1 transition-transform flex items-center gap-1 font-bold">
-                    <span>Audit File</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDetail(building);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0b1b2d] hover:bg-[#1a2f47] text-white text-xs font-mono font-bold transition-colors cursor-pointer"
+                      >
+                        <span>Open Audit File</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -578,9 +1096,15 @@ export const ThermalGridPage: React.FC<Props> = ({
                       <div className="text-[10px] text-[#0b1b2d]/60">{b.district}</div>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <span className="font-bold text-[#a8321a]">{b.streetPlumeTempCelsius}°C</span>
+                      <span className="font-bold text-[#a8321a]">
+                        {b.streetPlumeTempCelsius}°C
+                      </span>
                       <span className="text-[10px] text-[#9e2a14] block font-semibold">
-                        (+{(b.streetPlumeTempCelsius - b.ambientBaselineTempCelsius).toFixed(1)}°C)
+                        (+
+                        {(
+                          b.streetPlumeTempCelsius - b.ambientBaselineTempCelsius
+                        ).toFixed(1)}
+                        °C)
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right font-semibold">
@@ -608,67 +1132,35 @@ export const ThermalGridPage: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Spatial Map View */}
+      {/* Overview Grid View */}
       {viewMode === 'map' && (
-        <div className="bg-[#efe8dc] rounded-2xl border border-[#d6cebe] p-6 space-y-4 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-base font-bold text-[#0b1b2d]">Spatial Urban Canopy Thermal Scatter</h3>
-              <p className="text-xs text-[#1f3044]">
-                Interactive spatial coordinates showing micro-canyon thermal traps across coordinates.
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-xs font-mono font-bold">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-600" />
-                <span className="text-[#9e2a14]">Lethal &gt;50°C</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-600" />
-                <span className="text-amber-800">Severe 45-50°C</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-                <span className="text-emerald-800">Mitigated &lt;42°C</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Map Canvas */}
-          <div className="w-full h-96 bg-[#f5efe6] rounded-xl border border-[#d6cebe] relative overflow-hidden flex items-center justify-center p-6">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 w-full h-full overflow-y-auto p-4 z-10">
-              {filteredBuildings.map((b) => (
-                <div
-                  key={b.id}
-                  onClick={() => handleOpenDetail(b)}
-                  className="bg-[#efe8dc] hover:bg-[#e4dcce] border border-[#d6cebe] hover:border-[#b8ad9d] rounded-xl p-3.5 flex flex-col justify-between cursor-pointer transition-all shadow-sm"
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="text-[10px] font-mono text-[#0b1b2d]/60 font-bold uppercase">{b.city}</span>
-                    <span
-                      className={`w-2 h-2 rounded-full ${
-                        b.streetPlumeTempCelsius >= 50
-                          ? 'bg-red-600 animate-ping'
-                          : b.streetPlumeTempCelsius >= 45
-                          ? 'bg-amber-600'
-                          : 'bg-emerald-600'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-[#0b1b2d] truncate">{b.name}</div>
-                    <div className="text-xs font-mono font-bold text-[#a8321a] mt-0.5">
-                      {b.streetPlumeTempCelsius}°C
-                    </div>
-                  </div>
-                  <div className="text-[10px] font-mono text-[#0b1b2d]/70 flex justify-between pt-1 border-t border-[#d6cebe]">
-                    <span>{b.adjacentVulnerablePopulation.vendorsCount} vendors</span>
-                    <span>{b.canyonWidthMeters}m canyon</span>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredBuildings.map((b) => (
+            <div
+              key={b.id}
+              onClick={() => handleOpenDetail(b)}
+              className="bg-[#efe8dc] hover:bg-[#f5efe6] border border-[#d6cebe] hover:border-[#b8ad9d] rounded-2xl p-5 flex flex-col justify-between cursor-pointer transition-all shadow-sm"
+            >
+              <div className="flex items-start justify-between">
+                <span className="text-[10px] font-mono text-[#0b1b2d]/60 font-bold uppercase">
+                  {b.city} · {b.district}
+                </span>
+                <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-mono text-[10px] font-bold">
+                  Debt {b.thermalDebtScore}/100
+                </span>
+              </div>
+              <div className="my-3">
+                <div className="text-base font-bold text-[#0b1b2d]">{b.name}</div>
+                <div className="text-xl font-mono font-black text-[#a8321a] mt-1">
+                  {b.streetPlumeTempCelsius}°C Plume
                 </div>
-              ))}
+              </div>
+              <div className="text-xs font-mono text-[#0b1b2d]/70 flex justify-between pt-2 border-t border-[#d6cebe]">
+                <span>{b.adjacentVulnerablePopulation.vendorsCount} vendors</span>
+                <span>{b.canyonWidthMeters}m canyon</span>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       )}
 
@@ -689,7 +1181,9 @@ export const ThermalGridPage: React.FC<Props> = ({
                       {activeDetailBuilding.city} ({activeDetailBuilding.district})
                     </span>
                   </div>
-                  <h2 className="text-2xl font-black text-[#0b1b2d]">{activeDetailBuilding.name}</h2>
+                  <h2 className="text-2xl font-black text-[#0b1b2d]">
+                    {activeDetailBuilding.name}
+                  </h2>
                   <p className="text-xs text-[#1f3044] font-mono flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-[#a8321a]" />
                     <span>{activeDetailBuilding.location}</span>
@@ -751,28 +1245,37 @@ export const ThermalGridPage: React.FC<Props> = ({
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
                   <div className="p-2.5 rounded-lg bg-[#f5efe6] border border-[#d6cebe]">
-                    <span className="text-[#0b1b2d]/60 block text-[10px] font-semibold">Split Outdoor ACs</span>
+                    <span className="text-[#0b1b2d]/60 block text-[10px] font-semibold">
+                      Split Outdoor ACs
+                    </span>
                     <span className="text-base font-bold text-[#0b1b2d]">
                       {activeDetailBuilding.detectedOutdoorUnits.splitUnits} units
                     </span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-[#f5efe6] border border-[#d6cebe]">
-                    <span className="text-[#0b1b2d]/60 block text-[10px] font-semibold">VRF Heat Exchangers</span>
+                    <span className="text-[#0b1b2d]/60 block text-[10px] font-semibold">
+                      VRF Heat Exchangers
+                    </span>
                     <span className="text-base font-bold text-[#0b1b2d]">
                       {activeDetailBuilding.detectedOutdoorUnits.vrfUnits} banks
                     </span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-[#f5efe6] border border-[#d6cebe]">
-                    <span className="text-[#0b1b2d]/60 block text-[10px] font-semibold">Chiller Towers</span>
+                    <span className="text-[#0b1b2d]/60 block text-[10px] font-semibold">
+                      Chiller Towers
+                    </span>
                     <span className="text-base font-bold text-[#0b1b2d]">
                       {activeDetailBuilding.detectedOutdoorUnits.chillerTowers} towers
                     </span>
                   </div>
                 </div>
                 <div className="pt-2 flex justify-between text-xs font-mono text-[#0b1b2d] border-t border-[#d6cebe]">
-                  <span className="text-[#0b1b2d]/70 font-semibold">Total Cooling Capacity:</span>
+                  <span className="text-[#0b1b2d]/70 font-semibold">
+                    Total Cooling Capacity:
+                  </span>
                   <span className="font-bold text-[#a8321a]">
-                    {activeDetailBuilding.totalCoolingTonnageTR} TR (~{activeDetailBuilding.rejectedHeatKw} kW waste heat)
+                    {activeDetailBuilding.totalCoolingTonnageTR} TR (~
+                    {activeDetailBuilding.rejectedHeatKw} kW waste heat)
                   </span>
                 </div>
               </div>
@@ -784,25 +1287,39 @@ export const ThermalGridPage: React.FC<Props> = ({
                   <span>Human Collateral &amp; Street Level Vulnerability</span>
                 </h4>
                 <p className="text-xs text-[#1f3044] leading-relaxed">
-                  Narrow street canyon width of {activeDetailBuilding.canyonWidthMeters} meters causes thermal trapping with H/W ratio exceeding threshold, reflecting heat between asphalt and masonry.
+                  Narrow street canyon width of {activeDetailBuilding.canyonWidthMeters}{' '}
+                  meters causes thermal trapping with H/W ratio exceeding threshold,
+                  reflecting heat between asphalt and masonry.
                 </p>
                 <div className="grid grid-cols-3 gap-2 text-xs font-mono pt-1">
                   <div className="p-2.5 rounded-lg bg-[#f5efe6] border border-[#d6cebe] text-center">
-                    <div className="text-[10px] text-[#0b1b2d]/60 font-semibold">Exposed Vendors</div>
+                    <div className="text-[10px] text-[#0b1b2d]/60 font-semibold">
+                      Exposed Vendors
+                    </div>
                     <div className="text-base font-black text-[#9e2a14]">
                       {activeDetailBuilding.adjacentVulnerablePopulation.vendorsCount}
                     </div>
                   </div>
                   <div className="p-2.5 rounded-lg bg-[#f5efe6] border border-[#d6cebe] text-center">
-                    <div className="text-[10px] text-[#0b1b2d]/60 font-semibold">Informal Residents</div>
+                    <div className="text-[10px] text-[#0b1b2d]/60 font-semibold">
+                      Informal Residents
+                    </div>
                     <div className="text-base font-black text-[#0b1b2d]">
-                      {activeDetailBuilding.adjacentVulnerablePopulation.informalSettlementDwellers}
+                      {
+                        activeDetailBuilding.adjacentVulnerablePopulation
+                          .informalSettlementDwellers
+                      }
                     </div>
                   </div>
                   <div className="p-2.5 rounded-lg bg-[#f5efe6] border border-[#d6cebe] text-center">
-                    <div className="text-[10px] text-[#0b1b2d]/60 font-semibold">Daily Footfall</div>
+                    <div className="text-[10px] text-[#0b1b2d]/60 font-semibold">
+                      Daily Footfall
+                    </div>
                     <div className="text-base font-black text-[#0b1b2d]">
-                      {activeDetailBuilding.adjacentVulnerablePopulation.dailyPedestrianFootfall}
+                      {
+                        activeDetailBuilding.adjacentVulnerablePopulation
+                          .dailyPedestrianFootfall
+                      }
                     </div>
                   </div>
                 </div>
@@ -814,10 +1331,14 @@ export const ThermalGridPage: React.FC<Props> = ({
                   <span className="text-xs font-mono text-emerald-900 font-bold uppercase">
                     Section 133 Thermal Surcharge Assessment
                   </span>
-                  <span className="text-xs font-mono text-emerald-700 font-semibold">CrPC Public Nuisance</span>
+                  <span className="text-xs font-mono text-emerald-700 font-semibold">
+                    CrPC Public Nuisance
+                  </span>
                 </div>
                 <div className="flex items-baseline justify-between">
-                  <span className="text-sm text-[#1f3044]">Calculated Monthly Exhaust Tax:</span>
+                  <span className="text-sm text-[#1f3044]">
+                    Calculated Monthly Exhaust Tax:
+                  </span>
                   <span className="text-2xl font-black font-mono text-emerald-800">
                     ₹{activeDetailBuilding.monthlyExhaustTaxInr.toLocaleString('en-IN')}/mo
                   </span>

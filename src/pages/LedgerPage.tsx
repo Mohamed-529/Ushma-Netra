@@ -1,21 +1,14 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { BuildingAudit, VendorTelemetry } from '../types';
 import { ThermalDebtLedger } from '../components/ThermalDebtLedger';
 import {
-  Scale,
   Building2,
-  TrendingDown,
   Award,
   ChevronRight,
-  ArrowRight,
-  ShieldCheck,
-  FileSpreadsheet,
-  Download,
   IndianRupee,
   Users,
-  ArrowLeft,
-  Home
+  Home,
 } from 'lucide-react';
 
 interface Props {
@@ -33,9 +26,6 @@ export const LedgerPage: React.FC<Props> = ({
   vendor,
   onApplyMitigation,
 }) => {
-  const navigate = useNavigate();
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'unmitigated' | 'compliant'>('all');
-
   const totalMonthlyTax = buildings.reduce((acc, b) => acc + b.monthlyExhaustTaxInr, 0);
   const totalHeatKw = buildings.reduce((acc, b) => acc + b.rejectedHeatKw, 0);
   const totalVendors = buildings.reduce((acc, b) => acc + b.adjacentVulnerablePopulation.vendorsCount, 0);
@@ -45,12 +35,12 @@ export const LedgerPage: React.FC<Props> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-      {/* Top Navigation & Breadcrumbs Bar */}
+      {/* Top Navigation & Breadcrumbs Bar on #12161A Dark Canvas */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-2">
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#efe8dc] hover:bg-[#e4dcce] text-[#0b1b2d] border border-[#d6cebe] text-xs font-mono font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FFFFFF] hover:bg-[#F3F4F6] text-[#111827] border border-[#E5E7EB] shadow-md text-xs font-mono font-bold transition-colors"
             title="Return to Home Overview"
           >
             <Home className="w-3.5 h-3.5 text-[#a8321a]" />
@@ -58,41 +48,41 @@ export const LedgerPage: React.FC<Props> = ({
           </Link>
         </div>
 
-        <nav className="flex items-center gap-2 text-xs font-mono text-[#0b1b2d]/70">
-          <Link to="/" className="hover:text-[#a8321a] transition-colors">
+        <nav className="flex items-center gap-2 text-xs font-mono text-slate-300">
+          <Link to="/" className="text-white hover:text-amber-400 transition-colors">
             Home
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-[#0b1b2d]/40" />
-          <span className="text-[#a8321a] font-bold">Municipal Debt Ledger</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-amber-400 font-bold">Municipal Debt Ledger</span>
         </nav>
       </div>
 
-      {/* Page Title & Metrics Banner */}
-      <div className="space-y-4 pb-6 border-b border-[#d6cebe]">
+      {/* Page Title & Metrics Banner on #12161A Dark Canvas */}
+      <div className="space-y-4 pb-6 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300">
+          <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-400/15 text-emerald-300 border border-emerald-400/30">
             Section 133 CrPC Statutory Ledger
           </span>
-          <span className="text-[#0b1b2d]/40 text-xs font-mono">·</span>
-          <span className="text-[#0b1b2d]/80 text-xs font-mono font-semibold">
+          <span className="text-slate-500 text-xs font-mono">·</span>
+          <span className="text-slate-300 text-xs font-mono font-semibold">
             Commercial AC Heat Dumping Penalties
           </span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#0b1b2d]">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
           Municipal Thermal Exhaust Debt Ledger
         </h1>
-        <p className="text-sm text-[#1f3044] max-w-3xl leading-relaxed">
+        <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
           Assessing statutory public nuisance and environmental hazard surcharges against commercial towers that dump unconsented 45°C–56°C AC exhaust onto pedestrian rights-of-way, directly funding municipal hydration and cool-island retrofits.
         </p>
 
-        {/* Aggregate Counters */}
+        {/* Aggregate Counters in Pure White #FFFFFF Floating Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-          <div className="p-4 rounded-2xl bg-[#efe8dc] border border-[#d6cebe] flex items-center justify-between shadow-sm">
+          <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E5E7EB] flex items-center justify-between shadow-xl">
             <div>
-              <div className="text-[10px] font-mono text-[#526071] uppercase font-bold tracking-wider">
+              <div className="text-[10px] font-mono text-[#111827]/70 uppercase font-bold tracking-wider">
                 Total Monthly Surcharge Levied
               </div>
-              <div className="text-2xl font-black font-mono text-emerald-800 mt-1">
+              <div className="text-2xl font-black font-mono text-emerald-700 mt-1">
                 ₹{totalMonthlyTax.toLocaleString('en-IN')}
               </div>
             </div>
@@ -101,9 +91,9 @@ export const LedgerPage: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#efe8dc] border border-[#d6cebe] flex items-center justify-between shadow-sm">
+          <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E5E7EB] flex items-center justify-between shadow-xl">
             <div>
-              <div className="text-[10px] font-mono text-[#526071] uppercase font-bold tracking-wider">
+              <div className="text-[10px] font-mono text-[#111827]/70 uppercase font-bold tracking-wider">
                 Aggregate Rejected Heat
               </div>
               <div className="text-2xl font-black font-mono text-[#a8321a] mt-1">
@@ -115,9 +105,9 @@ export const LedgerPage: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#efe8dc] border border-[#d6cebe] flex items-center justify-between shadow-sm">
+          <div className="p-5 rounded-2xl bg-[#FFFFFF] border border-[#E5E7EB] flex items-center justify-between shadow-xl">
             <div>
-              <div className="text-[10px] font-mono text-[#526071] uppercase font-bold tracking-wider">
+              <div className="text-[10px] font-mono text-[#111827]/70 uppercase font-bold tracking-wider">
                 Vulnerable Vendor Beneficiaries
               </div>
               <div className="text-2xl font-black font-mono text-rose-800 mt-1">
@@ -140,15 +130,15 @@ export const LedgerPage: React.FC<Props> = ({
         onApplyMitigation={onApplyMitigation}
       />
 
-      {/* Leaderboard Table of Top Heat Polluters */}
-      <div className="bg-[#efe8dc] rounded-2xl border border-[#d6cebe] p-6 sm:p-8 space-y-5 shadow-sm">
+      {/* Leaderboard Table of Top Heat Polluters in Pure White #FFFFFF Floating Card */}
+      <div className="bg-[#FFFFFF] rounded-3xl border border-[#E5E7EB] p-6 sm:p-8 space-y-5 shadow-xl text-[#111827]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-lg font-bold text-[#0b1b2d] flex items-center gap-2">
+            <h3 className="text-lg font-bold text-[#111827] flex items-center gap-2">
               <Award className="w-5 h-5 text-[#a8321a]" />
               <span>Commercial Polluter Heat Debt Leaderboard</span>
             </h3>
-            <p className="text-xs text-[#1f3044]">
+            <p className="text-xs text-[#111827]/80">
               Official ranking of commercial complexes dumping the highest sensible heat into pedestrian zones.
             </p>
           </div>
@@ -156,16 +146,16 @@ export const LedgerPage: React.FC<Props> = ({
           <div className="flex items-center gap-2">
             <Link
               to="/grid"
-              className="px-3.5 py-1.5 rounded-xl bg-[#f5efe6] hover:bg-[#e4dcce] border border-[#d6cebe] text-[#0b1b2d] text-xs font-mono font-bold transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-[#F3F4F6] hover:bg-[#E5E7EB] border border-[#E5E7EB] text-[#111827] text-xs font-mono font-bold transition-colors"
             >
               View Full Grid
             </Link>
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-[#d6cebe]">
+        <div className="overflow-x-auto rounded-xl border border-[#E5E7EB]">
           <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-[#dfd7c9] border-b border-[#d6cebe] text-[#0b1b2d] uppercase text-[10px] font-bold">
+            <thead className="bg-[#F3F4F6] border-b border-[#E5E7EB] text-[#111827] uppercase text-[10px] font-bold">
               <tr>
                 <th className="py-3 px-4">Rank</th>
                 <th className="py-3 px-4">Commercial Complex</th>
@@ -177,35 +167,35 @@ export const LedgerPage: React.FC<Props> = ({
                 <th className="py-3 px-4 text-center">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#d6cebe] text-[#0b1b2d] bg-[#f7f2ea]">
+            <tbody className="divide-y divide-[#E5E7EB] text-[#111827] bg-[#FFFFFF]">
               {leaderboard.map((b, idx) => (
                 <tr
                   key={b.id}
                   onClick={() => onSelectBuilding(b)}
-                  className={`hover:bg-[#efe8dc] cursor-pointer transition-colors ${
-                    selectedBuilding.id === b.id ? 'bg-[#e4dcce]/70' : ''
+                  className={`hover:bg-[#F3F4F6] cursor-pointer transition-colors ${
+                    selectedBuilding.id === b.id ? 'bg-[#F3F4F6]' : ''
                   }`}
                 >
-                  <td className="py-3 px-4 font-bold text-[#0b1b2d]/60">
+                  <td className="py-3 px-4 font-bold text-[#111827]/60">
                     {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#0${idx + 1}`}
                   </td>
-                  <td className="py-3 px-4 font-sans font-bold text-[#0b1b2d]">
+                  <td className="py-3 px-4 font-sans font-bold text-[#111827]">
                     <div>{b.name}</div>
-                    <div className="text-[10px] font-mono text-[#526071] font-normal">
+                    <div className="text-[10px] font-mono text-[#111827]/70 font-normal">
                       {b.location}
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-[#1f3044]">{b.city}</td>
+                  <td className="py-3 px-4 text-[#111827]">{b.city}</td>
                   <td className="py-3 px-4 text-right font-bold text-[#a8321a]">
                     +{(b.streetPlumeTempCelsius - b.ambientBaselineTempCelsius).toFixed(1)}°C
                   </td>
-                  <td className="py-3 px-4 text-right text-[#0b1b2d] font-semibold">
+                  <td className="py-3 px-4 text-right text-[#111827] font-semibold">
                     {b.rejectedHeatKw} kW ({b.totalCoolingTonnageTR} TR)
                   </td>
                   <td className="py-3 px-4 text-right font-black text-rose-800">
                     {b.thermalDebtScore}/100
                   </td>
-                  <td className="py-3 px-4 text-right font-bold text-emerald-800">
+                  <td className="py-3 px-4 text-right font-bold text-emerald-700">
                     ₹{b.monthlyExhaustTaxInr.toLocaleString('en-IN')}/mo
                   </td>
                   <td className="py-3 px-4 text-center">
