@@ -19,6 +19,7 @@ export const ThermalDebtLedger: React.FC<Props> = ({
   onApplyMitigation,
 }) => {
   const [generatingNotice, setGeneratingNotice] = useState<boolean>(false);
+  const [noticeDispatched, setNoticeDispatched] = useState<boolean>(false);
   const [generatedNotice, setGeneratedNotice] = useState<{
     legalNoticeTitle: string;
     executiveSummary: string;
@@ -29,6 +30,7 @@ export const ThermalDebtLedger: React.FC<Props> = ({
 
   const handleGenerateNotice = async () => {
     setGeneratingNotice(true);
+    setNoticeDispatched(false);
     try {
       const notice = await generateThermalAuditNotice(selectedBuilding, vendor);
       setGeneratedNotice(notice);
@@ -307,13 +309,46 @@ export const ThermalDebtLedger: React.FC<Props> = ({
           </div>
 
           {generatedNotice && (
-            <div className="pt-2 border-t border-[#d6cebe] flex justify-between items-center text-xs">
-              <span className="text-[#526071] font-mono font-medium">Reference: UN/MUNICIPAL/2026</span>
+            <div className="pt-2 border-t border-[#d6cebe] flex flex-wrap justify-between items-center gap-2 text-xs">
+              <span className="text-[#526071] font-mono font-medium">
+                {noticeDispatched
+                  ? `✅ Dispatched to Ward Registrar (${selectedBuilding.name})`
+                  : 'Reference: UN/MUNICIPAL/2026'}
+              </span>
               <button
-                onClick={() => alert(`Notice for ${selectedBuilding.name} dispatched to Municipal Enforcement Queue.`)}
-                className="px-3.5 py-1.5 bg-[#0b1b2d] hover:bg-[#1a2d42] text-white rounded-xl font-mono text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                onClick={() => {
+                  setNoticeDispatched(true);
+                  const content = [
+                    generatedNotice.legalNoticeTitle,
+                    '',
+                    'EXECUTIVE SUMMARY:',
+                    generatedNotice.executiveSummary,
+                    '',
+                    'THERMODYNAMIC FINDINGS:',
+                    generatedNotice.thermodynamicFindings,
+                    '',
+                    'STATUTORY DIRECTIVES (14 DAYS):',
+                    ...generatedNotice.statutoryDirectives.map((d, i) => `${i + 1}. ${d}`),
+                    '',
+                    'PENALTY MANDATE:',
+                    generatedNotice.calculatedPenaltyBreakdown,
+                  ].join('\n');
+                  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `Section133-Notice-${selectedBuilding.id}.txt`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className={`px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors ${
+                  noticeDispatched
+                    ? 'bg-emerald-700 text-white'
+                    : 'bg-[#0b1b2d] hover:bg-[#1a2d42] text-white'
+                }`}
               >
-                <Download className="w-3.5 h-3.5" /> Dispatch to Ward Registrar
+                <Download className="w-3.5 h-3.5" />
+                <span>{noticeDispatched ? 'Notice Dispatched & Downloaded' : 'Dispatch to Ward Registrar'}</span>
               </button>
             </div>
           )}
