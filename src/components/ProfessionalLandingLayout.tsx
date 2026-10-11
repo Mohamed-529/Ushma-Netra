@@ -20,9 +20,10 @@ import {
   Scan,
   Scale,
   Compass,
-  Sparkles
+  Download,
 } from 'lucide-react';
 import { NetraGuide } from './experience/NetraGuide';
+import { CustomFloatingCursor } from './experience/CustomFloatingCursor';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -35,16 +36,18 @@ interface LayoutProps {
   isMitigated?: boolean;
   onToggleMitigation?: () => void;
   onConnectHardware?: () => void;
+  isIntroRevealed?: boolean;
+  onDownloadPlatformBrief?: () => void;
 }
 
 export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
   children,
-  activeAct = 'wow_hero',
-  onNavigateTo,
   onSimulateSurge,
   isSurgeActive = false,
   isMitigated = false,
   onToggleMitigation,
+  isIntroRevealed = true,
+  onDownloadPlatformBrief,
 }) => {
   const [audioActive, setAudioActive] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -98,8 +101,7 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
   ];
 
   const isHomePage = location.pathname === '/';
-  // Telemetry ticker consistently visible across hero and all subpages
-  const showTicker = true;
+  const headerVisible = !isHomePage || isIntroRevealed;
 
   const handleReturn = () => {
     if (window.history.length > 1) {
@@ -109,81 +111,108 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
     }
   };
 
+  const handleDownloadClick = () => {
+    if (onDownloadPlatformBrief) {
+      onDownloadPlatformBrief();
+      return;
+    }
+    const content = `USHMA-NETRA // NEXT-GEN AUTONOMOUS THERMAL EQUITY AGENT PLATFORM
+===================================================================
+Generated: ${new Date().toISOString()}
+Monitored Urban Heat Canyons: 10 Zones (Delhi NCR, Mumbai, Bengaluru, Ahmedabad)
+Primary Telemetry: Landsat-9 TIR + Edge YOLOv8 + AWS IoT Core + Amazon Bedrock
+Statutory Compliance: Section 133 CrPC Municipal Heat Surcharge Ledger
+`;
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ushma-netra-agent-platform-spec.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="relative min-h-screen w-full bg-[#e6dfd3] text-[#0b1b2d] selection:bg-amber-900/20 selection:text-[#0b1b2d] antialiased overflow-x-hidden font-sans">
-      {/* Pinned Sticky Header Shell: Warm Magazine Architectural Aesthetic */}
+    <div className="relative min-h-screen w-full bg-transparent text-[#0b1b2d] selection:bg-amber-900/20 selection:text-[#0b1b2d] antialiased overflow-x-hidden font-sans">
+      {/* Smooth Custom Floating Cursor (translate3d + requestAnimationFrame + pointer-events: none) */}
+      <CustomFloatingCursor />
+
+      {/* Pinned Sticky Header Shell: Hidden at opacity-0 during initial hero typewriter on Home page */}
       <div
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        className={`sticky top-0 z-50 w-full transition-all duration-1000 ease-out ${
+          headerVisible
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 -translate-y-2 pointer-events-none'
+        } ${
           isScrolled || !isHomePage
             ? 'bg-[#e6dfd3]/95 backdrop-blur-xl border-b border-[#d6cebe] shadow-[0_4px_20px_rgba(11,27,45,0.06)]'
             : 'bg-transparent border-b border-transparent shadow-none'
         }`}
       >
-        {/* Tactical Marquee Ribbon: Displayed when scrolled or on deeper pages */}
-        {showTicker && (
-          <div className="w-full bg-[#dfd7c9] border-b border-[#d6cebe] text-[11px] font-mono py-1.5 px-0 overflow-hidden flex items-center justify-between text-[#0b1b2d] select-none relative">
-            <div className="flex-1 overflow-hidden relative marquee-mask">
-              <div className="flex w-max animate-marquee">
-                {/* Primary Track */}
-                <div className="flex items-center gap-6 shrink-0 pr-6">
-                  {telemetryItems.map((item) => (
-                    <div key={`track-a-${item.id}`} className="flex items-center gap-2 shrink-0">
-                      {item.isLive && (
-                        <span className="relative flex h-2 w-2 mr-0.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
-                        </span>
-                      )}
-                      <span className={`font-bold tracking-wider ${item.color}`}>
-                        {item.badge}
+        {/* Tactical Marquee Ribbon */}
+        <div className="w-full bg-[#dfd7c9] border-b border-[#d6cebe] text-[11px] font-mono py-1.5 px-0 overflow-hidden flex items-center justify-between text-[#0b1b2d] select-none relative">
+          <div className="flex-1 overflow-hidden relative marquee-mask">
+            <div className="flex w-max animate-marquee">
+              {/* Primary Track */}
+              <div className="flex items-center gap-6 shrink-0 pr-6">
+                {telemetryItems.map((item) => (
+                  <div key={`track-a-${item.id}`} className="flex items-center gap-2 shrink-0">
+                    {item.isLive && (
+                      <span className="relative flex h-2 w-2 mr-0.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
                       </span>
-                      <span className="text-[#0b1b2d]/40">/</span>
-                      <span className="text-[#0b1b2d] font-semibold">{item.text}</span>
-                      <span className="text-[#0b1b2d]/40 ml-4 font-bold">✦</span>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                    <span className={`font-bold tracking-wider ${item.color}`}>
+                      {item.badge}
+                    </span>
+                    <span className="text-[#0b1b2d]/40">/</span>
+                    <span className="text-[#0b1b2d] font-semibold">{item.text}</span>
+                    <span className="text-[#0b1b2d]/40 ml-4 font-bold">✦</span>
+                  </div>
+                ))}
+              </div>
 
-                {/* Cloned Duplicate Track for Seamless Looping */}
-                <div className="flex items-center gap-6 shrink-0 pr-6" aria-hidden="true">
-                  {telemetryItems.map((item) => (
-                    <div key={`track-b-${item.id}`} className="flex items-center gap-2 shrink-0">
-                      {item.isLive && (
-                        <span className="relative flex h-2 w-2 mr-0.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
-                        </span>
-                      )}
-                      <span className={`font-bold tracking-wider ${item.color}`}>
-                        {item.badge}
+              {/* Cloned Duplicate Track for Seamless Looping */}
+              <div className="flex items-center gap-6 shrink-0 pr-6" aria-hidden="true">
+                {telemetryItems.map((item) => (
+                  <div key={`track-b-${item.id}`} className="flex items-center gap-2 shrink-0">
+                    {item.isLive && (
+                      <span className="relative flex h-2 w-2 mr-0.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" />
                       </span>
-                      <span className="text-[#0b1b2d]/40">/</span>
-                      <span className="text-[#0b1b2d] font-semibold">{item.text}</span>
-                      <span className="text-[#0b1b2d]/40 ml-4 font-bold">✦</span>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                    <span className={`font-bold tracking-wider ${item.color}`}>
+                      {item.badge}
+                    </span>
+                    <span className="text-[#0b1b2d]/40">/</span>
+                    <span className="text-[#0b1b2d] font-semibold">{item.text}</span>
+                    <span className="text-[#0b1b2d]/40 ml-4 font-bold">✦</span>
+                  </div>
+                ))}
               </div>
             </div>
-
-            {/* Static Low-Latency Telemetry Badge on Right */}
-            <div className="hidden lg:flex items-center gap-3 shrink-0 font-mono text-[10px] text-[#0b1b2d]/80 px-4 border-l border-[#d6cebe] bg-[#dfd7c9] z-10">
-              <span className="flex items-center gap-1.5 font-bold">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                LATENCY: 12ms
-              </span>
-              <span className="text-[#0b1b2d]/30">·</span>
-              <span className="text-emerald-800 font-bold">AWS IOT: VERIFIED</span>
-            </div>
           </div>
-        )}
+
+          {/* Static Low-Latency Telemetry Badge on Right */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0 font-mono text-[10px] text-[#0b1b2d]/80 px-4 border-l border-[#d6cebe] bg-[#dfd7c9] z-10">
+            <span className="flex items-center gap-1.5 font-bold">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
+              LATENCY: 12ms
+            </span>
+            <span className="text-[#0b1b2d]/30">·</span>
+            <span className="text-emerald-800 font-bold">AWS IOT: VERIFIED</span>
+          </div>
+        </div>
 
         {/* Unified Main Navigation Bar */}
         <header className="w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
             {/* Brand Signature & Return Button */}
             <div className="flex items-center gap-3">
-              {/* Return Button if on Subpage */}
               {!isHomePage && (
                 <button
                   onClick={handleReturn}
@@ -195,19 +224,6 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
                 </button>
               )}
 
-              <span className="relative flex h-2.5 w-2.5">
-                <span
-                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                    isSurgeActive ? 'bg-red-500' : 'bg-emerald-600'
-                  }`}
-                />
-                <span
-                  className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                    isSurgeActive ? 'bg-red-600' : 'bg-emerald-700'
-                  }`}
-                />
-              </span>
-
               <Link
                 to="/"
                 onClick={() => {
@@ -215,19 +231,15 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }
                 }}
-                className="text-base sm:text-lg font-black tracking-wider uppercase font-mono cursor-pointer flex items-center gap-1 text-[#0b1b2d] hover:text-[#a8321a] transition-colors"
+                className="text-base sm:text-lg font-black tracking-wider uppercase font-mono cursor-pointer flex items-center gap-1 text-[#0b1b2d] hover:text-[#a8321a] transition-colors whitespace-nowrap shrink-0"
               >
                 <span>USHMA</span>
                 <span className="text-[#a8321a]">·</span>
                 <span>NETRA</span>
               </Link>
-
-              <span className="hidden sm:inline-block text-[10px] font-mono uppercase tracking-widest pl-2.5 border-l border-[#d6cebe] text-[#0b1b2d]/60 font-semibold">
-                Thermal Equity Grid
-              </span>
             </div>
 
-            {/* Desktop Navigation Links with High-Contrast Active Highlighting */}
+            {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-xs font-mono font-semibold">
               {routeLinks.map((link) => {
                 const isActive =
@@ -244,7 +256,7 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }
                     }}
-                    className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                       isActive
                         ? 'bg-[#0b1b2d] text-white font-bold shadow-sm'
                         : 'text-[#0b1b2d]/75 hover:text-[#0b1b2d] hover:bg-[#ded5c6]/60'
@@ -256,28 +268,26 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
               })}
             </nav>
 
-            {/* Action Controls & Mobile Menu Toggle */}
-            <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* Action Controls & Top-Right Download Button */}
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+              <button
+                onClick={handleDownloadClick}
+                className="px-4 py-1.5 rounded-full bg-[#0b1b2d] hover:bg-[#1a2d42] text-white font-sans font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all cursor-pointer whitespace-nowrap shrink-0"
+                title="Download Platform Specification & Audit Package"
+              >
+                <Download className="w-3.5 h-3.5 text-amber-300" />
+                <span>Download</span>
+              </button>
+
               {/* Interactive Netra Guide 10-Step Tour Button */}
               <button
                 onClick={() => setGuideOpen(true)}
-                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-mono font-extrabold text-xs flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-mono font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer whitespace-nowrap shrink-0"
                 title="Launch 10-step audio & scroll interactive walkthrough tour"
               >
-                <Compass className="w-3.5 h-3.5 text-slate-950 animate-spin-slow" />
-                <span className="hidden sm:inline">Netra Guide</span>
-                <span className="sm:hidden">Guide</span>
-                <span className="px-1.5 py-0.2 rounded-full bg-black/15 text-[10px]">10</span>
+                <Compass className="w-3.5 h-3.5 text-slate-950" />
+                <span className="hidden sm:inline">Guide</span>
               </button>
-
-              {/* Direct 3D Simulation Twin Launcher */}
-              <Link
-                to="/twin"
-                className="px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:shadow-md bg-[#0b1b2d] hover:bg-[#1a2d42] text-white"
-              >
-                <span>Live Twin</span>
-                <span className="text-[11px] leading-none text-amber-400">➔</span>
-              </Link>
 
               {onSimulateSurge && (
                 <button
@@ -285,14 +295,14 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
                   className="hidden sm:flex px-2.5 py-1.5 rounded-xl bg-red-100 hover:bg-red-200 border border-red-300 text-red-800 text-xs font-mono font-bold items-center gap-1.5 transition-all cursor-pointer"
                   title="Trigger emergency peak heat surge simulation"
                 >
-                  <Flame className="w-3.5 h-3.5 text-red-700 animate-pulse" />
+                  <Flame className="w-3.5 h-3.5 text-red-700" />
                 </button>
               )}
 
               {onToggleMitigation && (
                 <button
                   onClick={onToggleMitigation}
-                  className={`hidden md:flex px-2.5 py-1.5 rounded-xl border text-xs font-bold font-mono items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`hidden xl:flex px-2.5 py-1.5 rounded-xl border text-xs font-bold font-mono items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                     isMitigated
                       ? 'bg-emerald-100 border-emerald-300 text-emerald-900'
                       : 'bg-[#efe8dc] border-[#d6cebe] text-[#0b1b2d] hover:bg-[#e4dcce]'
@@ -330,7 +340,6 @@ export const ProfessionalLandingLayout: React.FC<LayoutProps> = ({
           {/* Mobile Navigation Dropdown */}
           {mobileMenuOpen && (
             <div className="lg:hidden bg-[#efe8dc] border-t border-[#d6cebe] px-4 py-4 space-y-3 shadow-xl">
-              {/* Quick Return in Mobile Menu if on Subpage */}
               {!isHomePage && (
                 <button
                   onClick={() => {

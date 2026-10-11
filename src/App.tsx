@@ -37,6 +37,13 @@ function AppContent() {
   const [isMitigated, setIsMitigated] = useState<boolean>(false);
   const [logs, setLogs] = useState<IncidentLog[]>(INITIAL_LOGS);
   const [surgeModalOpen, setSurgeModalOpen] = useState<boolean>(false);
+  const [isIntroRevealed, setIsIntroRevealed] = useState<boolean>(false);
+  const handleTypingComplete = React.useCallback(() => {
+    setIsIntroRevealed(true);
+  }, []);
+  const handleReplayIntro = React.useCallback(() => {
+    setIsIntroRevealed(false);
+  }, []);
 
   // Map route to theme atmosphere
   useEffect(() => {
@@ -117,7 +124,11 @@ function AppContent() {
   return (
     <div className="relative min-h-screen bg-[#e6dfd3] text-[#0b1b2d] font-sans selection:bg-amber-900/20 selection:text-[#0b1b2d] antialiased overflow-x-hidden">
       {/* Dynamic Background with unified warm magazine canvas & ambient mesh */}
-      <DynamicAtmosphere activeAct={activeAct} isSurgeActive={surgeModalOpen} />
+      <DynamicAtmosphere
+        activeAct={activeAct}
+        isSurgeActive={surgeModalOpen}
+        isIntroRevealed={location.pathname !== '/' || isIntroRevealed}
+      />
 
       {/* Global Layout: Sticky Header Navigation with Infinite Ticker & Routing */}
       <ProfessionalLandingLayout
@@ -130,6 +141,7 @@ function AppContent() {
         isMitigated={isMitigated}
         onToggleMitigation={() => setIsMitigated(!isMitigated)}
         onConnectHardware={() => scrollToAct('live_cockpit')}
+        isIntroRevealed={location.pathname !== '/' || isIntroRevealed}
       >
         <Routes>
           {/* Flagship Home Page */}
@@ -148,6 +160,9 @@ function AppContent() {
                 onApplyMitigation={handleApplyMitigation}
                 onSimulateSurge={handleSimulateSurge}
                 onScrollToAct={scrollToAct}
+                isIntroRevealed={isIntroRevealed}
+                onTypingComplete={handleTypingComplete}
+                onReplayIntro={handleReplayIntro}
               />
             }
           />

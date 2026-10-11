@@ -1,22 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
 import { BuildingAudit, VendorTelemetry } from '../types';
-
-// Read API key safely from environment
-const apiKey =
-  (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) ||
-  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GEMINI_API_KEY) ||
-  '';
-
-let aiClient: GoogleGenAI | null = null;
-try {
-  if (apiKey) {
-    aiClient = new GoogleGenAI({ apiKey });
-  } else {
-    aiClient = new GoogleGenAI();
-  }
-} catch (e) {
-  console.warn('GoogleGenAI client initialized in fallback mode', e);
-}
 
 export async function generateThermalAuditNotice(
   building: BuildingAudit,
@@ -28,46 +10,23 @@ export async function generateThermalAuditNotice(
   statutoryDirectives: string[];
   calculatedPenaltyBreakdown: string;
 }> {
-  const prompt = `You are the Lead Environmental Micro-Climate Officer for the Municipal Corporation in an Indian megacity implementing Ushma-Netra (Thermal Equity & AC Exhaust Regulation Framework).
-Generate a formal Municipal Section 133 Environmental Notice for micro-thermal exhaust dumping.
-
-Building Profile:
-- Name: ${building.name}
-- Location: ${building.location}, ${building.city}
-- Detected AC Outdoor Units: ${building.detectedOutdoorUnits.splitUnits} Split ACs, ${building.detectedOutdoorUnits.vrfUnits} VRF units
-- Total Rejected Heat: ${building.rejectedHeatKw} kW at ${building.exhaustAirTempCelsius}°C
-- Street Canyon Width: ${building.canyonWidthMeters} meters
-- Ambient Baseline: ${building.ambientBaselineTempCelsius}°C vs Measured Street Plume: ${building.streetPlumeTempCelsius}°C (+${(building.streetPlumeTempCelsius - building.ambientBaselineTempCelsius).toFixed(1)}°C delta)
-- Most Affected Citizen: ${vendor.vendorName} (${vendor.trade}), located ${vendor.distanceToExhaustMeters}m from exhaust vent, enduring ${vendor.wetBulbGlobeTempCelsius}°C WBGT (Category: ${vendor.heatStressCategory})
-- Monthly Exhaust Tax Assessment: ₹${building.monthlyExhaustTaxInr.toLocaleString('en-IN')}
-
-Return ONLY valid JSON matching this exact structure:
-{
-  "legalNoticeTitle": "Statutory Notice title with reference code",
-  "executiveSummary": "2-3 concise sentences summarizing the artificial heat dumping violation",
-  "thermodynamicFindings": "Clear explanation of how the ${building.rejectedHeatKw} kW waste heat creates an artificial death loop for neighboring workers",
-  "statutoryDirectives": ["List of 3 concrete mandatory engineering interventions the building owner must complete within 14 days"],
-  "calculatedPenaltyBreakdown": "Explanation of the ₹${building.monthlyExhaustTaxInr.toLocaleString('en-IN')} monthly charge and how funds will be deployed for street-level hydration and shading"
-}`;
-
   try {
-    if (aiClient) {
-      const response = await aiClient.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json',
-          temperature: 0.2,
-        },
-      });
+    const response = await fetch('/api/gemini/thermal-audit-notice', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ building, vendor }),
+    });
 
-      if (response.text) {
-        const parsed = JSON.parse(response.text);
+    if (response.ok) {
+      const parsed = await response.json();
+      if (parsed && parsed.legalNoticeTitle) {
         return parsed;
       }
     }
   } catch (error) {
-    console.warn('Gemini API call fell back to deterministic generator:', error);
+    console.warn('Server Gemini endpoint fell back to deterministic generator:', error);
   }
 
   // High-fidelity domain-grounded fallback

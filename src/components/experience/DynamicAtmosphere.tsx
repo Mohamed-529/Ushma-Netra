@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 export type StoryAct =
   | 'wow_hero'
@@ -15,9 +15,14 @@ export type StoryAct =
 interface Props {
   activeAct: StoryAct;
   isSurgeActive: boolean;
+  isIntroRevealed?: boolean;
 }
 
-export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive }) => {
+export const DynamicAtmosphere: React.FC<Props> = ({
+  activeAct,
+  isSurgeActive,
+  isIntroRevealed = true,
+}) => {
   // Cohesive Warm Magazine Canvas across ALL pages & story acts (#e6dfd3 canvas + #0b1b2d midnight blue text)
   const theme = useMemo(() => {
     return {
@@ -53,22 +58,27 @@ export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive })
     };
     window.addEventListener('resize', onResize);
 
-    // Warm organic air particles
-    const particles = Array.from({ length: 32 }, () => ({
+    // Floating antigravity / thermal particles
+    const palette = [
+      '168, 50, 26',   // terracotta
+      '11, 27, 45',    // midnight slate
+      '217, 119, 6',   // amber
+      '14, 165, 233',  // sky
+    ];
+
+    const particles = Array.from({ length: 48 }, (_, idx) => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      r: Math.random() * 2 + 1,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: -Math.random() * 0.4 - 0.15,
-      alpha: Math.random() * 0.25 + 0.08,
+      r: Math.random() * 2.4 + 1.1,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: -Math.random() * 0.45 - 0.15,
+      alpha: Math.random() * 0.28 + 0.12,
+      rgb: palette[idx % palette.length],
     }));
 
-    let frame = 0;
     const render = () => {
-      frame++;
       ctx.clearRect(0, 0, width, height);
 
-      // Subtle warm wave streamlines
       particles.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
@@ -79,7 +89,7 @@ export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive })
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(184, 168, 148, ${p.alpha})`;
+        ctx.fillStyle = `rgba(${p.rgb}, ${p.alpha})`;
         ctx.fill();
       });
 
@@ -99,9 +109,11 @@ export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive })
       className="fixed inset-0 pointer-events-none -z-10 transition-colors duration-700 ease-in-out"
       style={{ backgroundColor: theme.bgColor }}
     >
-      {/* Warm Ambient Radial Gradients */}
+      {/* Warm Ambient Radial Gradients — hidden until typewriter finishes */}
       <div
-        className="absolute inset-0 transition-all duration-700 ease-out"
+        className={`absolute inset-0 transition-opacity duration-1000 ease-out ${
+          isIntroRevealed ? 'opacity-100' : 'opacity-0'
+        }`}
         style={{
           background: `
             radial-gradient(circle at ${theme.meshPos1}, ${theme.mesh1} 0%, transparent 55%),
@@ -111,11 +123,20 @@ export const DynamicAtmosphere: React.FC<Props> = ({ activeAct, isSurgeActive })
         }}
       />
 
-      {/* Warm Magazine Architectural Grid */}
-      <div className="absolute inset-0 engineering-grid-bg opacity-40 mix-blend-multiply" />
+      {/* Warm Magazine Architectural Grid — hidden until typewriter finishes */}
+      <div
+        className={`absolute inset-0 engineering-grid-bg mix-blend-multiply transition-opacity duration-1000 ease-out ${
+          isIntroRevealed ? 'opacity-40' : 'opacity-0'
+        }`}
+      />
 
-      {/* Kinetic Ambient Particles Canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-60" />
+      {/* Floating Background Particles Canvas — smoothly fades in after headline finishes typing */}
+      <canvas
+        ref={canvasRef}
+        className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-out ${
+          isIntroRevealed ? 'opacity-80' : 'opacity-0'
+        }`}
+      />
 
       {/* Emergency Thermal Surge Warm Glow Overlay */}
       {isSurgeActive && (

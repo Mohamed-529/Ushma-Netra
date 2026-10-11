@@ -19,14 +19,14 @@ export const Thermal3DTwin: React.FC<Props> = ({
   const mountRef = useRef<HTMLDivElement>(null);
   const [acLoadPct, setAcLoadPct] = useState<number>(95);
   // Default to externalIsMitigated or building's compliance status
-  const effectiveMitigatedInitial = externalIsMitigated ?? (building.isMitigated || building.complianceStatus === 'Compliant');
+  const effectiveMitigatedInitial = externalIsMitigated ?? (building.mitigationStatus === 'compliant');
   const [isMitigated, setIsMitigated] = useState<boolean>(effectiveMitigatedInitial);
 
   // Keep state synced when external prop or building changes
   useEffect(() => {
-    const target = externalIsMitigated ?? (building.isMitigated || building.complianceStatus === 'Compliant');
+    const target = externalIsMitigated ?? (building.mitigationStatus === 'compliant');
     setIsMitigated(Boolean(target));
-  }, [externalIsMitigated, building.id, building.isMitigated, building.complianceStatus]);
+  }, [externalIsMitigated, building.id, building.mitigationStatus]);
   const [flirMode, setFlirMode] = useState<boolean>(true);
   const [activeProbe, setActiveProbe] = useState<'grill' | 'breathing_zone' | 'cart' | 'roof'>('breathing_zone');
   const [windSpeedKmh, setWindSpeedKmh] = useState<number>(3);

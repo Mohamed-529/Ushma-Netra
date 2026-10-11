@@ -40,6 +40,9 @@ interface Props {
   onApplyMitigation: (buildingId: string, intervention: string) => void;
   onSimulateSurge: () => void;
   onScrollToAct: (act: StoryAct) => void;
+  isIntroRevealed?: boolean;
+  onTypingComplete?: () => void;
+  onReplayIntro?: () => void;
 }
 
 export const HomePage: React.FC<Props> = ({
@@ -54,6 +57,9 @@ export const HomePage: React.FC<Props> = ({
   onApplyMitigation,
   onSimulateSurge,
   onScrollToAct,
+  isIntroRevealed = true,
+  onTypingComplete,
+  onReplayIntro,
 }) => {
   const navigate = useNavigate();
 
@@ -130,11 +136,22 @@ export const HomePage: React.FC<Props> = ({
         <WowHero
           onScrollToProblem={() => onScrollToAct('problem')}
           onJumpToLive={() => navigate('/twin')}
+          isIntroRevealed={isIntroRevealed}
+          onTypingComplete={onTypingComplete}
+          onReplayIntro={onReplayIntro}
         />
       </div>
 
-      {/* Quick Launchpad Gateway Section to all dedicated endpoints */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Remaining Landing Page Content — Hidden at opacity-0 until hero typewriter finishes */}
+      <div
+        className={`transition-opacity duration-1000 ease-out ${
+          isIntroRevealed
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* Quick Launchpad Gateway Section to all dedicated endpoints */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-3 mb-8">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
@@ -251,6 +268,7 @@ export const HomePage: React.FC<Props> = ({
         onNavigateTo={onScrollToAct}
         onSimulateSurge={onSimulateSurge}
       />
+      </div>
     </div>
   );
 };

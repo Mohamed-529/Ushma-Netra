@@ -147,6 +147,10 @@ class ThermalAudioEngine {
     }
   }
 
+  public playMitigation() {
+    this.playTone(587.33, 'sine', 0.25);
+  }
+
   public playTone(freq: number = 440, type: OscillatorType = 'sine', duration: number = 0.15) {
     try {
       this.initContext();
